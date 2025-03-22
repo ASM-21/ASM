@@ -6,9 +6,11 @@
 -->
 <html>
 	<head>
-		<title>Project Title - Andrew Morrissey</title>
+		<title>ME541: Underwater Automated Leveling Table - Andrew Morrissey</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<meta name="description" content="Andrew Morrissey's ME541 project on designing an underwater automated leveling table for ultrasonic nondestructive evaluation (NDE)." />
+		<meta name="keywords" content="Andrew Morrissey, ME541, Underwater Leveling Table, Ultrasonic NDE, Decision Analysis" />
 		<link rel="stylesheet" href="assets/css/main.css" />
 		<!-- Add Font Awesome for Icons -->
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
@@ -27,6 +29,7 @@
 				height: auto;
 				border-radius: 10px;
 				margin-bottom: 20px;
+				cursor: pointer; /* Indicates the image is clickable */
 			}
 
 			.project-details h3 {
@@ -54,6 +57,44 @@
 			.back-button:hover {
 				background: #45a049;
 			}
+
+			/* Lightbox CSS */
+			.lightbox {
+				display: none;
+				position: fixed;
+				z-index: 999;
+				padding-top: 60px;
+				left: 0;
+				top: 0;
+				width: 100%;
+				height: 100%;
+				overflow: auto;
+				background-color: rgba(0, 0, 0, 0.9);
+			}
+
+			.lightbox-content {
+				margin: auto;
+				display: block;
+				width: 80%;
+				max-width: 700px;
+			}
+
+			.close {
+				position: absolute;
+				top: 20px;
+				right: 35px;
+				color: #fff;
+				font-size: 40px;
+				font-weight: bold;
+				transition: 0.3s;
+			}
+
+			.close:hover,
+			.close:focus {
+				color: #bbb;
+				text-decoration: none;
+				cursor: pointer;
+			}
 		</style>
 	</head>
 	<body class="is-preload">
@@ -63,7 +104,7 @@
 			<div class="top">
 				<!-- Logo -->
 				<div id="logo">
-					<span class="image avatar48"><img src="images/avatar.jpg" alt="" /></span>
+					<span class="image avatar48"><img src="images/Avatar_1.jpg" alt="Andrew Morrissey Avatar" /></span>
 					<h1 id="title">Andrew Morrissey</h1>
 					<p>Mechanical Engineer</p>
 				</div>
@@ -95,26 +136,72 @@
 			<section id="project-details" class="two">
 				<div class="container">
 					<header>
-						<h2>Project Title</h2>
+						<h2>ME541: Underwater Automated Leveling Table for Ultrasonic NDE</h2>
 					</header>
 					<div class="project-details">
-						<img src="images/project-image.jpg" alt="Project Image" />
-						<h3>Overview</h3>
+						<img src="images/underwater_leveling_table.jpg" alt="Underwater Leveling Table Concept" onclick="openLightbox('images/underwater_leveling_table.jpg')" />
+						<h3>Introduction</h3>
 						<p>
-							Provide a brief overview of the project. Explain the problem you were solving, your role, and the outcome.
-							For example: "This project involved designing a foot pedal rake to assist individuals with limited mobility.
-							I led the mechanical design team and developed a prototype that improved usability by 30%."
+							This project focuses on designing an underwater automated leveling table for ultrasonic nondestructive evaluation (NDE). The goal is to automate the alignment of sample surfaces for ultrasonic transducers with high precision (≤15 µm) while operating underwater. The system requires motorized, adjustable legs and real-time feedback control for leveling. This device will improve the accuracy and reliability of ultrasonic testing results while reducing setup time from one hour to five minutes.
 						</p>
-						<h3>Key Features</h3>
-						<ul>
-							<li>Feature 1: Describe a key feature or accomplishment.</li>
-							<li>Feature 2: Highlight another important aspect of the project.</li>
-							<li>Feature 3: Mention any tools, technologies, or methodologies used.</li>
-						</ul>
-						<h3>Results</h3>
+						<h3>Decision Situation</h3>
 						<p>
-							Summarize the results or impact of the project. For example: "The final design was tested and achieved a 95%
-							success rate in usability tests. It was showcased at the Purdue Engineering Expo and received positive feedback."
+							The core decision is selecting the best design alternative for the leveling mechanism. The system must operate effectively underwater, provide precise adjustments, and stay within a $5,000 budget. Design alternatives include different actuators (linear, stepper motors, pneumatic systems) and materials (corrosion-resistant alloys, waterproof coatings).
+						</p>
+						<h3>Framing the Decision</h3>
+						<p>
+							The decision is framed around four fundamental objectives:
+							<ul>
+								<li><strong>Maximize Precision:</strong> Achieve alignment accuracy of ≤15 µm.</li>
+								<li><strong>Maximize Durability:</strong> Ensure reliable operation in underwater environments.</li>
+								<li><strong>Minimize Cost:</strong> Stay within the $5,000 budget.</li>
+								<li><strong>Maximize Ease of Use:</strong> Simplify system operation for researchers.</li>
+							</ul>
+						</p>
+						<h3>Attributes and Alternatives</h3>
+						<p>
+							Key attributes include:
+							<ul>
+								<li>Motor Speed (RPM)</li>
+								<li>Response Time (ms)</li>
+								<li>Corrosion Resistance (Rating)</li>
+								<li>Price ($)</li>
+							</ul>
+							Three alternatives were evaluated:
+							<ul>
+								<li><strong>M-228.10S Linear Actuator:</strong> Compact, precise, and durable.</li>
+								<li><strong>LAS10 Linear Servo Actuator:</strong> High speed and accuracy.</li>
+								<li><strong>XLA-5 Series Linear Actuator:</strong> Exceptional speed and precision.</li>
+							</ul>
+						</p>
+						<h3>Single-Attribute Utility Functions</h3>
+						<p>
+							Utility functions were developed for each attribute:
+							<ul>
+								<li><strong>Response Velocity:</strong> Exponential utility function.</li>
+								<li><strong>Response Accuracy:</strong> Logarithmic utility function.</li>
+								<li><strong>Corrosion Resistance:</strong> Piecewise utility function.</li>
+								<li><strong>Price:</strong> Third-order polynomial utility function.</li>
+							</ul>
+						</p>
+						<h3>Multi-Attribute Utility Function</h3>
+						<p>
+							A multi-attribute utility function was developed using scaling constants:
+							<pre>u(V,A,C,P) = (4.5e-7)u1(V) + (0.74685)u2(A) + (0.1671)u3(C) + (0.0853)u4(P)</pre>
+						</p>
+						<h3>Expected Utility Evaluation</h3>
+						<p>
+							The expected utility for each alternative was calculated:
+							<ul>
+								<li><strong>M-228.10S:</strong> 0.92718</li>
+								<li><strong>LAS10:</strong> 0.73756</li>
+								<li><strong>XLA-5 Series:</strong> 0.87918</li>
+							</ul>
+							The M-228.10S was identified as the most preferred alternative due to its high expected utility.
+						</p>
+						<h3>Discussion and Learning</h3>
+						<p>
+							This project highlighted the importance of balancing technical performance and cost while considering uncertainty in input data. The structured decision-making approach provided a clear framework for evaluating alternatives, which can be applied to future projects involving multiple conflicting attributes.
 						</p>
 						<a href="index.html#portfolio" class="back-button">Back to Portfolio</a>
 					</div>
@@ -138,5 +225,26 @@
 		<script src="assets/js/breakpoints.min.js"></script>
 		<script src="assets/js/util.js"></script>
 		<script src="assets/js/main.js"></script>
+		<script>
+			// Lightbox functionality
+			function openLightbox(imageSrc) {
+				var lightbox = document.createElement('div');
+				lightbox.className = 'lightbox';
+				lightbox.innerHTML = `
+					<span class="close" onclick="closeLightbox()">&times;</span>
+					<img class="lightbox-content" src="${imageSrc}" alt="Enlarged Image">
+				`;
+				document.body.appendChild(lightbox);
+				lightbox.style.display = 'block';
+			}
+
+			function closeLightbox() {
+				var lightbox = document.querySelector('.lightbox');
+				if (lightbox) {
+					lightbox.style.display = 'none';
+					lightbox.remove();
+				}
+			}
+		</script>
 	</body>
 </html>
