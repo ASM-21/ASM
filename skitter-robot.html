@@ -6,9 +6,11 @@
 -->
 <html>
 	<head>
-		<title>Project Title - Andrew Morrissey</title>
+		<title>ME 375: Skitter Robot - Andrew Morrissey</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<meta name="description" content="Andrew Morrissey's ME 375 project on programming the Skitter Robot to perform autonomous line-following and hand-following tasks." />
+		<meta name="keywords" content="Andrew Morrissey, Skitter Robot, ME 375, Line Following, Hand Following, Autonomous Robot" />
 		<link rel="stylesheet" href="assets/css/main.css" />
 		<!-- Add Font Awesome for Icons -->
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
@@ -27,6 +29,7 @@
 				height: auto;
 				border-radius: 10px;
 				margin-bottom: 20px;
+				cursor: pointer; /* Indicates the image is clickable */
 			}
 
 			.project-details h3 {
@@ -54,6 +57,44 @@
 			.back-button:hover {
 				background: #45a049;
 			}
+
+			/* Lightbox CSS */
+			.lightbox {
+				display: none;
+				position: fixed;
+				z-index: 999;
+				padding-top: 60px;
+				left: 0;
+				top: 0;
+				width: 100%;
+				height: 100%;
+				overflow: auto;
+				background-color: rgba(0, 0, 0, 0.9);
+			}
+
+			.lightbox-content {
+				margin: auto;
+				display: block;
+				width: 80%;
+				max-width: 700px;
+			}
+
+			.close {
+				position: absolute;
+				top: 20px;
+				right: 35px;
+				color: #fff;
+				font-size: 40px;
+				font-weight: bold;
+				transition: 0.3s;
+			}
+
+			.close:hover,
+			.close:focus {
+				color: #bbb;
+				text-decoration: none;
+				cursor: pointer;
+			}
 		</style>
 	</head>
 	<body class="is-preload">
@@ -63,7 +104,7 @@
 			<div class="top">
 				<!-- Logo -->
 				<div id="logo">
-					<span class="image avatar48"><img src="images/avatar.jpg" alt="" /></span>
+					<span class="image avatar48"><img src="images/Avatar_1.jpg" alt="Andrew Morrissey Avatar" /></span>
 					<h1 id="title">Andrew Morrissey</h1>
 					<p>Mechanical Engineer</p>
 				</div>
@@ -95,26 +136,52 @@
 			<section id="project-details" class="two">
 				<div class="container">
 					<header>
-						<h2>Project Title</h2>
+						<h2>ME 375: Skitter Robot - Autonomous Line and Hand Following</h2>
 					</header>
 					<div class="project-details">
-						<img src="images/project-image.jpg" alt="Project Image" />
-						<h3>Overview</h3>
+						<img src="images/skitter_robot.jpg" alt="Skitter Robot" onclick="openLightbox('images/skitter_robot.jpg')" />
+						<h3>Introduction</h3>
 						<p>
-							Provide a brief overview of the project. Explain the problem you were solving, your role, and the outcome.
-							For example: "This project involved designing a foot pedal rake to assist individuals with limited mobility.
-							I led the mechanical design team and developed a prototype that improved usability by 30%."
+							The goal of this project is to program the Skitter Robot to perform two autonomous tasks: 
+							<ol>
+								<li>Follow a line around a 320-inch track.</li>
+								<li>Maintain a nine-inch distance from an operator's hand while following it in a straight line.</li>
+							</ol>
+							The robot utilizes subsystems such as encoders, an ultrasonic sensor, a line-following sensor, two motors, a gearbox, and an Arduino for control.
 						</p>
-						<h3>Key Features</h3>
-						<ul>
-							<li>Feature 1: Describe a key feature or accomplishment.</li>
-							<li>Feature 2: Highlight another important aspect of the project.</li>
-							<li>Feature 3: Mention any tools, technologies, or methodologies used.</li>
-						</ul>
-						<h3>Results</h3>
+						<h3>Subsystem Characterization</h3>
 						<p>
-							Summarize the results or impact of the project. For example: "The final design was tested and achieved a 95%
-							success rate in usability tests. It was showcased at the Purdue Engineering Expo and received positive feedback."
+							Each subsystem was tested to understand its performance:
+							<ul>
+								<li><strong>Encoders:</strong> Measured distance traveled by relating wheel rotations to encoder counts.</li>
+								<li><strong>Ultrasonic Sensor:</strong> Tested for distance measurement accuracy, with a nonlinear relationship between sensor values and distance.</li>
+								<li><strong>Line-Following Sensors:</strong> Binary sensors detect the line position, with a combined output for precise tracking.</li>
+								<li><strong>Motors:</strong> Friction compensation and system identification were performed to improve control.</li>
+							</ul>
+						</p>
+						<h3>Controller Design</h3>
+						<p>
+							A PI (Proportional-Integral) controller was designed for closed-loop feedback control. The transfer function for the motors was derived, and a controller was calculated to achieve a settling time of 0.3 seconds and 10% overshoot.
+							<br><br>
+							The final controller is:
+							<pre>C(s) = 1.544 + 73.39/s</pre>
+						</p>
+						<h3>State Machines</h3>
+						<p>
+							Two state machines were developed:
+							<ul>
+								<li><strong>Line-Following State Machine:</strong> Adjusts the robot's motion to follow the line, with states for forward motion, sharp turns, and reversing if the line is lost.</li>
+								<li><strong>Hand-Following State Machine:</strong> Uses the ultrasonic sensor to maintain a nine-inch distance from the operator's hand.</li>
+							</ul>
+						</p>
+						<h3>Potential Problems</h3>
+						<p>
+							Challenges included:
+							<ul>
+								<li>Accurate system identification for the plant function.</li>
+								<li>Variability in sensor performance due to environmental factors.</li>
+								<li>Ensuring smooth transitions between states in the state machines.</li>
+							</ul>
 						</p>
 						<a href="index.html#portfolio" class="back-button">Back to Portfolio</a>
 					</div>
@@ -138,5 +205,26 @@
 		<script src="assets/js/breakpoints.min.js"></script>
 		<script src="assets/js/util.js"></script>
 		<script src="assets/js/main.js"></script>
+		<script>
+			// Lightbox functionality
+			function openLightbox(imageSrc) {
+				var lightbox = document.createElement('div');
+				lightbox.className = 'lightbox';
+				lightbox.innerHTML = `
+					<span class="close" onclick="closeLightbox()">&times;</span>
+					<img class="lightbox-content" src="${imageSrc}" alt="Enlarged Image">
+				`;
+				document.body.appendChild(lightbox);
+				lightbox.style.display = 'block';
+			}
+
+			function closeLightbox() {
+				var lightbox = document.querySelector('.lightbox');
+				if (lightbox) {
+					lightbox.style.display = 'none';
+					lightbox.remove();
+				}
+			}
+		</script>
 	</body>
 </html>
