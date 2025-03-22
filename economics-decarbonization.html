@@ -6,9 +6,11 @@
 -->
 <html>
 	<head>
-		<title>Project Title - Andrew Morrissey</title>
+		<title>Economic Impact of Decarbonization - Andrew Morrissey</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<meta name="description" content="Andrew Morrissey's research project on the economic impact of decarbonization, focusing on burden shifting in manufacturing industries using international trade data." />
+		<meta name="keywords" content="Andrew Morrissey, Decarbonization, Burden Shifting, Manufacturing, Economic Impact, Trade Data" />
 		<link rel="stylesheet" href="assets/css/main.css" />
 		<!-- Add Font Awesome for Icons -->
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
@@ -27,6 +29,7 @@
 				height: auto;
 				border-radius: 10px;
 				margin-bottom: 20px;
+				cursor: pointer; /* Indicates the image is clickable */
 			}
 
 			.project-details h3 {
@@ -54,6 +57,44 @@
 			.back-button:hover {
 				background: #45a049;
 			}
+
+			/* Lightbox CSS */
+			.lightbox {
+				display: none;
+				position: fixed;
+				z-index: 999;
+				padding-top: 60px;
+				left: 0;
+				top: 0;
+				width: 100%;
+				height: 100%;
+				overflow: auto;
+				background-color: rgba(0, 0, 0, 0.9);
+			}
+
+			.lightbox-content {
+				margin: auto;
+				display: block;
+				width: 80%;
+				max-width: 700px;
+			}
+
+			.close {
+				position: absolute;
+				top: 20px;
+				right: 35px;
+				color: #fff;
+				font-size: 40px;
+				font-weight: bold;
+				transition: 0.3s;
+			}
+
+			.close:hover,
+			.close:focus {
+				color: #bbb;
+				text-decoration: none;
+				cursor: pointer;
+			}
 		</style>
 	</head>
 	<body class="is-preload">
@@ -63,7 +104,7 @@
 			<div class="top">
 				<!-- Logo -->
 				<div id="logo">
-					<span class="image avatar48"><img src="images/avatar.jpg" alt="" /></span>
+					<span class="image avatar48"><img src="images/Avatar_1.jpg" alt="Andrew Morrissey Avatar" /></span>
 					<h1 id="title">Andrew Morrissey</h1>
 					<p>Mechanical Engineer</p>
 				</div>
@@ -95,26 +136,50 @@
 			<section id="project-details" class="two">
 				<div class="container">
 					<header>
-						<h2>Project Title</h2>
+						<h2>Economic Impact of Decarbonization: Burden Shifting in Manufacturing</h2>
 					</header>
 					<div class="project-details">
-						<img src="images/project-image.jpg" alt="Project Image" />
-						<h3>Overview</h3>
+						<img src="images/decarbonization.jpg" alt="Decarbonization Concept" onclick="openLightbox('images/decarbonization.jpg')" />
+						<h3>Project Introduction</h3>
 						<p>
-							Provide a brief overview of the project. Explain the problem you were solving, your role, and the outcome.
-							For example: "This project involved designing a foot pedal rake to assist individuals with limited mobility.
-							I led the mechanical design team and developed a prototype that improved usability by 30%."
+							This project investigates the environmental performance of manufacturing industries, focusing on the effects of burden shifting in international production. Burden shifting occurs when a country offshores emission-intensive manufacturing processes to less developed countries with relaxed environmental regulations. While this may reduce direct emissions in the originating country, global emissions often remain constant or increase due to less efficient technologies and lower labor costs in the receiving countries. The project uses international trade data from the Organisation for Economic Co-operation and Development (OECD) to analyze the growth and shift in global production across different manufacturing sectors.
 						</p>
-						<h3>Key Features</h3>
-						<ul>
-							<li>Feature 1: Describe a key feature or accomplishment.</li>
-							<li>Feature 2: Highlight another important aspect of the project.</li>
-							<li>Feature 3: Mention any tools, technologies, or methodologies used.</li>
-						</ul>
-						<h3>Results</h3>
+						<h3>Background</h3>
 						<p>
-							Summarize the results or impact of the project. For example: "The final design was tested and achieved a 95%
-							success rate in usability tests. It was showcased at the Purdue Engineering Expo and received positive feedback."
+							The relationship between economic growth and environmental impact has been studied extensively. One key concept is the Environmental Kuznets Curve (EKC), which hypothesizes that pollutant emissions increase with income per capita up to a certain point and then decrease. However, this hypothesis has been criticized for its lack of robust statistical evidence. Other studies, such as those by Hamit-Haggar (2012) and Aguilar-Hernandez et al. (2018), have explored the relationship between economic growth and greenhouse gas emissions, as well as the role of circular economies in minimizing environmental impact.
+						</p>
+						<h3>Work Completed</h3>
+						<p>
+							The project has progressed through several phases:
+							<ul>
+								<li><strong>Initial Research:</strong> Reviewed literature on burden shifting, circular economies, and environmental performance metrics.</li>
+								<li><strong>Data Exploration:</strong> Analyzed the World Input-Output Database (WIOD) and Trade in Value Added (TiVA) datasets to understand global production trends.</li>
+								<li><strong>Code Development:</strong> Created MATLAB and Python scripts to process and visualize data, including time series and choropleth maps.</li>
+								<li><strong>Focus on Specific Sectors:</strong> Investigated sectors such as rubber and plastic products, chemicals, and basic metals to identify burden-shifting trends.</li>
+							</ul>
+						</p>
+						<h3>Key Findings</h3>
+						<p>
+							Preliminary findings include:
+							<ul>
+								<li>Evidence of burden shifting in sectors like rubber and plastic products, where production has increased in developing countries while decreasing in developed countries.</li>
+								<li>Significant growth in value-added production in countries like China, India, and Vietnam, which account for a large share of global manufacturing emissions.</li>
+								<li>Challenges in analyzing data due to inflation and sector growth, which can obscure true burden-shifting effects.</li>
+							</ul>
+						</p>
+						<h3>Plans for Next Steps</h3>
+						<p>
+							The next steps for the project include:
+							<ul>
+								<li>Expanding the analysis to additional sectors, such as chemicals and basic metals.</li>
+								<li>Developing more advanced visualizations, including stacked bar charts and interactive dashboards.</li>
+								<li>Finalizing the poster for the end-of-semester presentation, summarizing key findings and visualizations.</li>
+								<li>Exploring the use of additional indicators, such as CO2 emissions embodied in international trade, to further quantify environmental impact.</li>
+							</ul>
+						</p>
+						<h3>Conclusion</h3>
+						<p>
+							This project highlights the complex relationship between economic growth and environmental impact in manufacturing industries. By analyzing international trade data, the project aims to provide insights into burden-shifting effects and inform policies for sustainable manufacturing practices. The use of advanced data analysis tools and visualizations will help communicate these findings effectively.
 						</p>
 						<a href="index.html#portfolio" class="back-button">Back to Portfolio</a>
 					</div>
@@ -138,5 +203,26 @@
 		<script src="assets/js/breakpoints.min.js"></script>
 		<script src="assets/js/util.js"></script>
 		<script src="assets/js/main.js"></script>
+		<script>
+			// Lightbox functionality
+			function openLightbox(imageSrc) {
+				var lightbox = document.createElement('div');
+				lightbox.className = 'lightbox';
+				lightbox.innerHTML = `
+					<span class="close" onclick="closeLightbox()">&times;</span>
+					<img class="lightbox-content" src="${imageSrc}" alt="Enlarged Image">
+				`;
+				document.body.appendChild(lightbox);
+				lightbox.style.display = 'block';
+			}
+
+			function closeLightbox() {
+				var lightbox = document.querySelector('.lightbox');
+				if (lightbox) {
+					lightbox.style.display = 'none';
+					lightbox.remove();
+				}
+			}
+		</script>
 	</body>
 </html>
