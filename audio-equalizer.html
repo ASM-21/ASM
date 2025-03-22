@@ -6,9 +6,11 @@
 -->
 <html>
 	<head>
-		<title>Project Title - Andrew Morrissey</title>
+		<title>Audio Equalizer - Andrew Morrissey</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<meta name="description" content="Andrew Morrissey's project on designing an analog audio equalizer with low-pass, high-pass, and band-pass filters, integrated with a power amplifier." />
+		<meta name="keywords" content="Andrew Morrissey, Audio Equalizer, Analog Filters, Power Amplifier, Circuit Design" />
 		<link rel="stylesheet" href="assets/css/main.css" />
 		<!-- Add Font Awesome for Icons -->
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
@@ -27,6 +29,7 @@
 				height: auto;
 				border-radius: 10px;
 				margin-bottom: 20px;
+				cursor: pointer; /* Indicates the image is clickable */
 			}
 
 			.project-details h3 {
@@ -54,6 +57,44 @@
 			.back-button:hover {
 				background: #45a049;
 			}
+
+			/* Lightbox CSS */
+			.lightbox {
+				display: none;
+				position: fixed;
+				z-index: 999;
+				padding-top: 60px;
+				left: 0;
+				top: 0;
+				width: 100%;
+				height: 100%;
+				overflow: auto;
+				background-color: rgba(0, 0, 0, 0.9);
+			}
+
+			.lightbox-content {
+				margin: auto;
+				display: block;
+				width: 80%;
+				max-width: 700px;
+			}
+
+			.close {
+				position: absolute;
+				top: 20px;
+				right: 35px;
+				color: #fff;
+				font-size: 40px;
+				font-weight: bold;
+				transition: 0.3s;
+			}
+
+			.close:hover,
+			.close:focus {
+				color: #bbb;
+				text-decoration: none;
+				cursor: pointer;
+			}
 		</style>
 	</head>
 	<body class="is-preload">
@@ -63,7 +104,7 @@
 			<div class="top">
 				<!-- Logo -->
 				<div id="logo">
-					<span class="image avatar48"><img src="images/avatar.jpg" alt="" /></span>
+					<span class="image avatar48"><img src="images/Avatar_1.jpg" alt="Andrew Morrissey Avatar" /></span>
 					<h1 id="title">Andrew Morrissey</h1>
 					<p>Mechanical Engineer</p>
 				</div>
@@ -95,26 +136,66 @@
 			<section id="project-details" class="two">
 				<div class="container">
 					<header>
-						<h2>Project Title</h2>
+						<h2>Audio Equalizer: Analog Filters and Power Amplifier</h2>
 					</header>
 					<div class="project-details">
-						<img src="images/project-image.jpg" alt="Project Image" />
-						<h3>Overview</h3>
+						<img src="images/audio_equalizer.jpg" alt="Audio Equalizer Circuit" onclick="openLightbox('images/audio_equalizer.jpg')" />
+						<h3>Abstract</h3>
 						<p>
-							Provide a brief overview of the project. Explain the problem you were solving, your role, and the outcome.
-							For example: "This project involved designing a foot pedal rake to assist individuals with limited mobility.
-							I led the mechanical design team and developed a prototype that improved usability by 30%."
+							This project involved designing an analog audio equalizer with low-pass, high-pass, and band-pass filters, integrated with a power amplifier. The equalizer allows users to adjust the loudness of individual frequency bands, and the amplifier ensures the output is loud enough for a speaker. The design successfully met all performance specifications, including filter cutoffs, voltage levels, and power output.
 						</p>
-						<h3>Key Features</h3>
-						<ul>
-							<li>Feature 1: Describe a key feature or accomplishment.</li>
-							<li>Feature 2: Highlight another important aspect of the project.</li>
-							<li>Feature 3: Mention any tools, technologies, or methodologies used.</li>
-						</ul>
+						<h3>Objectives</h3>
+						<p>
+							The primary objectives of the project were:
+							<ul>
+								<li>Design and implement low-pass, high-pass, and band-pass filters with specific cutoff frequencies.</li>
+								<li>Provide adjustable controls for each filter and an overall volume control.</li>
+								<li>Integrate a power amplifier to ensure sufficient output power (>400 mW).</li>
+								<li>Meet all voltage and ripple specifications across the frequency range.</li>
+							</ul>
+						</p>
+						<h3>Specifications</h3>
+						<p>
+							The circuit was designed to meet the following specifications:
+							<ul>
+								<li><strong>Speaker Resistance:</strong> 8 Ω</li>
+								<li><strong>Bass Filter (-3dB Cutoff):</strong> 320 Hz ±10%</li>
+								<li><strong>Mid Filter (-3dB Bandwidth):</strong> 0.32 kHz to 3.2 kHz ±10%</li>
+								<li><strong>Treble Filter (-3dB Cutoff):</strong> 3.2 kHz ±10%</li>
+								<li><strong>Output Voltage (Vamp):</strong> <15 mVrms (min), 100 mVrms ±10% (max)</li>
+								<li><strong>Output Power:</strong> >400 mW from 200 Hz to 10 kHz</li>
+							</ul>
+						</p>
+						<h3>Circuit Design</h3>
+						<p>
+							The circuit consists of three main sections:
+							<ol>
+								<li><strong>Filters:</strong> Low-pass, high-pass, and band-pass filters were designed using RC circuits. The cutoff frequencies were calculated using the formula:
+									<pre>f = 1 / (2πRC)</pre>
+								</li>
+								<li><strong>Volume Control:</strong> Potentiometers were used to adjust the gain of each filter and the overall volume. Inverting amplifiers ensured proper signal summation.</li>
+								<li><strong>Power Amplifier:</strong> An LM386D IC was used to amplify the signal, providing sufficient power to drive the speaker.</li>
+							</ol>
+						</p>
 						<h3>Results</h3>
 						<p>
-							Summarize the results or impact of the project. For example: "The final design was tested and achieved a 95%
-							success rate in usability tests. It was showcased at the Purdue Engineering Expo and received positive feedback."
+							The circuit successfully met all specifications:
+							<ul>
+								<li><strong>Filter Cutoffs:</strong> The low-pass, high-pass, and band-pass filters achieved the required cutoff frequencies within ±10% tolerance.</li>
+								<li><strong>Output Voltage:</strong> The Vamp values were within the specified range for both minimum and maximum gain settings.</li>
+								<li><strong>Output Power:</strong> The amplifier delivered >400 mW of power across the frequency range.</li>
+								<li><strong>Ripple:</strong> The ripple voltage was <15 mVrms, meeting the design requirements.</li>
+							</ul>
+						</p>
+						<h3>Conclusion</h3>
+						<p>
+							The project successfully demonstrated the design and implementation of an analog audio equalizer. Key takeaways include:
+							<ul>
+								<li>The importance of precise component selection and circuit layout to avoid loading effects and signal degradation.</li>
+								<li>The effectiveness of potentiometers for adjustable gain and volume control.</li>
+								<li>The challenges of debugging breadboard circuits and the benefits of soldering for stability.</li>
+							</ul>
+							This project provided valuable hands-on experience with analog circuit design and signal processing, which will be applicable in future engineering projects.
 						</p>
 						<a href="index.html#portfolio" class="back-button">Back to Portfolio</a>
 					</div>
@@ -138,5 +219,26 @@
 		<script src="assets/js/breakpoints.min.js"></script>
 		<script src="assets/js/util.js"></script>
 		<script src="assets/js/main.js"></script>
+		<script>
+			// Lightbox functionality
+			function openLightbox(imageSrc) {
+				var lightbox = document.createElement('div');
+				lightbox.className = 'lightbox';
+				lightbox.innerHTML = `
+					<span class="close" onclick="closeLightbox()">&times;</span>
+					<img class="lightbox-content" src="${imageSrc}" alt="Enlarged Image">
+				`;
+				document.body.appendChild(lightbox);
+				lightbox.style.display = 'block';
+			}
+
+			function closeLightbox() {
+				var lightbox = document.querySelector('.lightbox');
+				if (lightbox) {
+					lightbox.style.display = 'none';
+					lightbox.remove();
+				}
+			}
+		</script>
 	</body>
 </html>
