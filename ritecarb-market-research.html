@@ -6,9 +6,11 @@
 -->
 <html>
 	<head>
-		<title>Project Title - Andrew Morrissey</title>
+		<title>Go-to-Market Strategy for Ritecarb - Andrew Morrissey</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<meta name="description" content="Andrew Morrissey's project on developing a go-to-market strategy for Ritecarb, leading a team of four through venture development and market analysis." />
+		<meta name="keywords" content="Andrew Morrissey, Ritecarb, Go-to-Market Strategy, Venture Capital, Market Analysis" />
 		<link rel="stylesheet" href="assets/css/main.css" />
 		<!-- Add Font Awesome for Icons -->
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
@@ -27,6 +29,7 @@
 				height: auto;
 				border-radius: 10px;
 				margin-bottom: 20px;
+				cursor: pointer; /* Indicates the image is clickable */
 			}
 
 			.project-details h3 {
@@ -54,6 +57,44 @@
 			.back-button:hover {
 				background: #45a049;
 			}
+
+			/* Lightbox CSS */
+			.lightbox {
+				display: none;
+				position: fixed;
+				z-index: 999;
+				padding-top: 60px;
+				left: 0;
+				top: 0;
+				width: 100%;
+				height: 100%;
+				overflow: auto;
+				background-color: rgba(0, 0, 0, 0.9);
+			}
+
+			.lightbox-content {
+				margin: auto;
+				display: block;
+				width: 80%;
+				max-width: 700px;
+			}
+
+			.close {
+				position: absolute;
+				top: 20px;
+				right: 35px;
+				color: #fff;
+				font-size: 40px;
+				font-weight: bold;
+				transition: 0.3s;
+			}
+
+			.close:hover,
+			.close:focus {
+				color: #bbb;
+				text-decoration: none;
+				cursor: pointer;
+			}
 		</style>
 	</head>
 	<body class="is-preload">
@@ -63,7 +104,7 @@
 			<div class="top">
 				<!-- Logo -->
 				<div id="logo">
-					<span class="image avatar48"><img src="images/avatar.jpg" alt="" /></span>
+					<span class="image avatar48"><img src="images/Avatar_1.jpg" alt="Andrew Morrissey Avatar" /></span>
 					<h1 id="title">Andrew Morrissey</h1>
 					<p>Mechanical Engineer</p>
 				</div>
@@ -95,26 +136,52 @@
 			<section id="project-details" class="two">
 				<div class="container">
 					<header>
-						<h2>Project Title</h2>
+						<h2>Go-to-Market Strategy for Ritecarb</h2>
 					</header>
 					<div class="project-details">
-						<img src="images/project-image.jpg" alt="Project Image" />
-						<h3>Overview</h3>
+						<img src="images/ritecarb.jpg" alt="Ritecarb Concept" onclick="openLightbox('images/ritecarb.jpg')" />
+						<h3>Project Overview</h3>
 						<p>
-							Provide a brief overview of the project. Explain the problem you were solving, your role, and the outcome.
-							For example: "This project involved designing a foot pedal rake to assist individuals with limited mobility.
-							I led the mechanical design team and developed a prototype that improved usability by 30%."
+							As an Associate at the Purdue Venture Capital Club, I am leading a team of four to develop a go-to-market strategy for Ritecarb in collaboration with Purdue Innovates. This project provides hands-on experience in venture development and market analysis, focusing on identifying key market opportunities, competitive positioning, and actionable strategies for Ritecarb's product launch.
 						</p>
-						<h3>Key Features</h3>
-						<ul>
-							<li>Feature 1: Describe a key feature or accomplishment.</li>
-							<li>Feature 2: Highlight another important aspect of the project.</li>
-							<li>Feature 3: Mention any tools, technologies, or methodologies used.</li>
-						</ul>
-						<h3>Results</h3>
+						<h3>About Purdue Venture Capital Club</h3>
 						<p>
-							Summarize the results or impact of the project. For example: "The final design was tested and achieved a 95%
-							success rate in usability tests. It was showcased at the Purdue Engineering Expo and received positive feedback."
+							The Purdue Venture Capital Club supports students in exploring careers in venture capital through peer-to-peer education, student-led analyst projects, and networking opportunities with industry professionals. The club facilitates guest speaker events, collegiate competitions, and visits to VC firms, providing practical exposure to the world of venture capital and helping members advance their career goals.
+						</p>
+						<h3>Team Members</h3>
+						<p>
+							The team consists of four talented individuals, each contributing unique skills and perspectives:
+							<ul>
+								<li><strong>Andrew Morrissey (Team Lead):</strong> Overseeing project execution, coordinating team efforts, and ensuring deliverables align with Ritecarb's goals.</li>
+								<li><strong>Team Member 1:</strong> Conducting market research and competitive analysis.</li>
+								<li><strong>Team Member 2:</strong> Developing financial models and pricing strategies.</li>
+								<li><strong>Team Member 3:</strong> Creating marketing and distribution plans.</li>
+								<li><strong>Team Member 4:</strong> Analyzing customer segments and identifying target markets.</li>
+							</ul>
+						</p>
+						<h3>Work Completed</h3>
+						<p>
+							The team has made significant progress in the following areas:
+							<ul>
+								<li><strong>Market Research:</strong> Analyzed industry trends, customer needs, and competitive landscape to identify opportunities for Ritecarb.</li>
+								<li><strong>Financial Modeling:</strong> Developed pricing strategies and financial projections to ensure profitability and scalability.</li>
+								<li><strong>Marketing Strategy:</strong> Created a comprehensive marketing plan, including digital marketing, partnerships, and distribution channels.</li>
+								<li><strong>Customer Segmentation:</strong> Identified key customer segments and tailored strategies to meet their specific needs.</li>
+							</ul>
+						</p>
+						<h3>Key Learnings</h3>
+						<p>
+							This project has provided valuable insights and skills, including:
+							<ul>
+								<li><strong>Venture Development:</strong> Gained hands-on experience in developing a go-to-market strategy for a real-world product.</li>
+								<li><strong>Team Leadership:</strong> Enhanced leadership skills by coordinating a diverse team and ensuring effective collaboration.</li>
+								<li><strong>Market Analysis:</strong> Developed expertise in analyzing market trends, competitive positioning, and customer segmentation.</li>
+								<li><strong>Strategic Planning:</strong> Learned to create actionable strategies that align with business goals and market opportunities.</li>
+							</ul>
+						</p>
+						<h3>Conclusion</h3>
+						<p>
+							The go-to-market strategy for Ritecarb is a critical step in ensuring the successful launch of its product. By leveraging market research, financial modeling, and strategic planning, the team has developed a comprehensive plan to position Ritecarb for success. This project has not only provided practical experience in venture development but also strengthened teamwork, leadership, and analytical skills.
 						</p>
 						<a href="index.html#portfolio" class="back-button">Back to Portfolio</a>
 					</div>
@@ -138,5 +205,26 @@
 		<script src="assets/js/breakpoints.min.js"></script>
 		<script src="assets/js/util.js"></script>
 		<script src="assets/js/main.js"></script>
+		<script>
+			// Lightbox functionality
+			function openLightbox(imageSrc) {
+				var lightbox = document.createElement('div');
+				lightbox.className = 'lightbox';
+				lightbox.innerHTML = `
+					<span class="close" onclick="closeLightbox()">&times;</span>
+					<img class="lightbox-content" src="${imageSrc}" alt="Enlarged Image">
+				`;
+				document.body.appendChild(lightbox);
+				lightbox.style.display = 'block';
+			}
+
+			function closeLightbox() {
+				var lightbox = document.querySelector('.lightbox');
+				if (lightbox) {
+					lightbox.style.display = 'none';
+					lightbox.remove();
+				}
+			}
+		</script>
 	</body>
 </html>
