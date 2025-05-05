@@ -6,7 +6,7 @@
 -->
 <html>
 	<head>
-		<title>Automatic Underwater Leveling Table - Andrew Morrissey</title>
+		<title>Automatic Underwater Sample Leveling Table - Andrew Morrissey</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<link rel="stylesheet" href="assets/css/main.css" />
@@ -54,6 +54,64 @@
 			.back-button:hover {
 				background: #45a049;
 			}
+            
+            .technical-specs {
+                background: #f0f8ff;
+                padding: 15px;
+                border-radius: 8px;
+                margin: 20px 0;
+                border-left: 4px solid #4CAF50;
+            }
+            
+            .process-timeline {
+                display: flex;
+                flex-direction: column;
+                margin: 25px 0;
+            }
+            
+            .timeline-item {
+                display: flex;
+                margin-bottom: 15px;
+            }
+            
+            .timeline-marker {
+                flex: 0 0 30px;
+                height: 30px;
+                border-radius: 50%;
+                background: #4CAF50;
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-right: 15px;
+            }
+            
+            .timeline-content {
+                flex: 1;
+                background: #f5f5f5;
+                padding: 10px 15px;
+                border-radius: 5px;
+            }
+            
+            .results-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 20px;
+                margin: 20px 0;
+            }
+            
+            @media (max-width: 768px) {
+                .results-grid {
+                    grid-template-columns: 1fr;
+                }
+            }
+            
+            .result-card {
+                background: #f5f5f5;
+                padding: 15px;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
 		</style>
 	</head>
 	<body class="is-preload">
@@ -95,29 +153,177 @@
 			<section id="project-details" class="two">
 				<div class="container">
 					<header>
-						<h2>Automatic Underwater Sample Leveling Table</h2>
+						<h2>Senior Design: Automatic Underwater Sample Leveling Table for Nondestructive Evaluation</h2>
 					</header>
 					<div class="project-details">
-						<!-- Replace with your CAD image -->
-						<img src="images/project-image.jpg" alt="CAD Rendering of Automatic Underwater Leveling Table" />
+						<img src="images/Senior_1.PNG" alt="Automatic Leveling Table Project" />
 						<h3>Overview</h3>
 						<p>
-							The Automatic Underwater Sample Leveling Table is designed to streamline ultrasonic nondestructive evaluation (NDE) by automating the leveling process. Currently, manual leveling takes up to an hour and is prone to human error. This project uses stepper motors and lead screws to adjust the table's tilt, ensuring the sample is level within a 15 µm tolerance in under 5 minutes.
+							This senior design project focused on developing an automated system to precisely level samples for ultrasonic nondestructive evaluation (NDE). In ultrasonic testing, the sample surface must be perfectly perpendicular to the transducer to accurately detect internal defects. The current manual process is time-consuming, often taking lab technicians up to an hour to achieve the required precision. Our solution dramatically reduces this time to under one minute while improving accuracy to within 2-11 microns—well below the 15-micron requirement.
 						</p>
-						<h3>Key Features</h3>
+                        
+                        <div class="technical-specs">
+                            <h4><i class="fas fa-cogs"></i> Technical Specifications</h4>
+                            <ul>
+                                <li><strong>Leveling Accuracy:</strong> 2-11 microns (requirement: 15 microns)</li>
+                                <li><strong>Leveling Time:</strong> Under 1 minute (from 30-60 minutes manually)</li>
+                                <li><strong>Load Capacity:</strong> Up to 15 pounds</li>
+                                <li><strong>Platform Size:</strong> Triangular with 22.5-inch sides</li>
+                                <li><strong>Power Input:</strong> Standard 120 VAC, 60 Hz wall power</li>
+                                <li><strong>Motor Specification:</strong> IP68-rated waterproof stepper motors</li>
+                                <li><strong>Control System:</strong> Arduino-based with Python GUI interface</li>
+                            </ul>
+                        </div>
+                        
+						<h3>The Challenge</h3>
+						<p>
+							Ultrasonic nondestructive evaluation is a critical technique used across aerospace, automotive, military, and academic research to inspect manufactured parts without damaging them. The method can detect internal flaws by measuring ultrasonic wave reflections, but requires the sample surface to be precisely perpendicular to the transducer. The existing manual leveling process was extremely tedious, requiring multiple iterations of micro-adjustments using manual screws, with each attempt taking 30-60 minutes of valuable lab time.
+						</p>
+                        
+                        <img src="images/fluids_example1.PNG" alt="Ultrasonic Testing Example" />
+                        
+                        <p>
+                            The image above shows an additively manufactured block of steel with intentional defects inside forming the Purdue P. These defects are invisible to the naked eye but detectable with ultrasonic scanning when the sample is properly leveled.
+                        </p>
+                        
+						<h3>Design Approach</h3>
+						<p>
+							Our team designed an innovative solution using stepper motors with lead screws to automatically adjust a triangular mounting platform. The system works by:
+                        </p>
+                        <ol>
+                            <li>First performing an initial ultrasonic scan to measure the surface orientation</li>
+                            <li>Using a sophisticated algorithm to calculate the required adjustments</li>
+                            <li>Precisely moving two motorized corners of the triangular platform while keeping one fixed</li>
+                            <li>Confirming level position with validation scans showing micron-level precision</li>
+                        </ol>
+                        
+                        <div class="process-timeline">
+                            <h4>Project Development Process</h4>
+                            <div class="timeline-item">
+                                <div class="timeline-marker">1</div>
+                                <div class="timeline-content">
+                                    <strong>Problem Definition & Requirements Analysis</strong>
+                                    <p>Worked with stakeholders to understand the limitations of manual leveling and defined technical requirements including 15-micron tolerance, underwater operation, and 5-minute time limit.</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-marker">2</div>
+                                <div class="timeline-content">
+                                    <strong>Concept Development & Selection</strong>
+                                    <p>Evaluated multiple solutions before selecting stepper motors with lead screws due to their precision, reliability, and compatibility with underwater operation.</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-marker">3</div>
+                                <div class="timeline-content">
+                                    <strong>Detailed Design & Prototyping</strong>
+                                    <p>Developed CAD models, performed mechanical calculations for load capacity and deflection, created electronic schematics, and built a preliminary cardboard prototype to validate the concept.</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-marker">4</div>
+                                <div class="timeline-content">
+                                    <strong>Software Development</strong>
+                                    <p>Created a comprehensive Python-based GUI for surface analysis and motor control, implementing both geometric and least-squares plane fitting algorithms.</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-marker">5</div>
+                                <div class="timeline-content">
+                                    <strong>Manufacturing & Assembly</strong>
+                                    <p>Manufactured components using waterjet cutting and precision machining, assembled electronic components with safety features, and integrated the system with the existing ultrasonic scanner.</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-marker">6</div>
+                                <div class="timeline-content">
+                                    <strong>Testing & Validation</strong>
+                                    <p>Conducted rigorous testing with multiple samples, validating performance against all requirements and demonstrating exceptional improvements in both speed and accuracy.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h3>Technical Innovations</h3>
+                        <p>
+                            The project incorporated several key technical innovations:
+                        </p>
+                        <ul>
+                            <li><strong>Precise Motion Control:</strong> Our system achieves 6.35 micrometer resolution per step using a carefully selected combination of lead screws and microstepping motor drivers.</li>
+                            <li><strong>Safety-Critical Design:</strong> We implemented redundant safety systems including dual 10-amp relays and an emergency stop button to prevent electrical hazards when operating in water.</li>
+                            <li><strong>Intelligent Software:</strong> Our custom Python GUI processes ultrasonic scan data using advanced plane-fitting algorithms to determine optimal adjustments.</li>
+                            <li><strong>Mechanical Integration:</strong> The triangular platform design with aluminum construction provides excellent stability while maintaining compatibility with the existing equipment.</li>
+                            <li><strong>Waterproof Operation:</strong> The final design includes IP68-rated motors capable of continuous underwater operation.</li>
+                        </ul>
+                        
+                        <img src="images/Senior_1.PNG" alt="CAD Model of the Automatic Leveling Table" />
+                        
+                        <h3>Key Challenges & Solutions</h3>
+                        <p>
+                            Throughout the project, we encountered and overcame several significant challenges:
+                        </p>
+                        <ul>
+                            <li><strong>Supply Chain Issues:</strong> When waterproof motors were delayed, we implemented a temporary solution using standard motors for validation while designing for easy upgrade to waterproof components.</li>
+                            <li><strong>Electrical Safety:</strong> Operating electronics underwater presented serious safety concerns, which we addressed with redundant safety systems, waterproof connectors, and comprehensive testing protocols.</li>
+                            <li><strong>Precision Requirements:</strong> Achieving 15-micron accuracy required extensive calibration and algorithmic refinement, ultimately exceeding requirements with 2-11 micron precision.</li>
+                            <li><strong>System Integration:</strong> Connecting our system to the existing ultrasonic scanner required careful coordination and custom interface development.</li>
+                        </ul>
+                        
+                        <h3>Results</h3>
+                        <div class="results-grid">
+                            <div class="result-card">
+                                <h4>Acrylic Sample Test</h4>
+                                <p><strong>Initial Difference:</strong> 515.04 μm between corners</p>
+                                <p><strong>After Leveling:</strong> 11.84 μm difference</p>
+                                <p><strong>Improvement:</strong> 97.7% reduction in surface variation</p>
+                            </div>
+                            <div class="result-card">
+                                <h4>PLA Sample Test</h4>
+                                <p><strong>Initial Difference:</strong> 296 μm between corners</p>
+                                <p><strong>After Leveling:</strong> 2 μm difference</p>
+                                <p><strong>Improvement:</strong> 99.3% reduction in surface variation</p>
+                            </div>
+                            <div class="result-card">
+                                <h4>Time Performance</h4>
+                                <p><strong>Manual Process:</strong> 30-60 minutes</p>
+                                <p><strong>Our System:</strong> Under 1 minute</p>
+                                <p><strong>Time Savings:</strong> Up to 98% reduction</p>
+                            </div>
+                            <div class="result-card">
+                                <h4>Economic Impact</h4>
+                                <p><strong>Annual Labor Savings:</strong> ~$3,000 per lab</p>
+                                <p><strong>Production Cost:</strong> ~$3,000</p>
+                                <p><strong>ROI:</strong> Approximately 1 year</p>
+                            </div>
+                        </div>
+                        
+						<!-- Team Members Section -->
+						<h3>Team Members</h3>
+						<p>
+							This project was a collaborative effort of the Ultra Seniors team, and I would like to acknowledge the contributions of my teammates:
+						</p>
 						<ul>
-							<li><strong>Precision Leveling</strong>: Achieves ±0.5° precision using stepper motors and lead screws.</li>
-							<li><strong>Waterproof Design</strong>: IP68-rated stepper motors and waterproof connectors ensure safe operation underwater.</li>
-							<li><strong>Feedback Loop</strong>: Utilizes ultrasonic scanner feedback to adjust the table's tilt automatically.</li>
-							<li><strong>Compatibility</strong>: Fits within the existing ultrasonic testing setup and supports samples up to 15 lbs.</li>
+							<li>
+								<strong><a href="https://www.linkedin.com/in/jose-e-guzman31/" target="_blank">José E. Guzmán</a></strong> - Led software development and created the Python GUI for ultrasonic data processing and motor control.
+							</li>
+							<li>
+								<strong><a href="https://www.linkedin.com/in/nicol%C3%A1s-giesemann-sicilia-5b6b55249/" target="_blank">Nicolás Giesemann</a></strong> - Focused on mechanical design aspects and CAD modeling, ensuring proper integration with existing equipment.
+							</li>
+							<li>
+								<strong><a href="https://www.linkedin.com/in/raymond-frazee-engineer/" target="_blank">Raymond Frazee</a></strong> - Managed the electronics design, motor selection, and electrical safety considerations.
+							</li>
+							<li>
+								<strong><a href="https://www.linkedin.com/in/lauren-tricker-122124243/" target="_blank">Lauren Tricker</a></strong> - Oversaw testing protocols, validation procedures, and documentation.
+							</li>
 						</ul>
-						<h3>Technical Details</h3>
+                        
+                        <h3>Market Analysis</h3>
+                        <p>
+                            Research indicated significant potential applications for our automatic leveling system. The US Naval research lab alone has at least 7 ultrasonic testing machines similar to the one at Purdue. Combined with Air Force and Army facilities, there could be demand for 21+ units just in military research settings. Furthermore, the automotive powertrain testing market is projected to grow from $11.9 billion (2020) to $19.7 billion (2025), while aerospace testing is expected to reach $18.6 billion by 2025. Even capturing a small percentage of these markets could represent substantial commercial opportunity.
+                        </p>
+                        
+						<h3>Conclusion</h3>
 						<p>
-							The system consists of a triangular table with two motorized corners and one stationary corner. Stepper motors rotate lead screws to adjust the table's height, while a microcontroller processes feedback from the ultrasonic scanner to ensure precise leveling. The design minimizes mechanical disturbance in the water and operates on standard 120 VAC power.
-						</p>
-						<h3>Results</h3>
-						<p>
-							The prototype is expected to reduce leveling time from 1 hour to under 5 minutes, improving the efficiency and accuracy of ultrasonic NDE. The system will be tested in a controlled underwater environment and presented at the National Engineering Symposium.
+							The Automatic Underwater Sample Leveling Table project successfully delivered a solution that dramatically improves both efficiency and accuracy in ultrasonic nondestructive evaluation. By reducing leveling time from 30-60 minutes to under one minute while exceeding precision requirements, our system provides significant value to research laboratories and testing facilities. The project demonstrates how thoughtful engineering design and integration of mechanical, electronic, and software components can solve complex technical challenges and create meaningful improvements in scientific processes.
 						</p>
 						<a href="index.html#portfolio" class="back-button">Back to Portfolio</a>
 					</div>
