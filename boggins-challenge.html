@@ -1,0 +1,186 @@
+<!DOCTYPE HTML>
+<!--
+	Prologue by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>The Boggins Challenge - Andrew Morrissey</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<!-- Add Font Awesome for Icons -->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+		<style>
+			/* Custom CSS for Project Page */
+			.project-details {
+				padding: 20px;
+				background: #f9f9f9;
+				border-radius: 10px;
+				box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+				margin-top: 20px;
+			}
+
+			.project-details img {
+				max-width: 100%;
+				height: auto;
+				border-radius: 10px;
+				margin-bottom: 20px;
+			}
+
+			.project-details h3 {
+				margin-top: 0;
+				color: #4CAF50; /* Green color */
+			}
+
+			.project-details p {
+				font-size: 1rem;
+				line-height: 1.6;
+				color: #333;
+			}
+
+			.back-button {
+				display: inline-block;
+				margin-top: 20px;
+				padding: 10px 20px;
+				background: #4CAF50;
+				color: #fff;
+				text-decoration: none;
+				border-radius: 5px;
+				transition: background 0.3s ease;
+			}
+
+			.back-button:hover {
+				background: #45a049;
+			}
+		</style>
+	</head>
+	<body class="is-preload">
+
+		<!-- Header -->
+		<div id="header">
+			<div class="top">
+				<!-- Logo -->
+				<div id="logo">
+					<span class="image avatar48"><img src="images/Avatar_1.jpg" alt="" /></span>
+					<h1 id="title">Andrew Morrissey</h1>
+					<p>Mechanical Engineer</p>
+				</div>
+
+				<!-- Nav -->
+				<nav id="nav">
+					<ul>
+						<li><a href="index.html#top" id="top-link"><span class="icon solid fa-home">Intro</span></a></li>
+						<li><a href="index.html#portfolio" id="portfolio-link"><span class="icon solid fa-th">Portfolio</span></a></li>
+						<li><a href="index.html#about" id="about-link"><span class="icon solid fa-user">About Me</span></a></li>
+						<li><a href="index.html#contact" id="contact-link"><span class="icon solid fa-envelope">Contact</span></a></li>
+					</ul>
+				</nav>
+			</div>
+
+			<div class="bottom">
+				<!-- Social Icons -->
+				<ul class="icons">
+					<li><a href="https://www.linkedin.com/in/asmorrissey" class="icon brands fa-linkedin" target="_blank"><span class="label">LinkedIn</span></a></li>
+					<li><a href="mailto:asmspartan21@gmail.com" class="icon solid fa-envelope"><span class="label">Email</span></a></li>
+					<li><a href="https://github.com/ASM-21" class="icon brands fa-github" target="_blank"><span class="label">Github</span></a></li>
+				</ul>
+			</div>
+		</div>
+
+		<!-- Main -->
+		<div id="main">
+			<!-- Project Details Section -->
+			<section id="project-details" class="two">
+				<div class="container">
+					<header>
+						<h2>The Boggins Challenge: A Cross-Platform Fitness App</h2>
+					</header>
+					<div class="project-details">
+						<img src="images/boggins_app1.jpg" alt="Boggins Challenge App" />
+						<h3>Overview</h3>
+						<p>
+							The Boggins Challenge is a cross-platform fitness application designed to help users build a daily pushup habit through progressive challenges. The app motivates users by increasing their daily pushup goal by one each day, creating a sustainable path to improved upper body strength and discipline. With features like streak tracking, progress visualization, and daily reminders, the Boggins Challenge transforms a simple exercise into an engaging daily ritual.
+						</p>
+						<h3>Key Features</h3>
+						<ul>
+							<li>Daily Pushup Tracking: Log daily pushups with progressive goals (one more each day).</li>
+							<li>Streak & Progress Visualization: Track current streak and total pushups completed.</li>
+							<li>Daily Reminders: Receive customizable notifications to maintain consistency.</li>
+							<li>Celebration Screens: Motivational feedback when daily goals are met.</li>
+							<li>Firebase Integration: Secure authentication and cloud data storage.</li>
+							<li>Offline Support: Local storage backup ensures progress is never lost.</li>
+							<li>Cross-Platform Compatibility: Seamless experience across iOS, Android, and web.</li>
+						</ul>
+						<h3>Technology Stack</h3>
+						<p>
+							The application was built using modern web and mobile technologies:
+							<ul>
+								<li>React Native & Expo: For cross-platform development targeting iOS, Android, and web.</li>
+								<li>Firebase: Authentication and Firestore database for secure user data storage.</li>
+								<li>Redux: Global state management for consistent app behavior.</li>
+								<li>Expo Notifications: Implementation of custom daily reminder system.</li>
+								<li>AsyncStorage: Local storage solution for offline functionality.</li>
+								<li>Jest: Framework for unit testing to ensure reliability.</li>
+								<li>React Navigation: For intuitive app routing and screen transitions.</li>
+							</ul>
+						</p>
+						<h3>Development Process</h3>
+						<p>
+							The development process followed an agile methodology with iterative improvements based on user feedback:
+							<ul>
+								<li>Requirements Gathering: Research on effective fitness habit formation and user needs.</li>
+								<li>UI/UX Design: Creating wireframes and prototypes for an intuitive user experience.</li>
+								<li>Implementation: Building the core functionality with React Native and integrating Firebase.</li>
+								<li>Testing: Rigorous testing across different devices and platforms.</li>
+								<li>Deployment: Publishing to app stores and setting up web hosting.</li>
+								<li>Feedback Integration: Continuing to improve based on user suggestions.</li>
+							</ul>
+						</p>
+						<!-- Team Members section removed as requested -->
+						<h3>Challenges & Solutions</h3>
+						<p>
+							During development, several challenges were addressed:
+							<ul>
+								<li>Cross-Platform Consistency: Ensuring uniform experience across iOS, Android, and web required platform-specific optimizations.</li>
+								<li>Offline Functionality: Implementing robust data synchronization between local storage and Firebase to handle intermittent connectivity.</li>
+								<li>Notification Reliability: Developing a dependable notification system that respects user preferences while maintaining engagement.</li>
+								<li>User Retention: Designing progression mechanics that maintain user motivation without becoming overwhelming.</li>
+							</ul>
+						</p>
+						<!-- Results & Impact section removed as requested -->
+						<h3>Conclusions & Future Development</h3>
+						<p>
+							The Boggins Challenge demonstrates how thoughtful app design can transform simple exercises into engaging daily habits. Future development plans include:
+							<ul>
+								<li>Additional exercise types and challenge variations</li>
+								<li>Social features for friendly competition and accountability</li>
+								<li>Integration with fitness wearables for automated tracking</li>
+								<li>Expanded analytics to provide deeper insights into user progress</li>
+							</ul>
+						</p>
+						<a href="index.html#portfolio" class="back-button">Back to Portfolio</a>
+					</div>
+				</div>
+			</section>
+		</div>
+
+		<!-- Footer -->
+		<div id="footer">
+			<!-- Copyright -->
+			<ul class="copyright">
+				<li>&copy; Andrew Morrissey. All rights reserved.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+			</ul>
+		</div>
+
+		<!-- Scripts -->
+		<script src="assets/js/jquery.min.js"></script>
+		<script src="assets/js/jquery.scrolly.min.js"></script>
+		<script src="assets/js/jquery.scrollex.min.js"></script>
+		<script src="assets/js/browser.min.js"></script>
+		<script src="assets/js/breakpoints.min.js"></script>
+		<script src="assets/js/util.js"></script>
+		<script src="assets/js/main.js"></script>
+	</body>
+</html>
