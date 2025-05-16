@@ -9,15 +9,15 @@
 		<title>Go-to-Market Strategy for Ritecarb - Andrew Morrissey</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-		<meta name="description" content="Andrew Morrissey's project on developing a go-to-market strategy for Ritecarb, leading a team of four through venture development and market analysis." />
-		<meta name="keywords" content="Andrew Morrissey, Ritecarb, Go-to-Market Strategy, Venture Capital, Market Analysis" />
+		<meta name="description" content="Andrew Morrissey's project on developing a go-to-market strategy for Ritecarb, leading a team through venture development and market analysis focused on gut-brain health innovations." />
+		<meta name="keywords" content="Andrew Morrissey, Ritecarb, Go-to-Market Strategy, Venture Capital, Market Analysis, Purdue Venture Capital Club, Gut-Brain Health" />
 		<link rel="stylesheet" href="assets/css/main.css" />
 		<!-- Add Font Awesome for Icons -->
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 		<style>
 			/* Custom CSS for Project Page */
 			.project-details {
-				padding: 20px;
+				padding: 2rem;
 				background: #f9f9f9;
 				border-radius: 10px;
 				box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -30,11 +30,17 @@
 				border-radius: 10px;
 				margin-bottom: 20px;
 				cursor: pointer; /* Indicates the image is clickable */
+				transition: transform 0.3s ease;
+			}
+			
+			.project-details img:hover {
+				transform: scale(1.02);
 			}
 
 			.project-details h3 {
-				margin-top: 0;
+				margin-top: 1.5rem;
 				color: #4CAF50; /* Green color */
+				font-weight: 600;
 			}
 
 			.project-details p {
@@ -42,20 +48,99 @@
 				line-height: 1.6;
 				color: #333;
 			}
+			
+			.project-details ul {
+				margin-left: 1.5rem;
+			}
+			
+			.project-details li {
+				margin-bottom: 0.5rem;
+			}
+			
+			/* Team member links styling */
+			.project-details ul li {
+				margin-bottom: 1rem;
+			}
+			
+			.project-details ul li a {
+				color: #4CAF50;
+				text-decoration: none;
+				transition: color 0.3s ease;
+			}
+			
+			.project-details ul li a:hover {
+				color: #45a049;
+				text-decoration: underline;
+			}
+			
+			/* Company link styling */
+			.company-link {
+				color: #4CAF50;
+				font-weight: 600;
+				text-decoration: none;
+				border-bottom: 1px dotted #4CAF50;
+				transition: all 0.3s ease;
+			}
+			
+			.company-link:hover {
+				color: #45a049;
+				border-bottom: 1px solid #45a049;
+			}
 
 			.back-button {
 				display: inline-block;
-				margin-top: 20px;
+				margin-top: 2rem;
 				padding: 10px 20px;
 				background: #4CAF50;
 				color: #fff;
 				text-decoration: none;
 				border-radius: 5px;
 				transition: background 0.3s ease;
+				font-weight: bold;
 			}
 
 			.back-button:hover {
 				background: #45a049;
+			}
+			
+			/* Work Highlights Section */
+			.work-highlights {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+				gap: 1.5rem;
+				margin-top: 1.5rem;
+			}
+			
+			.work-card {
+				background: #ffffff;
+				border-radius: 8px;
+				padding: 1.5rem;
+				box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+				transition: transform 0.3s ease, box-shadow 0.3s ease;
+			}
+			
+			.work-card:hover {
+				transform: translateY(-5px);
+				box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+			}
+			
+			.work-card h4 {
+				color: #4CAF50;
+				margin-top: 0;
+				margin-bottom: 1rem;
+				font-size: 1.1rem;
+			}
+			
+			.work-card p {
+				margin-bottom: 0;
+				font-size: 0.95rem;
+			}
+			
+			.work-card i {
+				font-size: 1.8rem;
+				color: #4CAF50;
+				margin-bottom: 1rem;
+				opacity: 0.8;
 			}
 
 			/* Lightbox CSS */
@@ -139,49 +224,99 @@
 						<h2>Go-to-Market Strategy for Ritecarb</h2>
 					</header>
 					<div class="project-details">
-						<img src="images/ritecarb.jpg" alt="Ritecarb Concept" onclick="openLightbox('images/ritecarb.jpg')" />
+						<img src="images/Rite_1.PNG" alt="Ritecarb" onclick="openLightbox('images/Rite_1.PNG')" />
 						<h3>Project Overview</h3>
 						<p>
-							As an Associate at the Purdue Venture Capital Club, I am leading a team of four to develop a go-to-market strategy for Ritecarb in collaboration with Purdue Innovates. This project provides hands-on experience in venture development and market analysis, focusing on identifying key market opportunities, competitive positioning, and actionable strategies for Ritecarb's product launch.
+							As an Associate at the <a href="https://www.purduevc.com/" target="_blank" class="company-link">Purdue Venture Capital Club</a>, I led a team to develop a comprehensive go-to-market strategy for Ritecarb in collaboration with <a href="https://www.purdue.edu/innovates/" target="_blank" class="company-link">Purdue Innovates</a>. Our team focused on analyzing market opportunities for Ritecarb's gut-brain health innovations, developing competitive positioning strategies, and creating actionable plans for product launch. The project provided valuable hands-on experience in venture development, market analysis, and strategic planning for innovative health products.
 						</p>
-						<h3>About Purdue Venture Capital Club</h3>
+						
+						<h3>About Ritecarb</h3>
 						<p>
-							The Purdue Venture Capital Club supports students in exploring careers in venture capital through peer-to-peer education, student-led analyst projects, and networking opportunities with industry professionals. The club facilitates guest speaker events, collegiate competitions, and visits to VC firms, providing practical exposure to the world of venture capital and helping members advance their career goals.
+							Ritecarb is developing innovative solutions at the intersection of gut and brain health. Their products aim to address neurological conditions through targeting the gut-brain axis, with particular focus on applications for Parkinson's disease patients and general gut-brain health. The company's approach combines scientific innovation with market-focused strategies to bring effective health solutions to those who need them most.
 						</p>
+						
 						<h3>Team Members</h3>
 						<p>
-							The team consists of four talented individuals, each contributing unique skills and perspectives:
-							<ul>
-								<li><strong>Andrew Morrissey (Team Lead):</strong> Overseeing project execution, coordinating team efforts, and ensuring deliverables align with Ritecarb's goals.</li>
-								<li><strong>Team Member 1:</strong> Conducting market research and competitive analysis.</li>
-								<li><strong>Team Member 2:</strong> Developing financial models and pricing strategies.</li>
-								<li><strong>Team Member 3:</strong> Creating marketing and distribution plans.</li>
-								<li><strong>Team Member 4:</strong> Analyzing customer segments and identifying target markets.</li>
-							</ul>
+							This project was a collaborative effort with a talented team of analysts:
 						</p>
-						<h3>Work Completed</h3>
+						<ul>
+							<li>
+								<strong><a href="https://www.linkedin.com/in/alvan-ramee-a0052a271/" target="_blank">Alvan Ramee</a></strong>
+							</li>
+							<li>
+								<strong><a href="https://www.linkedin.com/in/artem-kolomiiets/" target="_blank">Artem Kolomiiets</a></strong>
+							</li>
+							<li>
+								<strong><a href="https://www.linkedin.com/in/josephlens/" target="_blank">Joseph Lens</a></strong>
+							</li>
+							<li>
+								<strong><a href="https://www.linkedin.com/in/qingyang-tony-zhang/" target="_blank">Tony Zhang</a></strong>
+							</li>
+						</ul>
+						
+						<h3>Comprehensive Work Delivered</h3>
 						<p>
-							The team has made significant progress in the following areas:
-							<ul>
-								<li><strong>Market Research:</strong> Analyzed industry trends, customer needs, and competitive landscape to identify opportunities for Ritecarb.</li>
-								<li><strong>Financial Modeling:</strong> Developed pricing strategies and financial projections to ensure profitability and scalability.</li>
-								<li><strong>Marketing Strategy:</strong> Created a comprehensive marketing plan, including digital marketing, partnerships, and distribution channels.</li>
-								<li><strong>Customer Segmentation:</strong> Identified key customer segments and tailored strategies to meet their specific needs.</li>
-							</ul>
+							Our team developed a wide range of strategic assets and analyses to support Ritecarb's go-to-market efforts:
 						</p>
+						
+						<div class="work-highlights">
+							<div class="work-card">
+								<i class="fas fa-chart-line"></i>
+								<h4>Competitive Landscape Analysis</h4>
+								<p>Comprehensive mapping of direct and indirect competitors, highlighting Ritecarb's unique value proposition and strategic positioning opportunities in the gut-brain health market.</p>
+							</div>
+							
+							<div class="work-card">
+								<i class="fas fa-comments"></i>
+								<h4>Customer Feedback Plan</h4>
+								<p>Structured approach for gathering, analyzing, and implementing customer insights throughout the product development and launch cycles.</p>
+							</div>
+							
+							<div class="work-card">
+								<i class="fas fa-bullseye"></i>
+								<h4>Market Segmentation Strategies</h4>
+								<p>Dual-path market strategies focusing on both Parkinson's patients and the broader gut-brain health market, with tailored approaches for each segment.</p>
+							</div>
+							
+							<div class="work-card">
+								<i class="fas fa-file-alt"></i>
+								<h4>Outreach Documents</h4>
+								<p>Professional communication materials designed to engage key stakeholders, including potential investors, healthcare providers, and strategic partners.</p>
+							</div>
+							
+							<div class="work-card">
+								<i class="fas fa-book-medical"></i>
+								<h4>Informational Guide</h4>
+								<p>Comprehensive resource explaining the science behind gut-brain health innovations and Ritecarb's unique approach, designed for various stakeholder audiences.</p>
+							</div>
+							
+							<div class="work-card">
+								<i class="fas fa-clipboard-check"></i>
+								<h4>Regulatory Research</h4>
+								<p>In-depth analysis of regulatory pathways and requirements for bringing Ritecarb's products to market, identifying potential challenges and strategies for compliance.</p>
+							</div>
+							
+							<div class="work-card">
+								<i class="fas fa-laptop"></i>
+								<h4>Digital Marketing Plan</h4>
+								<p>Strategic approach to building brand awareness and engagement through various digital channels, targeting both healthcare professionals and end consumers.</p>
+							</div>
+						</div>
+						
 						<h3>Key Learnings</h3>
 						<p>
-							This project has provided valuable insights and skills, including:
-							<ul>
-								<li><strong>Venture Development:</strong> Gained hands-on experience in developing a go-to-market strategy for a real-world product.</li>
-								<li><strong>Team Leadership:</strong> Enhanced leadership skills by coordinating a diverse team and ensuring effective collaboration.</li>
-								<li><strong>Market Analysis:</strong> Developed expertise in analyzing market trends, competitive positioning, and customer segmentation.</li>
-								<li><strong>Strategic Planning:</strong> Learned to create actionable strategies that align with business goals and market opportunities.</li>
-							</ul>
+							This project provided valuable insights and skills development, including:
 						</p>
+						<ul>
+							<li><strong>Venture Development:</strong> Gained hands-on experience in developing a comprehensive go-to-market strategy for an innovative health solution, understanding the complex interplay between scientific innovation and market realities.</li>
+							<li><strong>Market Analysis:</strong> Developed expertise in analyzing health innovation markets, identifying unmet needs, and positioning products effectively within competitive landscapes.</li>
+							<li><strong>Strategic Planning:</strong> Created actionable strategies that bridge scientific innovation with practical market implementation, balancing ambitious health outcomes with commercial viability.</li>
+							<li><strong>Team Leadership:</strong> Coordinated diverse expertise across team members to deliver cohesive, comprehensive strategies that address multiple aspects of market entry and growth.</li>
+						</ul>
+						
 						<h3>Conclusion</h3>
 						<p>
-							The go-to-market strategy for Ritecarb is a critical step in ensuring the successful launch of its product. By leveraging market research, financial modeling, and strategic planning, the team has developed a comprehensive plan to position Ritecarb for success. This project has not only provided practical experience in venture development but also strengthened teamwork, leadership, and analytical skills.
+							The go-to-market strategy developed for Ritecarb represents a critical foundation for the company's market entry and growth. By combining rigorous market analysis with strategic planning and creative execution, our team has developed a comprehensive roadmap that positions Ritecarb for success in the emerging gut-brain health market. This project has not only contributed to Ritecarb's business development but has also provided invaluable real-world experience in venture development, market analysis, and strategic planning for our team members.
 						</p>
 						<a href="index.html#portfolio" class="back-button">Back to Portfolio</a>
 					</div>
@@ -216,6 +351,20 @@
 				`;
 				document.body.appendChild(lightbox);
 				lightbox.style.display = 'block';
+				
+				// Close lightbox when clicking outside the image
+				lightbox.addEventListener('click', function(e) {
+					if (e.target === lightbox) {
+						closeLightbox();
+					}
+				});
+				
+				// Close lightbox with Escape key
+				document.addEventListener('keydown', function(e) {
+					if (e.key === 'Escape') {
+						closeLightbox();
+					}
+				});
 			}
 
 			function closeLightbox() {
