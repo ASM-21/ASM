@@ -10,14 +10,14 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<meta name="description" content="Andrew Morrissey's due diligence project for Krishi, focusing on skills and learnings gained from the process while respecting NDA constraints." />
-		<meta name="keywords" content="Andrew Morrissey, Krishi, Due Diligence, Venture Capital, Market Analysis" />
+		<meta name="keywords" content="Andrew Morrissey, Krishi, Due Diligence, Venture Capital, Market Analysis, Purdue Venture Capital Club" />
 		<link rel="stylesheet" href="assets/css/main.css" />
 		<!-- Add Font Awesome for Icons -->
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 		<style>
 			/* Custom CSS for Project Page */
 			.project-details {
-				padding: 20px;
+				padding: 2rem;
 				background: #f9f9f9;
 				border-radius: 10px;
 				box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -30,11 +30,17 @@
 				border-radius: 10px;
 				margin-bottom: 20px;
 				cursor: pointer; /* Indicates the image is clickable */
+				transition: transform 0.3s ease;
+			}
+			
+			.project-details img:hover {
+				transform: scale(1.02);
 			}
 
 			.project-details h3 {
-				margin-top: 0;
+				margin-top: 1.5rem;
 				color: #4CAF50; /* Green color */
+				font-weight: 600;
 			}
 
 			.project-details p {
@@ -42,20 +48,60 @@
 				line-height: 1.6;
 				color: #333;
 			}
+			
+			.project-details ul {
+				margin-left: 1.5rem;
+			}
+			
+			.project-details li {
+				margin-bottom: 0.5rem;
+			}
 
 			.back-button {
 				display: inline-block;
-				margin-top: 20px;
+				margin-top: 2rem;
 				padding: 10px 20px;
 				background: #4CAF50;
 				color: #fff;
 				text-decoration: none;
 				border-radius: 5px;
 				transition: background 0.3s ease;
+				font-weight: bold;
 			}
 
 			.back-button:hover {
 				background: #45a049;
+			}
+
+			/* Team Section Styles */
+			/* Team member links styling */
+			.project-details ul li {
+				margin-bottom: 1rem;
+			}
+			
+			.project-details ul li a {
+				color: #4CAF50;
+				text-decoration: none;
+				transition: color 0.3s ease;
+			}
+			
+			.project-details ul li a:hover {
+				color: #45a049;
+				text-decoration: underline;
+			}
+			
+			/* Company link styling */
+			.company-link {
+				color: #4CAF50;
+				font-weight: 600;
+				text-decoration: none;
+				border-bottom: 1px dotted #4CAF50;
+				transition: all 0.3s ease;
+			}
+			
+			.company-link:hover {
+				color: #45a049;
+				border-bottom: 1px solid #45a049;
 			}
 
 			/* Lightbox CSS */
@@ -139,33 +185,52 @@
 						<h2>Due Diligence for Krishi</h2>
 					</header>
 					<div class="project-details">
-						<img src="images/krishi.jpg" alt="Krishi Logo" onclick="openLightbox('images/krishi.jpg')" />
+						<img src="images/krishi.PNG" alt="Krishi Logo" onclick="openLightbox('images/krishi.PNG')" />
 						<h3>Project Overview</h3>
 						<p>
-							As part of my role with the Purdue Venture Capital Club, I conducted due diligence for Krishi, a company focused on providing on-demand molecular insights for veterinary care. While specific details of the pitch deck are confidential due to an NDA, this project provided valuable experience in venture analysis, market research, and strategic evaluation.
+							As part of my role with Purdue's Student Managed Venture Fund course, I conducted comprehensive due diligence for Krishi, an innovative company focused on providing on-demand molecular insights for veterinary care. This engagement provided invaluable experience in venture analysis, market research, and strategic evaluation. Information was excluded due to a NDA.
 						</p>
 						<h3>About Krishi</h3>
 						<p>
-							Krishi's mission is to revolutionize veterinary care through innovative solutions like the SHERPA™ platform, which provides lab-accurate antibiotic guidance for urinary tract and skin infections in pets. The platform consists of two components:
-							<ul>
-								<li><strong>SHERPA™ Vision:</strong> A reusable, IoT-connected device for imaging and analysis.</li>
-								<li><strong>SHERPA™ Chip:</strong> A consumable test with embedded reagents for quick and accurate results.</li>
-							</ul>
-							Krishi's technology aims to enhance antimicrobial stewardship, speed up patient recovery, and augment veterinary practice revenue.
+							<a href="https://krishidiagnostics.com/" target="_blank" class="company-link">Krishi's</a> mission is to revolutionize veterinary care through their innovative SHERPA™ platform, which provides lab-accurate antibiotic guidance for urinary tract and skin infections in pets. The platform consists of two complementary components:
+						</p>
+						<ul>
+							<li><strong>SHERPA™ Vision:</strong> A reusable, IoT-connected device that performs advanced imaging and analysis to identify pathogens rapidly.</li>
+							<li><strong>SHERPA™ Chip:</strong> A consumable test with embedded reagents that delivers quick and accurate diagnostic results.</li>
+						</ul>
+						<p>
+							Krishi's technology aims to enhance antimicrobial stewardship, accelerate patient recovery, and significantly augment veterinary practice revenue through point-of-care diagnostics.
 						</p>
 						<h3>Key Learnings</h3>
 						<p>
-							This due diligence process provided valuable insights and skills, including:
-							<ul>
-								<li><strong>Market Analysis:</strong> Conducted in-depth research on the veterinary diagnostics market, including trends, competitors, and customer needs.</li>
-								<li><strong>Financial Evaluation:</strong> Analyzed Krishi's business model, revenue streams, and growth potential.</li>
-								<li><strong>Technical Assessment:</strong> Evaluated the feasibility and scalability of Krishi's SHERPA™ platform.</li>
-								<li><strong>Strategic Insights:</strong> Identified key opportunities and risks for Krishi's market entry and expansion.</li>
-							</ul>
+							This comprehensive due diligence process provided valuable insights and developed critical skills, including:
 						</p>
+						<ul>
+							<li><strong>Market Analysis:</strong> Conducted in-depth research on the veterinary diagnostics market, including trends, competitive landscape, and unmet customer needs.</li>
+							<li><strong>Financial Evaluation:</strong> Analyzed Krishi's business model, revenue streams, unit economics, and long-term growth potential.</li>
+							<li><strong>Technical Assessment:</strong> Evaluated the technical feasibility, scalability, and competitive advantages of Krishi's SHERPA™ platform.</li>
+							<li><strong>Strategic Insights:</strong> Identified key opportunities, potential risks, and critical success factors for Krishi's market entry and expansion strategy.</li>
+						</ul>
+						
+						<h3>Team Members</h3>
+						<p>
+							This project was a collaborative effort, and I would like to acknowledge the contributions of my teammates:
+						</p>
+						<ul>
+							<li>
+								<strong><a href="https://www.linkedin.com/in/hetshah4902/" target="_blank">Het Shah</a></strong>
+							</li>
+							<li>
+								<strong><a href="https://www.linkedin.com/in/liliannebrush/" target="_blank">Lilianne Brush</a></strong>
+							</li>
+						</ul>
+						
 						<h3>Conclusion</h3>
 						<p>
-							The due diligence process for Krishi was an invaluable learning experience, providing hands-on exposure to venture analysis and strategic decision-making. While specific findings are confidential, the project enhanced my skills in market research, financial modeling, and technical evaluation, preparing me for future roles in venture capital and business strategy.
+							The due diligence process for Krishi was an invaluable learning experience, providing hands-on exposure to venture analysis and strategic decision-making in the rapidly evolving veterinary technology sector. While specific findings remain confidential, this project significantly enhanced our skills in market research, financial modeling, and technical evaluation, preparing us for future roles in venture capital and business strategy.
+						</p>
+						<p>
+							Working as a team allowed us to leverage diverse perspectives and expertise, resulting in a comprehensive analysis that considered technical, financial, and market factors. 
 						</p>
 						<a href="index.html#portfolio" class="back-button">Back to Portfolio</a>
 					</div>
@@ -200,6 +265,20 @@
 				`;
 				document.body.appendChild(lightbox);
 				lightbox.style.display = 'block';
+				
+				// Close lightbox when clicking outside the image
+				lightbox.addEventListener('click', function(e) {
+					if (e.target === lightbox) {
+						closeLightbox();
+					}
+				});
+				
+				// Close lightbox with Escape key
+				document.addEventListener('keydown', function(e) {
+					if (e.key === 'Escape') {
+						closeLightbox();
+					}
+				});
 			}
 
 			function closeLightbox() {
