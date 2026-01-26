@@ -1,0 +1,391 @@
+<!DOCTYPE HTML>
+<!--
+	Prologue by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>Speedruns & Personal Records - Andrew Morrissey</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<!-- Add Font Awesome for Icons -->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+		<style>
+			/* Custom CSS for Project Page */
+			.project-details {
+				padding: 20px;
+				background: #f9f9f9;
+				border-radius: 10px;
+				box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+				margin-top: 20px;
+			}
+
+			.project-details img {
+				max-width: 100%;
+				height: auto;
+				border-radius: 10px;
+				margin-bottom: 20px;
+			}
+
+			.project-details h3 {
+				margin-top: 0;
+				color: #4CAF50;
+			}
+
+			.project-details p {
+				font-size: 1rem;
+				line-height: 1.6;
+				color: #333;
+			}
+
+			.back-button {
+				display: inline-block;
+				margin-top: 20px;
+				padding: 10px 20px;
+				background: #4CAF50;
+				color: #fff;
+				text-decoration: none;
+				border-radius: 5px;
+				transition: background 0.3s ease;
+			}
+
+			.back-button:hover {
+				background: #45a049;
+			}
+
+			/* Records Table Styles */
+			.records-section {
+				margin-bottom: 40px;
+			}
+
+			.records-section h3 {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+			}
+
+			.records-section h3 i {
+				font-size: 1.2rem;
+			}
+
+			.records-table {
+				width: 100%;
+				border-collapse: collapse;
+				margin-top: 15px;
+				background: #fff;
+				border-radius: 8px;
+				overflow: hidden;
+				box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+			}
+
+			.records-table thead {
+				background: #4CAF50;
+				color: #fff;
+			}
+
+			.records-table th,
+			.records-table td {
+				padding: 12px 16px;
+				text-align: left;
+			}
+
+			.records-table th {
+				font-weight: 600;
+				font-size: 0.95rem;
+			}
+
+			.records-table tbody tr {
+				border-bottom: 1px solid #eee;
+				transition: background 0.2s ease;
+			}
+
+			.records-table tbody tr:hover {
+				background: #f0f8f0;
+			}
+
+			.records-table tbody tr:last-child {
+				border-bottom: none;
+			}
+
+			.records-table td {
+				font-size: 0.95rem;
+				color: #333;
+			}
+
+			.records-table .placeholder {
+				color: #aaa;
+				font-style: italic;
+			}
+
+			.section-description {
+				color: #555;
+				margin-bottom: 10px;
+				font-size: 0.95rem;
+			}
+		</style>
+
+		<!-- Google Analytics -->
+		<!-- Google Tag Manager tracking ID: GTM-N34CKH5Q -->
+		<script async src="https://www.googletagmanager.com/gtag/js?id=GTM-N34CKH5Q"></script>
+		<script>
+			window.dataLayer = window.dataLayer || [];
+			function gtag(){dataLayer.push(arguments);}
+			gtag('js', new Date());
+			gtag('config', 'GTM-N34CKH5Q');
+		</script>
+	</head>
+	<body class="is-preload">
+
+		<!-- Header -->
+		<div id="header">
+			<div class="top">
+				<!-- Logo -->
+				<div id="logo">
+					<span class="image avatar48"><img src="images/Avatar_1.jpg" alt="" /></span>
+					<h1 id="title">Andrew Morrissey</h1>
+					<p>Mechanical Engineer</p>
+				</div>
+
+				<!-- Nav -->
+				<nav id="nav">
+					<ul>
+						<li><a href="index.html#top" id="top-link"><span class="icon solid fa-home">Intro</span></a></li>
+						<li><a href="index.html#portfolio" id="portfolio-link"><span class="icon solid fa-th">Portfolio</span></a></li>
+						<li><a href="index.html#about" id="about-link"><span class="icon solid fa-user">About Me</span></a></li>
+						<li><a href="index.html#contact" id="contact-link"><span class="icon solid fa-envelope">Contact</span></a></li>
+					</ul>
+				</nav>
+			</div>
+
+			<div class="bottom">
+				<!-- Social Icons -->
+				<ul class="icons">
+					<li><a href="https://www.linkedin.com/in/asmorrissey" class="icon brands fa-linkedin" target="_blank"><span class="label">LinkedIn</span></a></li>
+					<li><a href="mailto:asmspartan21@gmail.com" class="icon solid fa-envelope"><span class="label">Email</span></a></li>
+					<li><a href="https://github.com/ASM-21" class="icon brands fa-github" target="_blank"><span class="label">Github</span></a></li>
+				</ul>
+			</div>
+		</div>
+
+		<!-- Main -->
+		<div id="main">
+			<!-- Project Details Section -->
+			<section id="project-details" class="two">
+				<div class="container">
+					<header>
+						<h2>Speedruns & Personal Records</h2>
+					</header>
+					<div class="project-details">
+						<p>
+							A collection of my personal best times across speedcubing and running.
+							This page is updated every couple of months as I set new records.
+						</p>
+
+						<!-- ===================== -->
+						<!-- SPEEDCUBING SECTION   -->
+						<!-- ===================== -->
+						<div class="records-section">
+							<h3><i class="fas fa-cube"></i> Speedcubing</h3>
+							<p class="section-description">Standard NxN puzzles and other WCA events.</p>
+
+							<h4>NxN Cubes</h4>
+							<table class="records-table">
+								<thead>
+									<tr>
+										<th>Puzzle</th>
+										<th>Personal Best</th>
+										<th>Date</th>
+										<th>Notes</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>2x2</td>
+										<td class="placeholder">--:--</td>
+										<td class="placeholder">TBD</td>
+										<td></td>
+									</tr>
+									<tr>
+										<td>3x3</td>
+										<td class="placeholder">--:--</td>
+										<td class="placeholder">TBD</td>
+										<td></td>
+									</tr>
+									<tr>
+										<td>4x4</td>
+										<td class="placeholder">--:--</td>
+										<td class="placeholder">TBD</td>
+										<td></td>
+									</tr>
+									<tr>
+										<td>5x5</td>
+										<td class="placeholder">--:--</td>
+										<td class="placeholder">TBD</td>
+										<td></td>
+									</tr>
+								</tbody>
+							</table>
+
+							<h4>Other Puzzles</h4>
+							<table class="records-table">
+								<thead>
+									<tr>
+										<th>Puzzle</th>
+										<th>Personal Best</th>
+										<th>Date</th>
+										<th>Notes</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>Pyraminx</td>
+										<td class="placeholder">--:--</td>
+										<td class="placeholder">TBD</td>
+										<td></td>
+									</tr>
+									<tr>
+										<td>Megaminx</td>
+										<td class="placeholder">--:--</td>
+										<td class="placeholder">TBD</td>
+										<td></td>
+									</tr>
+									<tr>
+										<td>Kilominx</td>
+										<td class="placeholder">--:--</td>
+										<td class="placeholder">TBD</td>
+										<td></td>
+									</tr>
+									<tr>
+										<td>Skewb</td>
+										<td class="placeholder">--:--</td>
+										<td class="placeholder">TBD</td>
+										<td></td>
+									</tr>
+									<tr>
+										<td>Square-1</td>
+										<td class="placeholder">--:--</td>
+										<td class="placeholder">TBD</td>
+										<td></td>
+									</tr>
+									<tr>
+										<td>Clock</td>
+										<td class="placeholder">--:--</td>
+										<td class="placeholder">TBD</td>
+										<td></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+
+						<!-- ===================== -->
+						<!-- RUNNING SECTION       -->
+						<!-- ===================== -->
+						<div class="records-section">
+							<h3><i class="fas fa-running"></i> Running</h3>
+							<p class="section-description">Personal bests for race distances.</p>
+
+							<table class="records-table">
+								<thead>
+									<tr>
+										<th>Distance</th>
+										<th>Personal Best</th>
+										<th>Date</th>
+										<th>Notes</th>
+										<th>Results Link</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>Mile</td>
+										<td class="placeholder">--:--</td>
+										<td class="placeholder">TBD</td>
+										<td></td>
+										<td></td>
+									</tr>
+									<tr>
+										<td>5K</td>
+										<td class="placeholder">--:--</td>
+										<td class="placeholder">TBD</td>
+										<td></td>
+										<td></td>
+									</tr>
+									<tr>
+										<td>10K</td>
+										<td class="placeholder">--:--</td>
+										<td class="placeholder">TBD</td>
+										<td></td>
+										<td></td>
+									</tr>
+									<tr>
+										<td>Half Marathon</td>
+										<td class="placeholder">--:--</td>
+										<td class="placeholder">TBD</td>
+										<td></td>
+										<td></td>
+									</tr>
+									<tr>
+										<td>Marathon</td>
+										<td class="placeholder">--:--</td>
+										<td class="placeholder">TBD</td>
+										<td></td>
+										<td></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+
+						<!--
+							=== HOW TO ADD A NEW SECTION ===
+							Copy the block below, paste it here, and update the icon, title, description, and table columns/rows.
+
+							<div class="records-section">
+								<h3><i class="fas fa-icon-name"></i> Section Title</h3>
+								<p class="section-description">Short description of this category.</p>
+
+								<table class="records-table">
+									<thead>
+										<tr>
+											<th>Event</th>
+											<th>Personal Best</th>
+											<th>Date</th>
+											<th>Notes</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<td>Event Name</td>
+											<td class="placeholder">- -:- -</td>
+											<td class="placeholder">TBD</td>
+											<td></td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						-->
+
+						<a href="index.html#portfolio" class="back-button">Back to Portfolio</a>
+					</div>
+				</div>
+			</section>
+		</div>
+
+		<!-- Footer -->
+		<div id="footer">
+			<!-- Copyright -->
+			<ul class="copyright">
+				<li>&copy; Andrew Morrissey. All rights reserved.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+			</ul>
+		</div>
+
+		<!-- Scripts -->
+		<script src="assets/js/jquery.min.js"></script>
+		<script src="assets/js/jquery.scrolly.min.js"></script>
+		<script src="assets/js/jquery.scrollex.min.js"></script>
+		<script src="assets/js/browser.min.js"></script>
+		<script src="assets/js/breakpoints.min.js"></script>
+		<script src="assets/js/util.js"></script>
+		<script src="assets/js/main.js"></script>
+	</body>
+</html>
