@@ -1,0 +1,336 @@
+<!DOCTYPE HTML>
+<!--
+	Prologue by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>Data Center Sustainability Analysis - Andrew Morrissey</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<meta name="description" content="Comprehensive sustainability framework for data center design at Purdue, analyzing waste heat recovery through greenhouse integration and district heating, plus building optimization using EnergyPlus modeling." />
+		<meta name="keywords" content="Andrew Morrissey, Data Center, Sustainability, EnergyPlus, Waste Heat Recovery, District Heating, Greenhouse, PUE, Thermal-Fluids" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<!-- Add Font Awesome for Icons -->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+		<style>
+			/* Custom CSS for Project Page */
+			.project-details {
+				padding: 20px;
+				background: #f9f9f9;
+				border-radius: 10px;
+				box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+				margin-top: 20px;
+			}
+
+			.project-details img {
+				max-width: 100%;
+				height: auto;
+				border-radius: 10px;
+				margin-bottom: 20px;
+				cursor: pointer;
+			}
+
+			.project-details h3 {
+				margin-top: 0;
+				color: #4CAF50;
+			}
+
+			.project-details p {
+				font-size: 1rem;
+				line-height: 1.6;
+				color: #333;
+			}
+
+			.back-button {
+				display: inline-block;
+				margin-top: 20px;
+				padding: 10px 20px;
+				background: #4CAF50;
+				color: #fff;
+				text-decoration: none;
+				border-radius: 5px;
+				transition: background 0.3s ease;
+			}
+
+			.back-button:hover {
+				background: #45a049;
+			}
+
+			/* Lightbox CSS */
+			.lightbox {
+				display: none;
+				position: fixed;
+				z-index: 999;
+				padding-top: 60px;
+				left: 0;
+				top: 0;
+				width: 100%;
+				height: 100%;
+				overflow: auto;
+				background-color: rgba(0, 0, 0, 0.9);
+			}
+
+			.lightbox-content {
+				margin: auto;
+				display: block;
+				width: 80%;
+				max-width: 700px;
+			}
+
+			.close {
+				position: absolute;
+				top: 20px;
+				right: 35px;
+				color: #fff;
+				font-size: 40px;
+				font-weight: bold;
+				transition: 0.3s;
+			}
+
+			.close:hover,
+			.close:focus {
+				color: #bbb;
+				text-decoration: none;
+				cursor: pointer;
+			}
+
+			.project-meta {
+				background: #e8f5e9;
+				padding: 15px;
+				border-radius: 8px;
+				margin-bottom: 20px;
+			}
+
+			.project-meta p {
+				margin: 5px 0;
+			}
+
+			.results-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+				gap: 15px;
+				margin: 20px 0;
+			}
+
+			.result-card {
+				background: #f0f8f0;
+				padding: 15px;
+				border-radius: 8px;
+				border-left: 4px solid #4CAF50;
+			}
+
+			.result-card h4 {
+				color: #4CAF50;
+				margin-top: 0;
+			}
+
+			.tools-list {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 10px;
+				margin: 10px 0 20px 0;
+			}
+
+			.tool-tag {
+				background: #e8f5e9;
+				color: #333;
+				padding: 5px 12px;
+				border-radius: 15px;
+				font-size: 0.9rem;
+			}
+		</style>
+
+		<!-- Google Analytics -->
+		<!-- Google Tag Manager tracking ID: GTM-N34CKH5Q -->
+		<script async src="https://www.googletagmanager.com/gtag/js?id=GTM-N34CKH5Q"></script>
+		<script>
+			window.dataLayer = window.dataLayer || [];
+			function gtag(){dataLayer.push(arguments);}
+			gtag('js', new Date());
+			gtag('config', 'GTM-N34CKH5Q');
+		</script>
+	</head>
+	<body class="is-preload">
+
+		<!-- Header -->
+		<div id="header">
+			<div class="top">
+				<!-- Logo -->
+				<div id="logo">
+					<span class="image avatar48"><img src="images/Avatar_1.jpg" alt="Andrew Morrissey Avatar" /></span>
+					<h1 id="title">Andrew Morrissey</h1>
+					<p>Mechanical Engineer</p>
+				</div>
+
+				<!-- Nav -->
+				<nav id="nav">
+					<ul>
+						<li><a href="index.html#top" id="top-link"><span class="icon solid fa-home">Intro</span></a></li>
+						<li><a href="index.html#portfolio" id="portfolio-link"><span class="icon solid fa-th">Portfolio</span></a></li>
+						<li><a href="index.html#about" id="about-link"><span class="icon solid fa-user">About Me</span></a></li>
+						<li><a href="index.html#contact" id="contact-link"><span class="icon solid fa-envelope">Contact</span></a></li>
+					</ul>
+				</nav>
+			</div>
+
+			<div class="bottom">
+				<!-- Social Icons -->
+				<ul class="icons">
+					<li><a href="https://www.linkedin.com/in/asmorrissey" class="icon brands fa-linkedin" target="_blank"><span class="label">LinkedIn</span></a></li>
+					<li><a href="mailto:asmspartan21@gmail.com" class="icon solid fa-envelope"><span class="label">Email</span></a></li>
+					<li><a href="https://github.com/ASM-21" class="icon brands fa-github" target="_blank"><span class="label">Github</span></a></li>
+				</ul>
+			</div>
+		</div>
+
+		<!-- Main -->
+		<div id="main">
+			<!-- Project Details Section -->
+			<section id="project-details" class="two">
+				<div class="container">
+					<header>
+						<h2>Data Center Sustainability Analysis: A Blueprint for the Future</h2>
+					</header>
+					<div class="project-details">
+						<img src="images/smart_data_center.png" alt="Data Center Sustainability Analysis" onclick="openLightbox('images/smart_data_center.png')" />
+
+						<div class="project-meta">
+							<p><strong><i class="fas fa-graduation-cap"></i> Type:</strong> Graduate Course Project - Thermal-Fluids Systems</p>
+							<p><strong><i class="fas fa-calendar-alt"></i> Date:</strong> Fall 2024</p>
+						</div>
+
+						<h3>Overview</h3>
+						<p>
+							Developed a complete sustainability framework to evaluate data center design at Purdue University, addressing the explosive growth in computational demand and associated energy challenges. With data center load growth projected to double or triple by 2028 and major tech companies investing $260B+ in data center infrastructure, this project tackles both operational efficiency and waste heat recovery.
+						</p>
+
+						<h3>Key Contributions</h3>
+						<ul>
+							<li>Created piecewise linear models relating server count, floor area, energy consumption, and waste heat across four data center classes (Small, Medium, Hyperscale, AI Specialized)</li>
+							<li>Developed novel "effective PUE" metric that accounts for waste heat recovery benefits</li>
+							<li>Analyzed two waste heat recovery pathways: district heating network and greenhouse integration</li>
+							<li>Performed building optimization using EnergyPlus simulations for geometry, green walls/roofs, and exterior color</li>
+						</ul>
+
+						<h3>Data Center Sizing &amp; Energy Modeling</h3>
+						<p>
+							Established quantitative relationships between floor area (10&ndash;20,000 sq ft), server capacity (1&ndash;499 servers), and energy consumption using DOE data. Built piecewise linear interpolation models for each size category with Python, accounting for varying PUE values (1.2&ndash;1.8) and server types (single/dual-processor, 4-processor, 4-GPU configurations).
+						</p>
+
+						<h3>Building Performance Simulation</h3>
+						<p>
+							Used EnergyPlus to model climate-related loads for data center buildings in West Lafayette:
+						</p>
+						<ul>
+							<li><strong>Shape optimization:</strong> Found golden ratio (1:1.618) provides optimal volume-to-surface-area balance with only 2% load increase</li>
+							<li><strong>Green walls/roofs:</strong> Achieved 12% load reduction at 100% coverage, with linear trend showing diminishing returns above 70%</li>
+							<li><strong>Color analysis:</strong> Solar absorptivity of 0.6&ndash;0.7 minimized total building loads</li>
+						</ul>
+
+						<h3>Waste Heat Recovery &mdash; Greenhouse Integration</h3>
+						<p>
+							Modeled 5,000 m&sup3; commercial greenhouse heating requirements using London, Ontario climate data (&plusmn;1&ndash;2&deg;C from West Lafayette). Calculated monthly heating loads and waste heat recovery rates for each data center class:
+						</p>
+						<ul>
+							<li><strong>Small data centers:</strong> 2% heating load coverage, 85% fractional heat recovery</li>
+							<li><strong>AI Specialized:</strong> 85% heating load coverage, 7% fractional heat recovery</li>
+							<li>Projected 164,000 kg annual tomato production (40% of West Lafayette demand)</li>
+						</ul>
+
+						<h3>Waste Heat Recovery &mdash; District Heating</h3>
+						<p>
+							Analyzed infrastructure requirements for West Lafayette (1,100+ km piping needed for 90% connection rate). Determined AI Specialized (105 kW) and Hyperscale (39 kW with heat pump) data centers meet feasibility threshold for 5GDHC networks. Concluded district heating is viable only for larger installations due to infrastructure costs.
+						</p>
+
+						<h3>Key Results</h3>
+						<div class="results-grid">
+							<div class="result-card">
+								<h4>Greenhouse Integration</h4>
+								<p>Small/Medium data centers benefit most; greenhouse captures up to 85% of waste heat from small facilities</p>
+							</div>
+							<div class="result-card">
+								<h4>District Heating</h4>
+								<p>Viable at scale for Hyperscale/AI data centers meeting 5GDHC feasibility thresholds</p>
+							</div>
+							<div class="result-card">
+								<h4>Building Optimization</h4>
+								<p>Green walls, optimal geometry, and color selection achieve 1.8% load reduction across all scales</p>
+							</div>
+							<div class="result-card">
+								<h4>Effective PUE</h4>
+								<p>Novel metric enabling direct comparison of building optimization, waste heat recovery, and operational efficiency</p>
+							</div>
+						</div>
+
+						<h3>Tools &amp; Methods</h3>
+						<div class="tools-list">
+							<span class="tool-tag"><i class="fas fa-building"></i> EnergyPlus</span>
+							<span class="tool-tag"><i class="fab fa-python"></i> Python</span>
+							<span class="tool-tag"><i class="fas fa-calculator"></i> MATLAB</span>
+							<span class="tool-tag"><i class="fas fa-leaf"></i> OpenLCA</span>
+						</div>
+
+						<h3>Impact</h3>
+						<p>
+							This framework provides actionable guidance for data center sustainability at different scales, addressing a critical gap in combined system-level analysis. By relating all factors back to PUE, the work enables direct comparison of building optimization, waste heat recovery, and operational efficiency strategies specific to local conditions.
+						</p>
+
+						<h3>Team Members</h3>
+						<p>
+							This project was a collaborative effort. I would like to acknowledge my teammates:
+						</p>
+						<ul>
+							<li><strong><a href="https://www.linkedin.com/in/asmorrissey" target="_blank">Andrew Morrissey</a></strong></li>
+							<li><strong><a href="https://www.linkedin.com/in/mmreid/" target="_blank">Matthew Reid</a></strong></li>
+							<li><strong><a href="https://www.linkedin.com/in/reyhan-rafeek/" target="_blank">Reyan Rafeek</a></strong></li>
+							<li><strong><a href="https://www.linkedin.com/in/samuel-thengvall/" target="_blank">Samuel Thengvall</a></strong></li>
+							<li><strong><a href="https://www.linkedin.com/in/malte-behrens-963633241/" target="_blank">Malte Bjarne Behrens</a></strong></li>
+						</ul>
+
+						<a href="index.html#portfolio" class="back-button">Back to Portfolio</a>
+					</div>
+				</div>
+			</section>
+		</div>
+
+		<!-- Footer -->
+		<div id="footer">
+			<!-- Copyright -->
+			<ul class="copyright">
+				<li>&copy; Andrew Morrissey. All rights reserved.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+			</ul>
+		</div>
+
+		<!-- Scripts -->
+		<script src="assets/js/jquery.min.js"></script>
+		<script src="assets/js/jquery.scrolly.min.js"></script>
+		<script src="assets/js/jquery.scrollex.min.js"></script>
+		<script src="assets/js/browser.min.js"></script>
+		<script src="assets/js/breakpoints.min.js"></script>
+		<script src="assets/js/util.js"></script>
+		<script src="assets/js/main.js"></script>
+		<script>
+			// Lightbox functionality
+			function openLightbox(imageSrc) {
+				var lightbox = document.createElement('div');
+				lightbox.className = 'lightbox';
+				lightbox.innerHTML = `
+					<span class="close" onclick="closeLightbox()">&times;</span>
+					<img class="lightbox-content" src="${imageSrc}" alt="Enlarged Image">
+				`;
+				document.body.appendChild(lightbox);
+				lightbox.style.display = 'block';
+			}
+
+			function closeLightbox() {
+				var lightbox = document.querySelector('.lightbox');
+				if (lightbox) {
+					lightbox.style.display = 'none';
+					lightbox.remove();
+				}
+			}
+		</script>
+	</body>
+</html>
