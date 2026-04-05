@@ -1,0 +1,1048 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <title>Unit Converter – Andrew Morrissey</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+  <link rel="stylesheet" href="../assets/css/main.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --green:      #4CAF50;
+      --green-dark: #2e7d32;
+      --green-pale: #f0faf0;
+      --green-mid:  #e8f5e9;
+      --border:     #e4e4e4;
+      --bg:         #f7f7f5;
+      --surface:    #ffffff;
+      --text:       #1a1a1a;
+      --muted:      #888;
+      --subtle:     #bbb;
+      --mono:       'IBM Plex Mono', monospace;
+      --sans:       'DM Sans', sans-serif;
+      --radius:     9px;
+      --shadow:     0 2px 12px rgba(0,0,0,0.07);
+    }
+
+    .uc-wrap {
+      font-family: var(--sans);
+      background: var(--surface);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      max-width: 700px;
+      overflow: hidden;
+      animation: ucFadeIn .35s ease both;
+    }
+    @keyframes ucFadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+
+    .uc-header-strip {
+      background: var(--green-dark);
+      padding: 13px 20px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .uc-header-strip h3 {
+      font-family: var(--sans);
+      font-size: 0.8em;
+      font-weight: 700;
+      color: rgba(255,255,255,0.88);
+      letter-spacing: .09em;
+      text-transform: uppercase;
+      margin: 0; border: none; padding: 0;
+    }
+    .uc-header-meta { font-size: 0.7em; color: rgba(255,255,255,0.45); font-family: var(--mono); }
+
+    .uc-cats-wrap { padding: 14px 16px 0; }
+    .uc-cats { display: grid; grid-template-columns: repeat(7,1fr); gap: 5px; }
+    .uc-cat {
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
+      padding: 8px 3px 7px;
+      border: 1.5px solid #222;
+      border-radius: 8px;
+      background: #1a1a1a;
+      cursor: pointer;
+      font-family: var(--sans);
+      font-size: 0.62em; font-weight: 700; color: #ddd;
+      text-align: center; line-height: 1.2;
+      transition: border-color .14s, background .14s, color .14s, transform .1s;
+      user-select: none;
+      animation: catIn .3s ease both;
+    }
+    .uc-cat i { font-size: 1.15em; color: #bbb; transition: color .14s; display: block; }
+    .uc-cat:hover:not(.active) { border-color:var(--green); color:var(--green); transform:translateY(-1px); }
+    .uc-cat:hover:not(.active) i { color:var(--green); }
+    .uc-cat.active { border-color:var(--green); background:var(--green); color:#fff; }
+    .uc-cat.active i { color:#fff; }
+    @keyframes catIn { from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;} }
+
+    .uc-body { padding: 16px 16px 0; }
+    .uc-panel { display:grid; grid-template-columns:1fr 42px 1fr; gap:10px; align-items:start; margin-bottom:12px; }
+    .uc-side { display:flex; flex-direction:column; gap:6px; }
+    .uc-field-label { font-size:0.7em; font-weight:700; color:var(--subtle); text-transform:uppercase; letter-spacing:.09em; }
+
+    .uc-input-wrap { position:relative; }
+    .uc-side input[type="number"] {
+      width:100%; padding:10px 36px 10px 12px;
+      border:1.5px solid var(--border); border-radius:var(--radius);
+      font-family:var(--mono); font-size:1.2em; font-weight:600; color:var(--text);
+      background:var(--surface); box-sizing:border-box; transition:border-color .15s;
+      -moz-appearance:textfield;
+    }
+    .uc-side input[type="number"]::-webkit-outer-spin-button,
+    .uc-side input[type="number"]::-webkit-inner-spin-button { -webkit-appearance:none; }
+    .uc-side input[type="number"]:focus { outline:none; border-color:var(--green); }
+    .uc-clear-input {
+      position:absolute; right:9px; top:50%; transform:translateY(-50%);
+      background:none; border:none; color:var(--subtle); font-size:0.78em;
+      cursor:pointer; padding:2px; display:none; transition:color .13s;
+    }
+    .uc-clear-input:hover { color:var(--text); }
+
+    .uc-result-wrap { position:relative; }
+    .uc-result {
+      width:100%; padding:10px 36px 10px 12px;
+      border:1.5px solid var(--green); border-radius:var(--radius);
+      font-family:var(--mono); font-size:1.2em; font-weight:700; color:var(--green-dark);
+      background:var(--green-pale); box-sizing:border-box; min-height:48px;
+      word-break:break-all; transition:background .18s;
+    }
+    .uc-result.flash { background:#c8e6c9; transition:background .05s; }
+    .uc-fav-btn {
+      position:absolute; right:9px; top:50%; transform:translateY(-50%);
+      background:none; border:none; color:#1a1a1a; font-size:0.9em;
+      cursor:pointer; padding:2px; transition:color .14s, transform .14s; line-height:1;
+    }
+    .uc-fav-btn:hover { color:#f5a623; transform:translateY(-50%) scale(1.18); }
+    .uc-fav-btn.active { color:#f5a623; }
+
+    .uc-mid { display:flex; align-items:flex-start; justify-content:center; padding-top:22px; }
+    .uc-swap {
+      width:36px; height:36px; border-radius:50%;
+      border:1.5px solid #222; background:#1a1a1a; color:#ddd;
+      font-size:1em; cursor:pointer; display:flex; align-items:center; justify-content:center;
+      transition:border-color .14s, color .14s, transform .22s;
+    }
+    .uc-swap:hover { border-color:var(--green); color:var(--green); transform:rotate(180deg); }
+
+    /* searchable select */
+    .uc-sel-wrap { position:relative; width:100%; }
+    .uc-sel-trigger {
+      width:100%; padding:7px 26px 7px 10px;
+      border:1.5px solid var(--border); border-radius:var(--radius);
+      font-family:var(--sans); font-size:0.85em; font-weight:500;
+      background:var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='5' viewBox='0 0 9 5'%3E%3Cpath d='M0 0l4.5 5L9 0z' fill='%23bbb'/%3E%3C/svg%3E") no-repeat right 10px center;
+      box-sizing:border-box; cursor:pointer; user-select:none;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:var(--text);
+      transition:border-color .13s;
+    }
+    .uc-sel-trigger:focus { outline:none; border-color:var(--green); }
+    .uc-sel-trigger.open { border-color:var(--green); border-radius:var(--radius) var(--radius) 0 0; }
+    .uc-sel-dropdown {
+      position:absolute; top:100%; left:0; right:0;
+      background:var(--surface); border:1.5px solid var(--green); border-top:none;
+      border-radius:0 0 var(--radius) var(--radius);
+      z-index:300; box-shadow:0 8px 24px rgba(0,0,0,0.13);
+      max-height:270px; overflow:hidden; display:none; flex-direction:column;
+      animation:dropIn .13s ease both;
+    }
+    @keyframes dropIn { from{opacity:0;transform:translateY(-4px);}to{opacity:1;transform:none;} }
+    .uc-sel-dropdown.open { display:flex; }
+    .uc-sel-search-wrap { padding:6px 6px 5px; border-bottom:1px solid #f0f0f0; flex-shrink:0; }
+    .uc-sel-search {
+      width:100%; padding:5px 9px 5px 27px;
+      border:1.5px solid var(--border); border-radius:6px;
+      font-family:var(--sans); font-size:0.82em;
+      background:var(--bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23bbb' stroke-width='2.5'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E") no-repeat left 8px center;
+      box-sizing:border-box; color:var(--text);
+    }
+    .uc-sel-search:focus { outline:none; border-color:var(--green); }
+    .uc-sel-list { overflow-y:auto; flex:1; }
+    .uc-sel-group-label {
+      padding:5px 11px 2px; font-family:var(--sans); font-size:0.64em; font-weight:700;
+      color:var(--subtle); text-transform:uppercase; letter-spacing:.09em;
+      background:#fafafa; border-top:1px solid #f3f3f3; position:sticky; top:0;
+    }
+    .uc-sel-opt {
+      padding:6px 11px; font-family:var(--sans); font-size:0.85em;
+      cursor:pointer; display:flex; align-items:baseline; gap:8px;
+      transition:background .08s; color:var(--text);
+    }
+    .uc-sel-opt:hover,.uc-sel-opt.highlighted { background:var(--green-pale); }
+    .uc-sel-opt.selected { background:var(--green-mid); font-weight:600; }
+    .uc-sel-opt .opt-sym { font-family:var(--mono); font-weight:600; min-width:52px; color:var(--green-dark); font-size:0.9em; flex-shrink:0; }
+    .uc-sel-opt .opt-lbl { color:var(--muted); font-size:0.87em; }
+    .uc-sel-no-results { padding:13px 11px; font-size:0.82em; color:var(--subtle); text-align:center; }
+
+    /* controls */
+    .uc-controls { display:flex; align-items:center; flex-wrap:wrap; gap:9px; margin-bottom:11px; }
+    .uc-field-label-inline { font-size:0.68em; font-weight:700; color:var(--subtle); text-transform:uppercase; letter-spacing:.09em; white-space:nowrap; }
+    .uc-sigfig-pills { display:flex; gap:3px; }
+    .uc-sf {
+      padding:3px 9px; border:1.5px solid #222; border-radius:20px;
+      background:#1a1a1a; font-family:var(--sans); font-size:0.73em; font-weight:600;
+      color:#ddd; cursor:pointer; transition:all .13s; line-height:1.5;
+    }
+    .uc-sf:hover { border-color:var(--green); color:var(--green); }
+    .uc-sf.active { border-color:var(--green); background:var(--green); color:#fff; }
+    .uc-controls-right { margin-left:auto; display:flex; gap:5px; }
+    .uc-icon-btn {
+      display:flex; align-items:center; gap:5px;
+      padding:4px 11px; border:1.5px solid #222; border-radius:6px;
+      background:#1a1a1a; color:#ddd;
+      font-family:var(--sans); font-size:0.77em; font-weight:500;
+      cursor:pointer; transition:all .14s; white-space:nowrap;
+    }
+    .uc-icon-btn:hover { border-color:var(--green); color:var(--green); }
+    .uc-icon-btn.active { border-color:var(--green); background:var(--green); color:#fff; }
+
+    /* formula bar */
+    .uc-formula-bar {
+      padding:7px 12px; background:var(--bg); border-radius:7px;
+      font-family:var(--mono); font-size:0.79em; color:var(--muted);
+      margin-bottom:13px; min-height:32px; display:flex; align-items:center;
+      border:1px solid var(--border); transition:opacity .2s;
+    }
+    .uc-formula-bar.empty { opacity:0.38; }
+    .uc-formula-bar .fml-factor { color:var(--green-dark); font-weight:600; }
+
+    /* section label */
+    .uc-section-label {
+      font-size:0.67em; font-weight:700; color:var(--subtle);
+      text-transform:uppercase; letter-spacing:.09em;
+      margin-bottom:8px; display:flex; align-items:center; gap:6px;
+    }
+    .uc-section-label .lbl-line { flex:1; height:1px; background:var(--border); display:block; }
+
+    /* favorites */
+    .uc-favs-section { padding:0 16px 13px; }
+    .uc-favs-grid { display:flex; flex-wrap:wrap; gap:6px; }
+    .uc-fav-chip {
+      display:flex; align-items:center; gap:5px;
+      padding:5px 10px; background:var(--green-mid); border:1.5px solid #c8e6c9;
+      border-radius:20px; font-family:var(--sans); font-size:0.77em; font-weight:600;
+      color:var(--green-dark); cursor:pointer; transition:all .13s; user-select:none;
+    }
+    .uc-fav-chip:hover { background:var(--green); color:#fff; border-color:var(--green); }
+    .uc-fav-chip:hover .fav-remove { color:rgba(255,255,255,0.65); }
+    .uc-fav-chip .fav-arrow { opacity:0.55; font-size:0.85em; }
+    .uc-fav-chip .fav-remove {
+      color:#aaa; font-size:0.78em; margin-left:2px;
+      background:none; border:none; cursor:pointer; padding:0 0 0 2px; line-height:1;
+      transition:color .12s;
+    }
+    .uc-fav-chip .fav-remove:hover { color:#e53935; }
+
+    /* also equals */
+    .uc-also-section { padding:0 16px 13px; }
+    .uc-also-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; }
+    .uc-also-card {
+      padding:8px 10px; background:var(--bg); border:1.5px solid var(--border);
+      border-radius:var(--radius); cursor:pointer;
+      transition:border-color .12s, background .12s, transform .11s; overflow:hidden;
+    }
+    .uc-also-card:hover { border-color:var(--green); background:var(--green-pale); transform:translateY(-1px); }
+    .uc-also-card .au { font-family:var(--mono); font-size:0.67em; font-weight:600; color:var(--subtle); margin-bottom:2px; }
+    .uc-also-card .av { font-family:var(--mono); font-size:0.88em; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+    /* history */
+    .uc-history-section { padding:0 16px 16px; }
+    .uc-history-list { display:flex; flex-direction:column; gap:4px; }
+    .uc-hist-row {
+      display:flex; align-items:center; gap:7px;
+      padding:6px 10px; background:var(--bg); border:1.5px solid var(--border);
+      border-radius:7px; cursor:pointer; transition:border-color .12s, background .12s;
+      font-family:var(--sans);
+    }
+    .uc-hist-row:hover { border-color:var(--green); background:var(--green-pale); }
+    .uc-hist-from { font-family:var(--mono); font-size:0.82em; font-weight:600; color:var(--text); }
+    .uc-hist-arrow { color:var(--subtle); font-size:0.75em; flex-shrink:0; }
+    .uc-hist-to { font-family:var(--mono); font-size:0.82em; font-weight:700; color:var(--green-dark); }
+    .uc-hist-units { font-size:0.71em; color:var(--muted); margin-left:auto; font-family:var(--sans); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:120px; }
+    .uc-hist-clear {
+      background:none; border:none; color:var(--subtle); font-size:0.71em;
+      cursor:pointer; padding:0; font-family:var(--sans); text-decoration:underline;
+      transition:color .12s;
+    }
+    .uc-hist-clear:hover { color:#e53935; }
+
+    /* footer */
+    .uc-footer { padding:13px 16px 17px; }
+    .uc-back {
+      display:inline-block; padding:9px 20px; background:var(--green); color:#fff;
+      text-decoration:none; border-radius:7px; font-family:var(--sans); font-size:0.87em;
+      font-weight:500; transition:background .18s;
+    }
+    .uc-back:hover { background:var(--green-dark); }
+
+    /* keyboard hint */
+    .uc-kbd-hint { font-size:0.67em; color:var(--subtle); margin-left:auto; font-family:var(--mono); }
+    kbd { background:var(--bg); border:1px solid var(--border); border-radius:3px; padding:1px 4px; font-size:.95em; }
+
+    /* toast */
+    .uc-toast {
+      position:fixed; bottom:20px; right:20px;
+      background:var(--green-dark); color:#fff;
+      padding:7px 15px; border-radius:7px;
+      font-family:var(--sans); font-size:0.81em; font-weight:500;
+      opacity:0; transform:translateY(6px); transition:all .2s;
+      pointer-events:none; z-index:9999; box-shadow:0 4px 14px rgba(0,0,0,0.18);
+    }
+    .uc-toast.show { opacity:1; transform:translateY(0); }
+
+    /* responsive */
+    @media (max-width:620px) {
+      .uc-cats { grid-template-columns:repeat(4,1fr); }
+      .uc-panel { grid-template-columns:1fr; gap:6px; }
+      .uc-mid { padding-top:0; justify-content:flex-end; }
+      .uc-also-grid { grid-template-columns:repeat(2,1fr); }
+      .uc-kbd-hint { display:none; }
+    }
+    @media (max-width:400px) { .uc-cats { grid-template-columns:repeat(3,1fr); } }
+  </style>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=GTM-N34CKH5Q"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','GTM-N34CKH5Q');</script>
+</head>
+<body class="is-preload">
+
+  <div id="header">
+    <div class="top">
+      <div id="logo">
+        <span class="image avatar48"><img src="../images/Avatar_1.jpg" alt="" /></span>
+        <h1 id="title">Andrew Morrissey</h1>
+        <p>Mechanical Engineer</p>
+      </div>
+      <nav id="nav">
+        <ul>
+          <li><a href="../index.html#top"><span class="icon solid fa-home">Intro</span></a></li>
+          <li><a href="../index.html#portfolio"><span class="icon solid fa-th">Portfolio</span></a></li>
+          <li><a href="../index.html#tools"><span class="icon solid fa-wrench">Tools</span></a></li>
+          <li><a href="../index.html#blog"><span class="icon solid fa-pen-nib">Blog</span></a></li>
+          <li><a href="../index.html#about"><span class="icon solid fa-user">About Me</span></a></li>
+          <li><a href="../index.html#contact"><span class="icon solid fa-envelope">Contact</span></a></li>
+        </ul>
+      </nav>
+    </div>
+    <div class="bottom">
+      <ul class="icons">
+        <li><a href="https://www.linkedin.com/in/asmorrissey" class="icon brands fa-linkedin" target="_blank"><span class="label">LinkedIn</span></a></li>
+        <li><a href="mailto:asmspartan21@gmail.com" class="icon solid fa-envelope"><span class="label">Email</span></a></li>
+        <li><a href="https://github.com/ASM-21" class="icon brands fa-github" target="_blank"><span class="label">Github</span></a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div id="main">
+    <section id="calculator" class="two">
+      <div class="container">
+        <header>
+          <h2>Engineering Unit Converter</h2>
+          <p>14 categories · 140+ units · favorites · shareable links</p>
+        </header>
+
+        <div class="uc-wrap" id="ucWrap">
+
+          <div class="uc-header-strip">
+            <h3><i class="fas fa-ruler-combined" style="margin-right:7px;opacity:.65"></i>Unit Converter</h3>
+            <span class="uc-header-meta">14 categories · 140+ units</span>
+          </div>
+
+          <div class="uc-cats-wrap">
+            <div class="uc-cats" id="ucCats"></div>
+          </div>
+
+          <div style="height:13px"></div>
+
+          <div class="uc-body">
+            <!-- Main panel -->
+            <div class="uc-panel">
+              <div class="uc-side">
+                <span class="uc-field-label">Value</span>
+                <div class="uc-input-wrap">
+                  <input type="number" id="ucInput" placeholder="Enter value…" step="any" autocomplete="off" />
+                  <button class="uc-clear-input" id="ucClearInput" title="Clear">✕</button>
+                </div>
+                <span class="uc-field-label" style="margin-top:2px">From</span>
+                <div class="uc-sel-wrap" id="fromWrap"></div>
+              </div>
+              <div class="uc-mid">
+                <button class="uc-swap" id="ucSwap" title="Swap  (S)">⇌</button>
+              </div>
+              <div class="uc-side">
+                <span class="uc-field-label">Result</span>
+                <div class="uc-result-wrap">
+                  <div class="uc-result" id="ucResult">—</div>
+                  <button class="uc-fav-btn" id="ucFavBtn" title="Save favorite"><i class="far fa-star"></i></button>
+                </div>
+                <span class="uc-field-label" style="margin-top:2px">To</span>
+                <div class="uc-sel-wrap" id="toWrap"></div>
+              </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="uc-controls">
+              <span class="uc-field-label-inline">Precision</span>
+              <div class="uc-sigfig-pills" id="ucSigfigs">
+                <button class="uc-sf" data-sf="3">3 sf</button>
+                <button class="uc-sf" data-sf="4">4 sf</button>
+                <button class="uc-sf active" data-sf="6">6 sf</button>
+                <button class="uc-sf" data-sf="full">Full</button>
+              </div>
+              <span class="uc-kbd-hint"><kbd>/</kbd> focus &nbsp; <kbd>S</kbd> swap &nbsp; <kbd>C</kbd> copy</span>
+              <div class="uc-controls-right">
+                <button class="uc-icon-btn" id="ucCopy"><i class="fas fa-copy"></i> Copy</button>
+                <button class="uc-icon-btn" id="ucShare"><i class="fas fa-link"></i> Share</button>
+              </div>
+            </div>
+
+            <!-- Formula bar -->
+            <div class="uc-formula-bar empty" id="ucFormula">1 unit = 1 unit</div>
+          </div>
+
+          <!-- Favorites -->
+          <div class="uc-favs-section" id="ucFavsSection" style="display:none">
+            <div class="uc-section-label">
+              <i class="fas fa-star" style="color:#f5a623;font-size:.88em"></i> Favorites
+              <span class="lbl-line"></span>
+            </div>
+            <div class="uc-favs-grid" id="ucFavsGrid"></div>
+          </div>
+
+          <!-- Also equals -->
+          <div class="uc-also-section" id="ucAlsoSection" style="display:none">
+            <div class="uc-section-label">Also equals <span class="lbl-line"></span></div>
+            <div class="uc-also-grid" id="ucAlsoGrid"></div>
+          </div>
+
+          <!-- History -->
+          <div class="uc-history-section" id="ucHistSection" style="display:none">
+            <div class="uc-section-label">
+              Recent &nbsp;<button class="uc-hist-clear" id="ucHistClear">clear</button>
+              <span class="lbl-line"></span>
+            </div>
+            <div class="uc-history-list" id="ucHistList"></div>
+          </div>
+
+          <div class="uc-footer">
+            <a href="../index.html#tools" class="uc-back">← Back to Tools</a>
+          </div>
+
+        </div><!-- /.uc-wrap -->
+      </div>
+    </section>
+  </div>
+
+  <div id="footer">
+    <ul class="copyright">
+      <li>&copy; Andrew Morrissey. All rights reserved.</li>
+      <li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+    </ul>
+  </div>
+
+  <div class="uc-toast" id="ucToast"></div>
+
+  <script src="../assets/js/jquery.min.js"></script>
+  <script src="../assets/js/jquery.scrolly.min.js"></script>
+  <script src="../assets/js/jquery.scrollex.min.js"></script>
+  <script src="../assets/js/browser.min.js"></script>
+  <script src="../assets/js/breakpoints.min.js"></script>
+  <script src="../assets/js/util.js"></script>
+  <script src="../assets/js/main.js"></script>
+
+  <script>
+  /* ================================================================  UNIT DATA  ================================================================ */
+  const CATS = {
+    length: { label:'Length', icon:'fas fa-ruler', base:'m',
+      common:['nm','μm','mm','cm','m','km','in','ft','yd','mi','nmi'],
+      units:{
+        'nm':  {f:1e-9,    label:'Nanometer',          g:'Metric'},
+        'μm':  {f:1e-6,    label:'Micrometer',         g:'Metric'},
+        'mm':  {f:1e-3,    label:'Millimeter',         g:'Metric'},
+        'cm':  {f:1e-2,    label:'Centimeter',         g:'Metric'},
+        'm':   {f:1,       label:'Meter',              g:'Metric'},
+        'km':  {f:1e3,     label:'Kilometer',          g:'Metric'},
+        'in':  {f:0.0254,  label:'Inch',               g:'Imperial'},
+        'ft':  {f:0.3048,  label:'Foot',               g:'Imperial'},
+        'yd':  {f:0.9144,  label:'Yard',               g:'Imperial'},
+        'mi':  {f:1609.344,label:'Mile',               g:'Imperial'},
+        'nmi': {f:1852,    label:'Nautical Mile',      g:'Imperial'},
+        'AU':  {f:1.496e11,label:'Astronomical Unit',  g:'Astronomy'},
+      }},
+    area: { label:'Area', icon:'fas fa-vector-square', base:'m²',
+      common:['mm²','cm²','m²','km²','in²','ft²','yd²','acre','ha','mi²'],
+      units:{
+        'mm²': {f:1e-6,       label:'Square millimeter', g:'Metric'},
+        'cm²': {f:1e-4,       label:'Square centimeter', g:'Metric'},
+        'm²':  {f:1,          label:'Square meter',      g:'Metric'},
+        'km²': {f:1e6,        label:'Square kilometer',  g:'Metric'},
+        'ha':  {f:1e4,        label:'Hectare',           g:'Metric'},
+        'in²': {f:6.4516e-4,  label:'Square inch',       g:'Imperial'},
+        'ft²': {f:0.09290304, label:'Square foot',       g:'Imperial'},
+        'yd²': {f:0.83612736, label:'Square yard',       g:'Imperial'},
+        'acre':{f:4046.8564,  label:'Acre',              g:'Imperial'},
+        'mi²': {f:2589988.1,  label:'Square mile',       g:'Imperial'},
+      }},
+    volume: { label:'Volume', icon:'fas fa-cube', base:'L',
+      common:['mL','L','m³','in³','ft³','fl oz','gal (US)','gal (UK)','bbl (oil)'],
+      units:{
+        'mL':      {f:0.001,       label:'Millilitre',       g:'Metric'},
+        'cL':      {f:0.01,        label:'Centilitre',       g:'Metric'},
+        'dL':      {f:0.1,         label:'Decilitre',        g:'Metric'},
+        'L':       {f:1,           label:'Litre',            g:'Metric'},
+        'm³':      {f:1000,        label:'Cubic meter',      g:'Metric'},
+        'cm³':     {f:0.001,       label:'Cubic centimeter', g:'Metric'},
+        'in³':     {f:0.016387064, label:'Cubic inch',       g:'Imperial'},
+        'ft³':     {f:28.316847,   label:'Cubic foot',       g:'Imperial'},
+        'yd³':     {f:764.55486,   label:'Cubic yard',       g:'Imperial'},
+        'fl oz':   {f:0.029573530, label:'Fluid ounce (US)', g:'Imperial'},
+        'cup':     {f:0.23658824,  label:'Cup (US)',         g:'Imperial'},
+        'pt (US)': {f:0.47317647,  label:'Pint (US)',        g:'Imperial'},
+        'qt (US)': {f:0.94635295,  label:'Quart (US)',       g:'Imperial'},
+        'gal (US)':{f:3.7854118,   label:'Gallon (US)',      g:'Imperial'},
+        'gal (UK)':{f:4.5460900,   label:'Gallon (UK)',      g:'Imperial'},
+        'bbl (oil)':{f:158.98729,  label:'Barrel (oil)',     g:'Imperial'},
+      }},
+    mass: { label:'Mass', icon:'fas fa-weight-hanging', base:'kg',
+      common:['μg','mg','g','kg','tonne','oz','lb','ton (US)'],
+      units:{
+        'μg':      {f:1e-9,       label:'Microgram',       g:'Metric'},
+        'mg':      {f:1e-6,       label:'Milligram',       g:'Metric'},
+        'g':       {f:0.001,      label:'Gram',            g:'Metric'},
+        'kg':      {f:1,          label:'Kilogram',        g:'Metric'},
+        'tonne':   {f:1000,       label:'Metric tonne',    g:'Metric'},
+        'oz':      {f:0.028349523,label:'Ounce',           g:'Imperial'},
+        'lb':      {f:0.45359237, label:'Pound',           g:'Imperial'},
+        'ton (US)':{f:907.18474,  label:'Ton (US short)',  g:'Imperial'},
+        'ton (UK)':{f:1016.0469,  label:'Ton (UK long)',   g:'Imperial'},
+        'slug':    {f:14.593903,  label:'Slug',            g:'Imperial'},
+      }},
+    temperature: { label:'Temp', icon:'fas fa-thermometer-half', base:'special',
+      common:['°C','°F','K','°R'],
+      units:{
+        '°C':{f:null,label:'Celsius',   g:'All'},
+        '°F':{f:null,label:'Fahrenheit',g:'All'},
+        'K': {f:null,label:'Kelvin',    g:'All'},
+        '°R':{f:null,label:'Rankine',   g:'All'},
+      }},
+    pressure: { label:'Pressure', icon:'fas fa-compress', base:'Pa',
+      common:['Pa','kPa','MPa','bar','atm','psi','mmHg','inHg'],
+      units:{
+        'Pa':     {f:1,        label:'Pascal',          g:'SI'},
+        'hPa':    {f:100,      label:'Hectopascal',     g:'SI'},
+        'kPa':    {f:1e3,      label:'Kilopascal',      g:'SI'},
+        'MPa':    {f:1e6,      label:'Megapascal',      g:'SI'},
+        'GPa':    {f:1e9,      label:'Gigapascal',      g:'SI'},
+        'bar':    {f:1e5,      label:'Bar',             g:'Practical'},
+        'mbar':   {f:100,      label:'Millibar',        g:'Practical'},
+        'atm':    {f:101325,   label:'Atmosphere',      g:'Practical'},
+        'torr':   {f:133.32237,label:'Torr',            g:'Practical'},
+        'mmHg':   {f:133.32239,label:'Millimeters Hg',  g:'Practical'},
+        'inHg':   {f:3386.3886,label:'Inches Hg',       g:'Practical'},
+        'inH₂O':  {f:249.08890,label:'Inches H₂O',      g:'Practical'},
+        'psi':    {f:6894.757, label:'PSI',              g:'Imperial'},
+        'ksi':    {f:6894757,  label:'ksi',              g:'Imperial'},
+        'lbf/ft²':{f:47.88026, label:'lbf/ft²',         g:'Imperial'},
+      }},
+    energy: { label:'Energy', icon:'fas fa-bolt', base:'J',
+      common:['J','kJ','MJ','Wh','kWh','MWh','cal','kcal','BTU','MMBTU','ft·lbf'],
+      units:{
+        'J':     {f:1,               label:'Joule',             g:'SI'},
+        'kJ':    {f:1e3,             label:'Kilojoule',         g:'SI'},
+        'MJ':    {f:1e6,             label:'Megajoule',         g:'SI'},
+        'GJ':    {f:1e9,             label:'Gigajoule',         g:'SI'},
+        'Wh':    {f:3600,            label:'Watt-hour',         g:'Electrical'},
+        'kWh':   {f:3.6e6,           label:'Kilowatt-hour',     g:'Electrical'},
+        'MWh':   {f:3.6e9,           label:'Megawatt-hour',     g:'Electrical'},
+        'GWh':   {f:3.6e12,          label:'Gigawatt-hour',     g:'Electrical'},
+        'eV':    {f:1.602176634e-19, label:'Electron-volt',     g:'Electrical'},
+        'cal':   {f:4.184,           label:'Calorie (thermo)',  g:'Thermal'},
+        'kcal':  {f:4184,            label:'Kilocalorie',       g:'Thermal'},
+        'BTU':   {f:1055.0559,       label:'BTU',               g:'Thermal'},
+        'kBTU':  {f:1055055.9,       label:'kBTU',              g:'Thermal'},
+        'MMBTU': {f:1.0550559e9,     label:'MMBTU',             g:'Thermal'},
+        'therm': {f:1.0548040e8,     label:'Therm (US)',        g:'Thermal'},
+        'ft·lbf':{f:1.3558181,       label:'Foot-pound force',  g:'Mechanical'},
+        'in·lbf':{f:0.11298483,      label:'Inch-pound force',  g:'Mechanical'},
+        'hp·hr': {f:2684519.5,       label:'Horsepower-hour',   g:'Mechanical'},
+      }},
+    power: { label:'Power', icon:'fas fa-plug', base:'W',
+      common:['W','kW','MW','GW','hp (mech)','BTU/hr','ton (refrig)'],
+      units:{
+        'mW':          {f:1e-3,      label:'Milliwatt',             g:'SI'},
+        'W':           {f:1,         label:'Watt',                  g:'SI'},
+        'kW':          {f:1e3,       label:'Kilowatt',              g:'SI'},
+        'MW':          {f:1e6,       label:'Megawatt',              g:'SI'},
+        'GW':          {f:1e9,       label:'Gigawatt',              g:'SI'},
+        'hp (mech)':   {f:745.69987, label:'Horsepower (mech)',     g:'Mechanical'},
+        'hp (elec)':   {f:746,       label:'Horsepower (elec)',     g:'Mechanical'},
+        'hp (metric)': {f:735.49875, label:'Horsepower (metric)',   g:'Mechanical'},
+        'ft·lbf/s':    {f:1.3558181, label:'Foot-pound/second',     g:'Mechanical'},
+        'BTU/hr':      {f:0.29307107,label:'BTU/hour',              g:'Thermal'},
+        'BTU/min':     {f:17.584264, label:'BTU/minute',            g:'Thermal'},
+        'BTU/s':       {f:1055.0559, label:'BTU/second',            g:'Thermal'},
+        'ton (refrig)':{f:3516.8528, label:'Ton of refrigeration',  g:'Thermal'},
+        'cal/s':       {f:4.184,     label:'Calorie/second',        g:'Thermal'},
+        'kcal/hr':     {f:1.1622222, label:'Kilocalorie/hour',      g:'Thermal'},
+      }},
+    force: { label:'Force', icon:'fas fa-arrow-right', base:'N',
+      common:['N','kN','MN','lbf','kip','kgf'],
+      units:{
+        'dyn':          {f:1e-5,      label:'Dyne',               g:'CGS'},
+        'N':            {f:1,         label:'Newton',             g:'SI'},
+        'kN':           {f:1e3,       label:'Kilonewton',         g:'SI'},
+        'MN':           {f:1e6,       label:'Meganewton',         g:'SI'},
+        'kgf':          {f:9.80665,   label:'Kilogram-force',     g:'SI'},
+        'tonf (metric)':{f:9806.65,   label:'Ton-force (metric)', g:'SI'},
+        'ozf':          {f:0.27801385,label:'Ounce-force',        g:'Imperial'},
+        'lbf':          {f:4.4482216, label:'Pound-force',        g:'Imperial'},
+        'kip':          {f:4448.2216, label:'Kip (1000 lbf)',     g:'Imperial'},
+        'tonf (US)':    {f:8896.4432, label:'Ton-force (US)',     g:'Imperial'},
+      }},
+    torque: { label:'Torque', icon:'fas fa-sync-alt', base:'N·m',
+      common:['N·m','kN·m','lbf·in','lbf·ft','kgf·m'],
+      units:{
+        'N·mm':  {f:0.001,      label:'Newton-millimeter',  g:'SI'},
+        'N·cm':  {f:0.01,       label:'Newton-centimeter',  g:'SI'},
+        'N·m':   {f:1,          label:'Newton-meter',       g:'SI'},
+        'kN·m':  {f:1000,       label:'Kilonewton-meter',   g:'SI'},
+        'kgf·m': {f:9.80665,    label:'kgf-meter',          g:'SI'},
+        'kgf·cm':{f:0.0980665,  label:'kgf-centimeter',     g:'SI'},
+        'ozf·in':{f:0.0070615,  label:'Ozf-inch',           g:'Imperial'},
+        'lbf·in':{f:0.11298483, label:'Pound-force inch',   g:'Imperial'},
+        'lbf·ft':{f:1.3558181,  label:'Pound-force foot',   g:'Imperial'},
+        'kip·ft':{f:1355.8181,  label:'Kip-foot',           g:'Imperial'},
+        'kip·in':{f:112.98483,  label:'Kip-inch',           g:'Imperial'},
+      }},
+    speed: { label:'Speed', icon:'fas fa-tachometer-alt', base:'m/s',
+      common:['m/s','km/h','mph','ft/s','ft/min','knot','mach'],
+      units:{
+        'mm/s':  {f:0.001,      label:'Millimeter/second',    g:'Metric'},
+        'cm/s':  {f:0.01,       label:'Centimeter/second',    g:'Metric'},
+        'm/s':   {f:1,          label:'Meter/second',         g:'Metric'},
+        'km/s':  {f:1000,       label:'Kilometer/second',     g:'Metric'},
+        'km/h':  {f:0.27777778, label:'Kilometer/hour',       g:'Metric'},
+        'ft/s':  {f:0.3048,     label:'Foot/second',          g:'Imperial'},
+        'ft/min':{f:0.00508,    label:'Foot/minute',          g:'Imperial'},
+        'mph':   {f:0.44704,    label:'Mile/hour',            g:'Imperial'},
+        'knot':  {f:0.51444444, label:'Knot',                 g:'Nautical'},
+        'mach':  {f:343,        label:'Mach (20°C sea lvl)',  g:'Other'},
+      }},
+    density: { label:'Density', icon:'fas fa-flask', base:'kg/m³',
+      common:['kg/m³','g/cm³','g/L','lb/ft³','lb/in³'],
+      units:{
+        'g/m³':       {f:0.001,     label:'Gram/cubic meter',     g:'Metric'},
+        'kg/m³':      {f:1,         label:'Kilogram/cubic meter', g:'Metric'},
+        'g/cm³':      {f:1000,      label:'Gram/cubic cm',        g:'Metric'},
+        'g/L':        {f:1,         label:'Gram/litre',           g:'Metric'},
+        'kg/L':       {f:1000,      label:'Kilogram/litre',       g:'Metric'},
+        't/m³':       {f:1000,      label:'Tonne/cubic meter',    g:'Metric'},
+        'lb/ft³':     {f:16.018463, label:'Pound/cubic foot',     g:'Imperial'},
+        'lb/in³':     {f:27679.905, label:'Pound/cubic inch',     g:'Imperial'},
+        'lb/gal (US)':{f:119.82643, label:'Pound/gallon (US)',    g:'Imperial'},
+      }},
+    flow: { label:'Flow', icon:'fas fa-water', base:'m³/s',
+      common:['L/s','L/min','m³/hr','GPM (US)','CFM','CFS'],
+      units:{
+        'mL/s':    {f:1e-6,       label:'Millilitre/second',   g:'Metric'},
+        'mL/min':  {f:1.66667e-8, label:'Millilitre/minute',   g:'Metric'},
+        'L/s':     {f:1e-3,       label:'Litre/second',        g:'Metric'},
+        'L/min':   {f:1.66667e-5, label:'Litre/minute',        g:'Metric'},
+        'L/hr':    {f:2.77778e-7, label:'Litre/hour',          g:'Metric'},
+        'm³/s':    {f:1,          label:'Cubic meter/second',  g:'Metric'},
+        'm³/min':  {f:1.66667e-2, label:'Cubic meter/minute',  g:'Metric'},
+        'm³/hr':   {f:2.77778e-4, label:'Cubic meter/hour',    g:'Metric'},
+        'GPM (US)':{f:6.30902e-5, label:'Gallons/min (US)',    g:'Imperial'},
+        'GPH (US)':{f:1.05150e-6, label:'Gallons/hr (US)',     g:'Imperial'},
+        'CFM':     {f:4.71947e-4, label:'Cubic feet/minute',   g:'Imperial'},
+        'CFS':     {f:0.028316847,label:'Cubic feet/second',   g:'Imperial'},
+        'bbl/day': {f:1.84013e-6, label:'Barrels/day (oil)',   g:'Imperial'},
+      }},
+    frequency: { label:'Freq/RPM', icon:'fas fa-wave-square', base:'Hz',
+      common:['Hz','kHz','MHz','RPM','rev/s','rad/s'],
+      units:{
+        'μHz':  {f:1e-6,          label:'Microhertz',       g:'Frequency'},
+        'mHz':  {f:0.001,         label:'Millihertz',       g:'Frequency'},
+        'Hz':   {f:1,             label:'Hertz',            g:'Frequency'},
+        'kHz':  {f:1e3,           label:'Kilohertz',        g:'Frequency'},
+        'MHz':  {f:1e6,           label:'Megahertz',        g:'Frequency'},
+        'GHz':  {f:1e9,           label:'Gigahertz',        g:'Frequency'},
+        'THz':  {f:1e12,          label:'Terahertz',        g:'Frequency'},
+        'RPM':  {f:1/60,          label:'Revolutions/min',  g:'Rotational'},
+        'rev/s':{f:1,             label:'Revolutions/sec',  g:'Rotational'},
+        'rad/s':{f:1/(2*Math.PI), label:'Radians/second',   g:'Rotational'},
+        'deg/s':{f:1/360,         label:'Degrees/second',   g:'Rotational'},
+      }},
+  };
+
+  const TEMP_FORMULAS = {
+    '°C→°F':'°F = °C × 9/5 + 32',  '°F→°C':'°C = (°F − 32) × 5/9',
+    '°C→K': 'K = °C + 273.15',      'K→°C': '°C = K − 273.15',
+    '°F→K': 'K = (°F + 459.67) × 5/9','K→°F':'°F = K × 9/5 − 459.67',
+    '°C→°R':'°R = (°C + 273.15) × 9/5','°R→°C':'°C = °R × 5/9 − 273.15',
+    '°F→°R':'°R = °F + 459.67',     '°R→°F':'°F = °R − 459.67',
+    'K→°R': '°R = K × 9/5',         '°R→K': 'K = °R × 5/9',
+  };
+
+  /* ── state ── */
+  let activeCat = 'length', activeSF = 6;
+  let fromSel = null, toSel = null;
+  let favorites = [], hist = [];
+  const LS_FAV = 'uc_fav_v1', LS_HIST = 'uc_hist_v1';
+
+  /* ── SearchSelect ── */
+  class SearchSelect {
+    constructor(wrap, onChange) {
+      this.wrap = wrap; this.onChange = onChange;
+      this.options = []; this.selected = null;
+      this.isOpen = false; this.highlighted = -1; this._vo = [];
+      this._build();
+    }
+    _build() {
+      this.trigger = Object.assign(document.createElement('div'), {className:'uc-sel-trigger', tabIndex:0});
+      this.dropdown = Object.assign(document.createElement('div'), {className:'uc-sel-dropdown'});
+      const sw = document.createElement('div'); sw.className = 'uc-sel-search-wrap';
+      this.si = Object.assign(document.createElement('input'), {type:'text',className:'uc-sel-search',placeholder:'Search units…',autocomplete:'off'});
+      sw.appendChild(this.si);
+      this.list = Object.assign(document.createElement('div'), {className:'uc-sel-list'});
+      this.dropdown.append(sw, this.list);
+      this.wrap.append(this.trigger, this.dropdown);
+      this.trigger.addEventListener('click', e => { e.stopPropagation(); this._toggle(); });
+      this.trigger.addEventListener('keydown', e => {
+        if (e.key==='Enter'||e.key===' ') { e.preventDefault(); this._toggle(); }
+        if (e.key==='ArrowDown') { e.preventDefault(); this._open(); }
+      });
+      this.si.addEventListener('input', () => this._render());
+      this.si.addEventListener('keydown', e => this._key(e));
+      document.addEventListener('click', e => { if (!this.wrap.contains(e.target)) this._close(); });
+    }
+    setOptions(opts, sel) {
+      this.options = opts; this.selected = sel || (opts[0]&&opts[0].value);
+      this._upTrigger(); if (this.isOpen) this._render();
+    }
+    getValue() { return this.selected; }
+    setValue(val, silent) {
+      if (this.options.find(o=>o.value===val)) {
+        this.selected=val; this._upTrigger();
+        if (!silent&&this.onChange) this.onChange(val);
+      }
+    }
+    _toggle() { this.isOpen ? this._close() : this._open(); }
+    _open() {
+      this.isOpen=true; this.trigger.classList.add('open'); this.dropdown.classList.add('open');
+      this.si.value=''; this.highlighted=-1; this._render();
+      setTimeout(()=>{ const s=this.list.querySelector('.selected'); if(s)s.scrollIntoView({block:'nearest'}); this.si.focus(); },30);
+    }
+    _close() { this.isOpen=false; this.trigger.classList.remove('open'); this.dropdown.classList.remove('open'); }
+    _upTrigger() {
+      const o = this.options.find(o=>o.value===this.selected);
+      this.trigger.textContent = o ? `${o.value}  —  ${o.label}` : (this.selected||'—');
+    }
+    _render() {
+      const q = this.si.value.trim().toLowerCase();
+      this.highlighted=-1; this.list.innerHTML='';
+      const groups={};
+      this.options.forEach(o=>{
+        if(q&&!o.value.toLowerCase().includes(q)&&!o.label.toLowerCase().includes(q)&&!o.group.toLowerCase().includes(q))return;
+        if(!groups[o.group])groups[o.group]=[];
+        groups[o.group].push(o);
+      });
+      const order=[...new Set(this.options.map(o=>o.group))];
+      let vis=[];
+      order.forEach(g=>{
+        if(!groups[g]||!groups[g].length)return;
+        const lbl=document.createElement('div'); lbl.className='uc-sel-group-label'; lbl.textContent=g; this.list.appendChild(lbl);
+        groups[g].forEach(opt=>{
+          const el=document.createElement('div');
+          el.className='uc-sel-opt'+(opt.value===this.selected?' selected':'');
+          el.innerHTML=`<span class="opt-sym">${_e(opt.value)}</span><span class="opt-lbl">${_e(opt.label)}</span>`;
+          el.addEventListener('mousedown',e=>{e.preventDefault();this.selected=opt.value;this._upTrigger();this._close();if(this.onChange)this.onChange(opt.value);});
+          this.list.appendChild(el); vis.push({el,value:opt.value});
+        });
+      });
+      if(!vis.length){const no=document.createElement('div');no.className='uc-sel-no-results';no.textContent=`No matches for "${q}"`;this.list.appendChild(no);}
+      this._vo=vis;
+    }
+    _key(e) {
+      const o=this._vo;
+      if(e.key==='ArrowDown'){e.preventDefault();this.highlighted=Math.min(this.highlighted+1,o.length-1);this._hl(o);}
+      else if(e.key==='ArrowUp'){e.preventDefault();this.highlighted=Math.max(this.highlighted-1,0);this._hl(o);}
+      else if(e.key==='Enter'){e.preventDefault();if(this.highlighted>=0&&o[this.highlighted]){this.selected=o[this.highlighted].value;this._upTrigger();this._close();if(this.onChange)this.onChange(this.selected);}}
+      else if(e.key==='Escape'){this._close();this.trigger.focus();}
+      else if(e.key==='Tab'){this._close();}
+    }
+    _hl(o){o.forEach((x,i)=>{x.el.classList.toggle('highlighted',i===this.highlighted);if(i===this.highlighted)x.el.scrollIntoView({block:'nearest'});});}
+  }
+
+  function _e(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+  /* ── category grid ── */
+  function buildCatGrid() {
+    const grid=document.getElementById('ucCats');
+    Object.keys(CATS).forEach((key,i)=>{
+      const c=CATS[key], btn=document.createElement('button');
+      btn.className='uc-cat'+(key===activeCat?' active':'');
+      btn.id='cat-'+key; btn.style.animationDelay=(i*0.025)+'s';
+      btn.innerHTML=`<i class="${c.icon}"></i>${c.label}`;
+      btn.addEventListener('click',()=>setCategory(key));
+      grid.appendChild(btn);
+    });
+  }
+
+  function setCategory(key, silent) {
+    document.getElementById('cat-'+activeCat).classList.remove('active');
+    activeCat=key;
+    document.getElementById('cat-'+key).classList.add('active');
+    const opts=Object.entries(CATS[key].units).map(([sym,meta])=>({value:sym,label:meta.label,group:meta.g}));
+    const keys=Object.keys(CATS[key].units);
+    fromSel.setOptions(opts,keys[0]);
+    toSel.setOptions(opts,keys[Math.min(1,keys.length-1)]);
+    clearResult();
+    if(!silent){document.getElementById('ucInput').value='';document.getElementById('ucInput').focus();}
+    updateFavsUI();
+  }
+
+  /* ── conversion ── */
+  function convertValue(val,from,to) {
+    if(activeCat==='temperature')return convertTemp(val,from,to);
+    const u=CATS[activeCat].units;
+    if(!u[from]||!u[to])return NaN;
+    return val*u[from].f/u[to].f;
+  }
+  function convertTemp(val,from,to) {
+    if(from===to)return val;
+    let c;
+    if(from==='°C')c=val; else if(from==='°F')c=(val-32)*5/9; else if(from==='K')c=val-273.15; else c=(val-491.67)*5/9;
+    if(to==='°C')return c; else if(to==='°F')return c*9/5+32; else if(to==='K')return c+273.15; else return(c+273.15)*9/5;
+  }
+
+  /* ── fmt ── */
+  function fmt(n,sf) {
+    if(n===null||n===undefined)return'—';
+    if(!isFinite(n))return n>0?'∞':'−∞';
+    if(n===0)return'0';
+    const s=sf!==undefined?sf:activeSF;
+    if(s===null){const a=Math.abs(n);if(a>=1e15||(a>0&&a<1e-9))return n.toExponential();return n.toString();}
+    const a=Math.abs(n);
+    if(a>=1e15||(a>0&&a<1e-9))return n.toExponential(s-1);
+    const r=parseFloat(n.toPrecision(s));
+    if(Number.isInteger(r)&&Math.abs(r)>=10000)return r.toLocaleString('en-US');
+    return r.toString();
+  }
+
+  /* ── formula ── */
+  function fmlHTML(from,to) {
+    if(activeCat==='temperature'){
+      if(from===to)return`${_e(from)} → ${_e(to)}: same unit`;
+      return _e(TEMP_FORMULAS[from+'→'+to]||'');
+    }
+    if(from===to)return`1 ${_e(from)} = 1 ${_e(to)}`;
+    const u=CATS[activeCat].units;
+    if(!u[from]||!u[to])return'';
+    return`1 ${_e(from)} = <span class="fml-factor">${_e(fmt(u[from].f/u[to].f,6))}</span> ${_e(to)}`;
+  }
+
+  /* ── also equals ── */
+  function updateAlso(val,from,currentTo) {
+    const sec=document.getElementById('ucAlsoSection'), grid=document.getElementById('ucAlsoGrid');
+    grid.innerHTML='';
+    const show=(CATS[activeCat].common||[]).filter(u=>u!==currentTo&&u!==from&&CATS[activeCat].units[u]).slice(0,6);
+    if(!show.length){sec.style.display='none';return;}
+    show.forEach(unit=>{
+      const v=convertValue(val,from,unit), card=document.createElement('div');
+      card.className='uc-also-card';
+      card.innerHTML=`<div class="au">${_e(unit)}</div><div class="av" title="${_e(fmt(v,6))}">${_e(fmt(v,4))}</div>`;
+      card.addEventListener('click',()=>{toSel.setValue(unit);doConvert();});
+      grid.appendChild(card);
+    });
+    sec.style.display='block';
+  }
+
+  /* ── favorites ── */
+  function loadFavs(){try{favorites=JSON.parse(localStorage.getItem(LS_FAV))||[];}catch{favorites=[];}}
+  function saveFavs(){try{localStorage.setItem(LS_FAV,JSON.stringify(favorites));}catch{}}
+  function isFav(cat,from,to){return favorites.some(f=>f.cat===cat&&f.from===from&&f.to===to);}
+  function toggleFav() {
+    const from=fromSel.getValue(), to=toSel.getValue();
+    if(!from||!to||from===to)return;
+    if(isFav(activeCat,from,to)){
+      favorites=favorites.filter(f=>!(f.cat===activeCat&&f.from===from&&f.to===to));
+      showToast('Removed from favorites');
+    } else {
+      favorites.push({cat:activeCat,from,to});
+      showToast('⭐ Saved to favorites');
+    }
+    saveFavs(); updateFavBtn(from,to); updateFavsUI();
+  }
+  function updateFavBtn(from,to) {
+    const btn=document.getElementById('ucFavBtn'), on=from&&to&&from!==to&&isFav(activeCat,from,to);
+    btn.classList.toggle('active',on);
+    btn.innerHTML=on?'<i class="fas fa-star"></i>':'<i class="far fa-star"></i>';
+    btn.title=on?'Remove favorite':'Save as favorite';
+  }
+  function updateFavsUI() {
+    const sec=document.getElementById('ucFavsSection'), grid=document.getElementById('ucFavsGrid');
+    const catFavs=favorites.filter(f=>f.cat===activeCat);
+    if(!catFavs.length){sec.style.display='none';return;}
+    grid.innerHTML='';
+    catFavs.forEach(fav=>{
+      const chip=document.createElement('div'); chip.className='uc-fav-chip';
+      chip.innerHTML=`${_e(fav.from)} <span class="fav-arrow">→</span> ${_e(fav.to)}<button class="fav-remove" data-cat="${_e(fav.cat)}" data-from="${_e(fav.from)}" data-to="${_e(fav.to)}">✕</button>`;
+      chip.addEventListener('click',e=>{
+        if(e.target.classList.contains('fav-remove')){
+          const {cat,from,to}=e.target.dataset;
+          favorites=favorites.filter(f=>!(f.cat===cat&&f.from===from&&f.to===to));
+          saveFavs(); updateFavsUI(); doConvert(); return;
+        }
+        fromSel.setValue(fav.from,true); toSel.setValue(fav.to,true); doConvert();
+      });
+      grid.appendChild(chip);
+    });
+    sec.style.display='block';
+  }
+
+  /* ── history ── */
+  function loadHist(){try{hist=JSON.parse(localStorage.getItem(LS_HIST))||[];}catch{hist=[];}}
+  function saveHist(){try{localStorage.setItem(LS_HIST,JSON.stringify(hist));}catch{}}
+  function pushHist(cat,from,to,fv,tv) {
+    if(hist.length&&hist[0].cat===cat&&hist[0].from===from&&hist[0].to===to){hist[0]={cat,from,to,fv,tv};}
+    else{hist.unshift({cat,from,to,fv,tv});if(hist.length>8)hist.pop();}
+    saveHist(); renderHist();
+  }
+  function renderHist() {
+    const sec=document.getElementById('ucHistSection'), list=document.getElementById('ucHistList');
+    list.innerHTML='';
+    if(!hist.length){sec.style.display='none';return;}
+    hist.forEach(h=>{
+      const row=document.createElement('div'); row.className='uc-hist-row';
+      const lbl=CATS[h.cat]?CATS[h.cat].label:h.cat;
+      row.innerHTML=`<span class="uc-hist-from">${_e(h.fv)} ${_e(h.from)}</span><span class="uc-hist-arrow">→</span><span class="uc-hist-to">${_e(h.tv)} ${_e(h.to)}</span><span class="uc-hist-units">${_e(lbl)}</span>`;
+      row.addEventListener('click',()=>{
+        if(activeCat!==h.cat)setCategory(h.cat,true);
+        fromSel.setValue(h.from,true); toSel.setValue(h.to,true);
+        document.getElementById('ucInput').value=h.fv; doConvert();
+      });
+      list.appendChild(row);
+    });
+    sec.style.display='block';
+  }
+
+  /* ── URL state ── */
+  function toHash(){
+    const f=fromSel?fromSel.getValue():'', t=toSel?toSel.getValue():'', v=document.getElementById('ucInput').value;
+    return'#'+encodeURIComponent(activeCat)+'/'+encodeURIComponent(f)+'/'+encodeURIComponent(t)+'/'+encodeURIComponent(v);
+  }
+  function fromHash() {
+    const parts=decodeURIComponent(location.hash.replace('#','')).split('/');
+    if(parts.length<3)return false;
+    const [cat,from,to,val]=parts;
+    if(!CATS[cat]||!CATS[cat].units[from]||!CATS[cat].units[to])return false;
+    setCategory(cat,true); fromSel.setValue(from,true); toSel.setValue(to,true);
+    if(val)document.getElementById('ucInput').value=val;
+    return true;
+  }
+
+  /* ── clear ── */
+  function clearResult() {
+    document.getElementById('ucResult').textContent='—';
+    const fb=document.getElementById('ucFormula'); fb.innerHTML='1 unit = 1 unit'; fb.classList.add('empty');
+    document.getElementById('ucAlsoSection').style.display='none';
+    updateFavBtn(fromSel?fromSel.getValue():null,toSel?toSel.getValue():null);
+  }
+
+  /* ── main convert ── */
+  function doConvert() {
+    const rawVal=document.getElementById('ucInput').value;
+    const from=fromSel?fromSel.getValue():null, to=toSel?toSel.getValue():null;
+    document.getElementById('ucClearInput').style.display=rawVal?'block':'none';
+    updateFavBtn(from,to);
+    if(!from||!to){return;}
+    if(rawVal===''||rawVal===null){clearResult();return;}
+    const val=parseFloat(rawVal);
+    if(isNaN(val)){document.getElementById('ucResult').textContent='?';return;}
+    const result=convertValue(val,from,to);
+    const el=document.getElementById('ucResult');
+    el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash');
+    setTimeout(()=>el.classList.remove('flash'),150);
+    el.textContent=fmt(result);
+    const fb=document.getElementById('ucFormula'); fb.innerHTML=fmlHTML(from,to); fb.classList.remove('empty');
+    updateAlso(val,from,to); updateFavBtn(from,to);
+    clearTimeout(doConvert._t);
+    doConvert._t=setTimeout(()=>pushHist(activeCat,from,to,fmt(val,6),fmt(result)),800);
+  }
+
+  /* ── swap ── */
+  function swapUnits() {
+    const rt=document.getElementById('ucResult').textContent, n=parseFloat(rt.replace(/,/g,''));
+    const pf=fromSel.getValue(), pt=toSel.getValue();
+    fromSel.setValue(pt,true); toSel.setValue(pf,true);
+    if(!isNaN(n)&&rt!=='—'&&rt!=='?')document.getElementById('ucInput').value=n;
+    doConvert();
+  }
+
+  /* ── copy ── */
+  function copyResult() {
+    const text=document.getElementById('ucResult').textContent;
+    if(text==='—'||text==='?')return;
+    const btn=document.getElementById('ucCopy');
+    const flash=()=>{btn.classList.add('active');btn.innerHTML='<i class="fas fa-check"></i> Copied!';setTimeout(()=>{btn.classList.remove('active');btn.innerHTML='<i class="fas fa-copy"></i> Copy';},1500);};
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(flash).catch(()=>fbCopy(text,flash));}else fbCopy(text,flash);
+  }
+  function fbCopy(text,cb){const ta=document.createElement('textarea');ta.value=text;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch{}document.body.removeChild(ta);if(cb)cb();}
+
+  /* ── share ── */
+  function shareLink() {
+    const url=location.href.split('#')[0]+toHash(), btn=document.getElementById('ucShare');
+    const flash=()=>{btn.classList.add('active');btn.innerHTML='<i class="fas fa-check"></i> Copied!';setTimeout(()=>{btn.classList.remove('active');btn.innerHTML='<i class="fas fa-link"></i> Share';},2000);};
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(url).then(()=>{location.replace(toHash());flash();}).catch(()=>fbCopy(url,flash));}else fbCopy(url,flash);
+    showToast('Link copied — share it!');
+  }
+
+  /* ── toast ── */
+  let _tt;
+  function showToast(msg){const t=document.getElementById('ucToast');t.textContent=msg;t.classList.add('show');clearTimeout(_tt);_tt=setTimeout(()=>t.classList.remove('show'),2200);}
+
+  /* ── init ── */
+  document.addEventListener('DOMContentLoaded',()=>{
+    loadFavs(); loadHist(); buildCatGrid();
+    fromSel=new SearchSelect(document.getElementById('fromWrap'),()=>doConvert());
+    toSel=new SearchSelect(document.getElementById('toWrap'),()=>doConvert());
+    // populate default category
+    const opts=Object.entries(CATS.length.units).map(([sym,meta])=>({value:sym,label:meta.label,group:meta.g}));
+    const keys=Object.keys(CATS.length.units);
+    fromSel.setOptions(opts,keys[0]); toSel.setOptions(opts,keys[1]);
+
+    const loadedHash=fromHash();
+
+    document.getElementById('ucInput').addEventListener('input',doConvert);
+    document.getElementById('ucSwap').addEventListener('click',swapUnits);
+    document.getElementById('ucCopy').addEventListener('click',copyResult);
+    document.getElementById('ucShare').addEventListener('click',shareLink);
+    document.getElementById('ucFavBtn').addEventListener('click',toggleFav);
+    document.getElementById('ucClearInput').addEventListener('click',()=>{document.getElementById('ucInput').value='';document.getElementById('ucClearInput').style.display='none';clearResult();});
+    document.getElementById('ucHistClear').addEventListener('click',()=>{hist=[];saveHist();renderHist();});
+
+    document.getElementById('ucSigfigs').addEventListener('click',e=>{
+      const btn=e.target.closest('.uc-sf');if(!btn)return;
+      document.querySelectorAll('.uc-sf').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      activeSF=btn.dataset.sf==='full'?null:parseInt(btn.dataset.sf,10);
+      doConvert();
+    });
+
+    document.addEventListener('keydown',e=>{
+      if(['INPUT','TEXTAREA'].includes(document.activeElement.tagName))return;
+      if(e.key==='/'||e.key==='f'){e.preventDefault();document.getElementById('ucInput').focus();}
+      if(e.key==='s')swapUnits();
+      if(e.key==='c')copyResult();
+    });
+
+    updateFavsUI(); renderHist();
+    if(loadedHash)doConvert();
+  });
+  </script>
+
+</body>
+</html>

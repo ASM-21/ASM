@@ -1,0 +1,1683 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Beam Analysis Tool — Andrew Morrissey</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="../assets/css/main.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=GTM-N34CKH5Q"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'GTM-N34CKH5Q');
+    </script>
+
+    <style>
+        /* ===== BASE ===== */
+        .tool-wrapper * { box-sizing: border-box; }
+        .tool-wrapper {
+            font-family: 'IBM Plex Sans', sans-serif;
+            background: #0d1117;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #30363d;
+            margin-top: 2em;
+            width: 100%;
+        }
+
+        /* ===== TOP BAR ===== */
+        .tool-topbar {
+            background: #161b22;
+            padding: 0.85em 1.6em;
+            border-bottom: 1px solid #30363d;
+            display: flex;
+            align-items: center;
+            gap: 0.75em;
+        }
+        .status-dot {
+            width: 8px; height: 8px;
+            background: #3fb950;
+            border-radius: 50%;
+            box-shadow: 0 0 8px rgba(63,185,80,0.55);
+            flex-shrink: 0;
+            animation: pulse 2.5s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%,100% { box-shadow: 0 0 6px rgba(63,185,80,0.4); }
+            50%      { box-shadow: 0 0 14px rgba(63,185,80,0.8); }
+        }
+        .topbar-title {
+            font-size: 0.75em;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            color: #8b949e;
+            font-weight: 500;
+        }
+        .topbar-badges { margin-left: auto; display: flex; gap: 0.5em; }
+        .badge {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.68em;
+            color: #484f58;
+            background: #21262d;
+            padding: 0.2em 0.55em;
+            border-radius: 4px;
+            border: 1px solid #30363d;
+        }
+
+        /* ===== SECTION LABELS ===== */
+        .sec-label {
+            font-size: 0.7em;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            color: #58a6ff;
+            font-weight: 600;
+            margin-bottom: 1em;
+            padding-bottom: 0.5em;
+            border-bottom: 1px solid #21262d;
+            display: flex;
+            align-items: center;
+            gap: 0.5em;
+        }
+        .sec-label i { opacity: 0.8; }
+
+        /* ===== INPUT GRID ===== */
+        .input-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            border-bottom: 1px solid #30363d;
+        }
+        @media (max-width: 800px) { .input-grid { grid-template-columns: 1fr; } }
+        .input-panel {
+            padding: 1.4em 1.6em;
+            border-right: 1px solid #30363d;
+        }
+        .input-panel:last-child { border-right: none; }
+
+        /* ===== FORM CONTROLS ===== */
+        .fg { margin-bottom: 0.95em; }
+        .fg label {
+            display: block;
+            font-size: 0.8em;
+            color: #8b949e;
+            margin-bottom: 0.3em;
+            font-weight: 500;
+        }
+        .fg label .unit {
+            color: #484f58;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.9em;
+        }
+        .fg input[type="number"], .fg select {
+            width: 100%;
+            background: #161b22;
+            border: 1px solid #30363d;
+            color: #e6edf3;
+            padding: 0.52em 0.8em;
+            border-radius: 6px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.88em;
+            transition: border-color 0.18s, box-shadow 0.18s;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        .fg select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238b949e' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            padding-right: 32px;
+            cursor: pointer;
+        }
+        .fg input:focus, .fg select:focus {
+            outline: none;
+            border-color: #58a6ff;
+            box-shadow: 0 0 0 3px rgba(88,166,255,0.1);
+        }
+        .fg input[readonly] { color: #8b949e; cursor: default; }
+        .dims-grid  { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6em; }
+        .dims-grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.6em; }
+
+        /* ===== COMPUTED I ===== */
+        .computed-val {
+            background: #0a0e14;
+            border: 1px solid #30363d;
+            border-left: 3px solid #3fb950;
+            border-radius: 6px;
+            padding: 0.6em 1em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0.8em;
+        }
+        .cv-label { font-size: 0.78em; color: #8b949e; }
+        .cv-value {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.95em;
+            color: #3fb950;
+            font-weight: 600;
+        }
+
+        /* ===== LOAD ROW ===== */
+        .load-row {
+            padding: 1.2em 1.6em;
+            border-bottom: 1px solid #30363d;
+            display: grid;
+            grid-template-columns: 220px 1fr;
+            gap: 2em;
+            align-items: start;
+        }
+        @media (max-width: 700px) { .load-row { grid-template-columns: 1fr; } }
+        .load-row .fg { margin: 0; }
+
+        /* ===== SLIDER ===== */
+        .slider-section label.slider-lbl { font-size: 0.8em; color: #8b949e; font-weight: 500; }
+        .pos-label-val { font-family: 'IBM Plex Mono', monospace; color: #58a6ff; }
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%; height: 5px;
+            background: #21262d;
+            border-radius: 3px;
+            outline: none;
+            margin: 0.6em 0 0.4em;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 17px; height: 17px;
+            background: #58a6ff;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 6px rgba(88,166,255,0.45);
+            transition: box-shadow 0.2s, transform 0.1s;
+        }
+        input[type="range"]::-webkit-slider-thumb:hover {
+            box-shadow: 0 0 12px rgba(88,166,255,0.7);
+            transform: scale(1.15);
+        }
+        .slider-ends {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.72em;
+            color: #484f58;
+            font-family: 'IBM Plex Mono', monospace;
+        }
+        #posCanvas { display: block; width: 100%; margin-top: 0.6em; border-radius: 4px; }
+
+        /* ===== ANALYZE ROW ===== */
+        .analyze-row {
+            padding: 1.1em 1.6em;
+            border-bottom: 1px solid #30363d;
+            display: flex;
+            align-items: center;
+            gap: 1em;
+            flex-wrap: wrap;
+        }
+        .btn-analyze {
+            background: #238636;
+            color: #fff;
+            border: 1px solid #2ea043;
+            padding: 0.65em 1.8em;
+            border-radius: 6px;
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-size: 0.88em;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.55em;
+            transition: background 0.18s, box-shadow 0.18s;
+        }
+        .btn-analyze:hover { background: #2ea043; box-shadow: 0 0 14px rgba(46,160,67,0.4); }
+        .btn-reset {
+            background: transparent;
+            color: #8b949e;
+            border: 1px solid #30363d;
+            padding: 0.65em 1.3em;
+            border-radius: 6px;
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-size: 0.88em;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5em;
+            transition: border-color 0.18s, color 0.18s;
+        }
+        .btn-reset:hover { border-color: #8b949e; color: #e6edf3; }
+        .error-msg { color: #f78166; font-size: 0.82em; font-family: 'IBM Plex Mono', monospace; }
+
+        /* ===== RESULTS ===== */
+        #results { padding: 0 1.6em 1.8em; }
+        .results-header {
+            font-size: 0.7em;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            color: #58a6ff;
+            font-weight: 600;
+            padding: 1.2em 0 0.8em;
+            border-bottom: 1px solid #21262d;
+            margin-bottom: 1.2em;
+            display: flex;
+            align-items: center;
+            gap: 0.5em;
+        }
+
+        /* ===== RESULT CARDS ===== */
+        .result-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 0.75em;
+            margin-bottom: 1.6em;
+        }
+        .rc {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 0.9em 1em;
+            text-align: center;
+            transition: border-color 0.2s;
+        }
+        .rc:hover { border-color: #484f58; }
+        .rc-lbl {
+            font-size: 0.68em;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #8b949e;
+            font-weight: 500;
+            margin-bottom: 0.45em;
+        }
+        .rc-val {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 1.2em;
+            font-weight: 600;
+            line-height: 1.15;
+            word-break: break-all;
+        }
+        .rc-unit { font-size: 0.72em; color: #8b949e; margin-top: 0.2em; font-family: 'IBM Plex Mono', monospace; }
+        .c-green  { color: #3fb950; }
+        .c-blue   { color: #58a6ff; }
+        .c-amber  { color: #e3b341; }
+        .c-orange { color: #f0883e; }
+        .c-purple { color: #bc8cff; }
+
+        /* ===== DIAGRAMS ===== */
+        .diagrams-wrap { display: flex; flex-direction: column; gap: 0.9em; }
+        .diagram-card {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            overflow: visible;
+            position: relative;
+        }
+        .diagram-hdr {
+            padding: 0.65em 1.1em;
+            border-bottom: 1px solid #21262d;
+            display: flex;
+            align-items: center;
+            gap: 0.55em;
+            border-radius: 8px 8px 0 0;
+            overflow: hidden;
+        }
+        .dhd { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+        .dhd-blue   { background: #58a6ff; }
+        .dhd-orange { background: #f0883e; }
+        .dhd-amber  { background: #e3b341; }
+        .dhd-green  { background: #3fb950; }
+        .dhd-purple { background: #bc8cff; }
+        .diagram-hdr span {
+            font-size: 0.75em;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #8b949e;
+            font-weight: 500;
+        }
+        .diagram-hdr .formula-chip {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.7em;
+            color: #484f58;
+            background: #21262d;
+            padding: 0.15em 0.5em;
+            border-radius: 4px;
+        }
+        .hdr-right { margin-left: auto; display: flex; align-items: center; gap: 0.55em; }
+
+        /* ===== EXPORT BUTTON ===== */
+        .btn-export {
+            background: transparent;
+            border: 1px solid #30363d;
+            color: #484f58;
+            padding: 0.22em 0.65em;
+            border-radius: 4px;
+            font-size: 0.72em;
+            font-family: 'IBM Plex Mono', monospace;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35em;
+            transition: border-color 0.15s, color 0.15s;
+        }
+        .btn-export:hover { border-color: #8b949e; color: #e6edf3; }
+
+        /* ===== CANVAS WRAPPER (for hover overlay) ===== */
+        .canvas-wrap {
+            position: relative;
+            display: block;
+            overflow: hidden;
+            border-radius: 0 0 8px 8px;
+        }
+        .canvas-wrap canvas { display: block; width: 100%; }
+        .canvas-wrap .hover-overlay {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+        }
+
+        /* ===== HOVER TOOLTIP ===== */
+        .chart-tooltip {
+            position: fixed;
+            background: #1c2128;
+            border: 1px solid #388bfd;
+            border-radius: 6px;
+            padding: 0.55em 0.85em;
+            pointer-events: none;
+            z-index: 9999;
+            display: none;
+            min-width: 140px;
+        }
+        .chart-tooltip.visible { display: block; }
+        .tt-x {
+            font-size: 0.72em;
+            color: #8b949e;
+            font-family: 'IBM Plex Mono', monospace;
+            margin-bottom: 0.3em;
+            border-bottom: 1px solid #21262d;
+            padding-bottom: 0.3em;
+        }
+        .tt-row {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.82em;
+            display: flex;
+            justify-content: space-between;
+            gap: 1em;
+            margin-top: 0.2em;
+        }
+        .tt-lbl { color: #8b949e; }
+
+        /* ===== BACK BUTTON ===== */
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5em;
+            margin-top: 1.6em;
+            padding: 0.65em 1.4em;
+            background: #238636;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 6px;
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-size: 0.88em;
+            font-weight: 500;
+            transition: background 0.18s;
+        }
+        .back-btn:hover { background: #2ea043; color: #fff; }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body class="is-preload">
+
+    <div id="header">
+        <div class="top">
+            <div id="logo">
+                <span class="image avatar48"><img src="../images/Avatar_1.jpg" alt="" /></span>
+                <h1 id="title">Andrew Morrissey</h1>
+                <p>Mechanical Engineer</p>
+            </div>
+            <nav id="nav">
+                <ul>
+                    <li><a href="../index.html#top"><span class="icon solid fa-home">Intro</span></a></li>
+                    <li><a href="../index.html#portfolio"><span class="icon solid fa-th">Portfolio</span></a></li>
+                    <li><a href="../index.html#tools"><span class="icon solid fa-wrench">Tools</span></a></li>
+                    <li><a href="../index.html#blog"><span class="icon solid fa-pen-nib">Blog</span></a></li>
+                    <li><a href="../index.html#about"><span class="icon solid fa-user">About Me</span></a></li>
+                    <li><a href="../index.html#contact"><span class="icon solid fa-envelope">Contact</span></a></li>
+                </ul>
+            </nav>
+        </div>
+        <div class="bottom">
+            <ul class="icons">
+                <li><a href="https://www.linkedin.com/in/asmorrissey" class="icon brands fa-linkedin" target="_blank"><span class="label">LinkedIn</span></a></li>
+                <li><a href="mailto:asmspartan21@gmail.com" class="icon solid fa-envelope"><span class="label">Email</span></a></li>
+                <li><a href="https://github.com/ASM-21" class="icon brands fa-github" target="_blank"><span class="label">Github</span></a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="main">
+        <section id="beam-tool" class="two">
+            <div class="container">
+                <header>
+                    <h2>Beam Analysis Tool</h2>
+                    <p>Deflection &middot; Shear Force &middot; Bending Moment &middot; Reactions &middot; Slope</p>
+                </header>
+
+                <div class="tool-wrapper">
+
+                    <!-- Top Bar -->
+                    <div class="tool-topbar">
+                        <div class="status-dot"></div>
+                        <span class="topbar-title">Structural Beam Analyzer</span>
+                        <div class="topbar-badges">
+                            <span class="badge">Euler–Bernoulli</span>
+                            <span class="badge">v3.0</span>
+                        </div>
+                    </div>
+
+                    <!-- Input Grid -->
+                    <div class="input-grid">
+                        <!-- LEFT: Beam Config -->
+                        <div class="input-panel">
+                            <div class="sec-label"><i class="fas fa-ruler-combined"></i> Beam Configuration</div>
+                            <div class="fg">
+                                <label>Support Type</label>
+                                <select id="supportType" onchange="onSupportChange()">
+                                    <option value="simply_supported">Simply Supported  (Pin – Roller)</option>
+                                    <option value="cantilever">Cantilever  (Fixed – Free)</option>
+                                </select>
+                            </div>
+                            <div class="fg">
+                                <label>Load Type</label>
+                                <select id="loadType" onchange="onLoadTypeChange()">
+                                    <option value="point">Point Load</option>
+                                    <option value="udl">Uniformly Distributed Load (UDL)</option>
+                                </select>
+                            </div>
+                            <div class="fg">
+                                <label>Beam Length L <span class="unit">(m)</span></label>
+                                <input type="number" id="beamLength" value="2.0" min="0.01" step="0.1" />
+                            </div>
+                        </div>
+
+                        <!-- RIGHT: Material & Section -->
+                        <div class="input-panel">
+                            <div class="sec-label"><i class="fas fa-layer-group"></i> Material &amp; Cross-Section</div>
+                            <div class="fg">
+                                <label>Material Preset</label>
+                                <select id="materialPreset" onchange="onMaterialChange()">
+                                    <option value="steel">Structural Steel A36</option>
+                                    <option value="aluminum">Aluminum 6061-T6</option>
+                                    <option value="stainless">Stainless Steel 304</option>
+                                    <option value="titanium">Titanium Ti-6Al-4V</option>
+                                    <option value="cfrp">Carbon Fiber CFRP (0°)</option>
+                                    <option value="concrete">Reinforced Concrete</option>
+                                    <option value="wood">Wood (Douglas Fir)</option>
+                                    <option value="hdpe">HDPE</option>
+                                    <option value="custom">Custom</option>
+                                </select>
+                            </div>
+                            <div class="fg">
+                                <label>Elastic Modulus E <span class="unit">(GPa)</span></label>
+                                <input type="number" id="elasticMod" value="200" min="0.001" step="0.1" />
+                            </div>
+                            <div class="fg">
+                                <label>Cross-Section Type</label>
+                                <select id="sectionType" onchange="onSectionChange()">
+                                    <option value="custom_I">Custom — enter I<sub>xx</sub> directly</option>
+                                    <option value="rect">Solid Rectangle</option>
+                                    <option value="circle">Solid Circle</option>
+                                    <option value="hollow_rect">Hollow Rectangle (RHS)</option>
+                                    <option value="ibeam">I-Beam / W-Section</option>
+                                    <option value="tube">Hollow Circle (CHS / Tube)</option>
+                                </select>
+                            </div>
+
+                            <div id="dims-custom_I" class="section-dims">
+                                <div class="fg">
+                                    <label>Moment of Inertia I<sub>xx</sub> <span class="unit">(cm⁴)</span></label>
+                                    <input type="number" id="customI" value="83.4" min="0.001" step="0.1" oninput="onDimChange()" />
+                                </div>
+                            </div>
+                            <div id="dims-rect" class="section-dims hidden">
+                                <div class="dims-grid">
+                                    <div class="fg"><label>Width b <span class="unit">(mm)</span></label><input type="number" id="rect_b" value="50" min="1" step="1" oninput="onDimChange()" /></div>
+                                    <div class="fg"><label>Height h <span class="unit">(mm)</span></label><input type="number" id="rect_h" value="100" min="1" step="1" oninput="onDimChange()" /></div>
+                                </div>
+                            </div>
+                            <div id="dims-circle" class="section-dims hidden">
+                                <div class="fg"><label>Diameter d <span class="unit">(mm)</span></label><input type="number" id="circ_d" value="50" min="1" step="1" oninput="onDimChange()" /></div>
+                            </div>
+                            <div id="dims-hollow_rect" class="section-dims hidden">
+                                <div class="dims-grid3">
+                                    <div class="fg"><label>Width b <span class="unit">(mm)</span></label><input type="number" id="hrect_b" value="80" min="1" step="1" oninput="onDimChange()" /></div>
+                                    <div class="fg"><label>Height h <span class="unit">(mm)</span></label><input type="number" id="hrect_h" value="120" min="1" step="1" oninput="onDimChange()" /></div>
+                                    <div class="fg"><label>Wall t <span class="unit">(mm)</span></label><input type="number" id="hrect_t" value="6" min="0.5" step="0.5" oninput="onDimChange()" /></div>
+                                </div>
+                            </div>
+                            <div id="dims-ibeam" class="section-dims hidden">
+                                <div class="dims-grid">
+                                    <div class="fg"><label>Flange b<sub>f</sub> <span class="unit">(mm)</span></label><input type="number" id="ib_bf" value="100" min="1" step="1" oninput="onDimChange()" /></div>
+                                    <div class="fg"><label>Flange t<sub>f</sub> <span class="unit">(mm)</span></label><input type="number" id="ib_tf" value="10" min="1" step="0.5" oninput="onDimChange()" /></div>
+                                    <div class="fg"><label>Web h<sub>w</sub> <span class="unit">(mm)</span></label><input type="number" id="ib_hw" value="180" min="1" step="1" oninput="onDimChange()" /></div>
+                                    <div class="fg"><label>Web t<sub>w</sub> <span class="unit">(mm)</span></label><input type="number" id="ib_tw" value="6" min="1" step="0.5" oninput="onDimChange()" /></div>
+                                </div>
+                            </div>
+                            <div id="dims-tube" class="section-dims hidden">
+                                <div class="dims-grid">
+                                    <div class="fg"><label>Outer D <span class="unit">(mm)</span></label><input type="number" id="tube_D" value="60" min="1" step="1" oninput="onDimChange()" /></div>
+                                    <div class="fg"><label>Inner d <span class="unit">(mm)</span></label><input type="number" id="tube_d" value="50" min="1" step="1" oninput="onDimChange()" /></div>
+                                </div>
+                            </div>
+
+                            <div class="computed-val">
+                                <span class="cv-label">Second Moment of Area I<sub>xx</sub></span>
+                                <span class="cv-value" id="computedIValue">— cm⁴</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Load Row -->
+                    <div class="load-row">
+                        <div class="fg">
+                            <label id="loadLabel">Load Magnitude P <span class="unit">(N)</span></label>
+                            <input type="number" id="loadMag" value="1000" min="0" step="100" />
+                        </div>
+                        <div id="sliderGroup" class="slider-section">
+                            <label class="slider-lbl">
+                                Load Position &mdash; <span class="pos-label-val" id="posLabel">50.0% of L</span>
+                            </label>
+                            <input type="range" id="loadPos" min="3" max="97" value="50" step="1" oninput="onPosChange()" />
+                            <div class="slider-ends"><span>End A</span><span>Midspan</span><span>End B</span></div>
+                            <canvas id="posCanvas" height="38"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Analyze Row -->
+                    <div class="analyze-row">
+                        <button class="btn-analyze" onclick="analyze()">
+                            <i class="fas fa-wave-square"></i> Run Analysis
+                        </button>
+                        <button class="btn-reset" onclick="resetTool()">
+                            <i class="fas fa-undo"></i> Reset
+                        </button>
+                        <span class="error-msg hidden" id="errorMsg"></span>
+                    </div>
+
+                    <!-- Results -->
+                    <div id="results" class="hidden">
+                        <div class="results-header"><i class="fas fa-chart-bar"></i> Analysis Results</div>
+
+                        <!-- Result Cards -->
+                        <div class="result-cards">
+                            <div class="rc">
+                                <div class="rc-lbl">Reaction R<sub>A</sub></div>
+                                <div class="rc-val c-blue" id="res-RA">—</div>
+                                <div class="rc-unit" id="res-RA-unit">N</div>
+                            </div>
+                            <div class="rc" id="cardRB">
+                                <div class="rc-lbl">Reaction R<sub>B</sub></div>
+                                <div class="rc-val c-blue" id="res-RB">—</div>
+                                <div class="rc-unit" id="res-RB-unit">N</div>
+                            </div>
+                            <div class="rc" id="cardMA">
+                                <div class="rc-lbl">Wall Moment M<sub>A</sub></div>
+                                <div class="rc-val c-amber" id="res-MA">—</div>
+                                <div class="rc-unit" id="res-MA-unit">N·m</div>
+                            </div>
+                            <div class="rc">
+                                <div class="rc-lbl">Max Deflection δ</div>
+                                <div class="rc-val c-green" id="res-delta">—</div>
+                                <div class="rc-unit" id="res-delta-unit">mm</div>
+                            </div>
+                            <div class="rc">
+                                <div class="rc-lbl">Max Slope θ</div>
+                                <div class="rc-val c-purple" id="res-theta">—</div>
+                                <div class="rc-unit" id="res-theta-unit">mrad</div>
+                            </div>
+                            <div class="rc">
+                                <div class="rc-lbl">Max Shear Force</div>
+                                <div class="rc-val c-orange" id="res-maxV">—</div>
+                                <div class="rc-unit" id="res-maxV-unit">N</div>
+                            </div>
+                            <div class="rc">
+                                <div class="rc-lbl">Max Bending Moment</div>
+                                <div class="rc-val c-amber" id="res-maxM">—</div>
+                                <div class="rc-unit" id="res-maxM-unit">N·m</div>
+                            </div>
+                        </div>
+
+                        <!-- Diagrams -->
+                        <div class="diagrams-wrap">
+
+                            <!-- Beam Schematic -->
+                            <div class="diagram-card">
+                                <div class="diagram-hdr">
+                                    <div class="dhd dhd-blue"></div>
+                                    <span>Beam Schematic &amp; Deflected Shape</span>
+                                    <div class="hdr-right">
+                                        <span class="formula-chip">Euler–Bernoulli</span>
+                                        <button class="btn-export" onclick="exportPNG('beamCanvas','beam_schematic')">
+                                            <i class="fas fa-download"></i> PNG
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="canvas-wrap" id="wrap-beam">
+                                    <canvas id="beamCanvas" height="230"></canvas>
+                                </div>
+                            </div>
+
+                            <!-- SFD -->
+                            <div class="diagram-card">
+                                <div class="diagram-hdr">
+                                    <div class="dhd dhd-orange"></div>
+                                    <span>Shear Force Diagram (SFD)</span>
+                                    <div class="hdr-right">
+                                        <span class="formula-chip" id="sfdFormula">V(x)</span>
+                                        <button class="btn-export" onclick="exportPNG('sfdCanvas','shear_force_diagram')">
+                                            <i class="fas fa-download"></i> PNG
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="canvas-wrap" id="wrap-sfd">
+                                    <canvas id="sfdCanvas" height="185"></canvas>
+                                </div>
+                            </div>
+
+                            <!-- BMD -->
+                            <div class="diagram-card">
+                                <div class="diagram-hdr">
+                                    <div class="dhd dhd-amber"></div>
+                                    <span>Bending Moment Diagram (BMD)</span>
+                                    <div class="hdr-right">
+                                        <span class="formula-chip" id="bmdFormula">M(x)</span>
+                                        <button class="btn-export" onclick="exportPNG('bmdCanvas','bending_moment_diagram')">
+                                            <i class="fas fa-download"></i> PNG
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="canvas-wrap" id="wrap-bmd">
+                                    <canvas id="bmdCanvas" height="185"></canvas>
+                                </div>
+                            </div>
+
+                            <!-- Deflection Diagram -->
+                            <div class="diagram-card">
+                                <div class="diagram-hdr">
+                                    <div class="dhd dhd-green"></div>
+                                    <span>Deflection Diagram δ(x)</span>
+                                    <div class="hdr-right">
+                                        <span class="formula-chip" id="defFormula">δ(x)</span>
+                                        <button class="btn-export" onclick="exportPNG('defCanvas','deflection_diagram')">
+                                            <i class="fas fa-download"></i> PNG
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="canvas-wrap" id="wrap-def">
+                                    <canvas id="defCanvas" height="185"></canvas>
+                                </div>
+                            </div>
+
+                            <!-- Slope Diagram -->
+                            <div class="diagram-card">
+                                <div class="diagram-hdr">
+                                    <div class="dhd dhd-purple"></div>
+                                    <span>Slope Diagram θ(x)</span>
+                                    <div class="hdr-right">
+                                        <span class="formula-chip">dδ/dx</span>
+                                        <button class="btn-export" onclick="exportPNG('slopeCanvas','slope_diagram')">
+                                            <i class="fas fa-download"></i> PNG
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="canvas-wrap" id="wrap-slope">
+                                    <canvas id="slopeCanvas" height="185"></canvas>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div><!-- end tool-wrapper -->
+
+                <a href="../index.html#tools" class="back-btn">
+                    <i class="fas fa-arrow-left"></i> Back to Tools
+                </a>
+            </div>
+        </section>
+    </div>
+
+    <!-- Global hover tooltip -->
+    <div class="chart-tooltip" id="chartTooltip">
+        <div class="tt-x" id="ttX">x = 0.00 m</div>
+        <div id="ttRows"></div>
+    </div>
+
+    <div id="footer">
+        <ul class="copyright">
+            <li>&copy; Andrew Morrissey. All rights reserved.</li>
+            <li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+        </ul>
+    </div>
+
+    <script src="../assets/js/jquery.min.js"></script>
+    <script src="../assets/js/jquery.scrolly.min.js"></script>
+    <script src="../assets/js/jquery.scrollex.min.js"></script>
+    <script src="../assets/js/browser.min.js"></script>
+    <script src="../assets/js/breakpoints.min.js"></script>
+    <script src="../assets/js/util.js"></script>
+    <script src="../assets/js/main.js"></script>
+
+    <script>
+    // ============================================================
+    //  GLOBAL STATE
+    // ============================================================
+    let G = null; // Holds all computed arrays after analysis
+
+    // ============================================================
+    //  MATERIALS
+    // ============================================================
+    const MATERIALS = {
+        steel:     { E: 200  },
+        aluminum:  { E: 69   },
+        stainless: { E: 193  },
+        titanium:  { E: 114  },
+        cfrp:      { E: 70   },
+        concrete:  { E: 30   },
+        wood:      { E: 13   },
+        hdpe:      { E: 1.4  },
+        custom:    { E: null }
+    };
+
+    function onMaterialChange() {
+        const key = document.getElementById('materialPreset').value;
+        const el  = document.getElementById('elasticMod');
+        const mat = MATERIALS[key];
+        if (mat.E !== null) { el.value = mat.E; el.readOnly = true; }
+        else                { el.readOnly = false; el.focus(); }
+    }
+
+    // ============================================================
+    //  CROSS-SECTION
+    // ============================================================
+    function onSectionChange() {
+        const type = document.getElementById('sectionType').value;
+        document.querySelectorAll('.section-dims').forEach(el => el.classList.add('hidden'));
+        document.getElementById('dims-' + type).classList.remove('hidden');
+        onDimChange();
+    }
+
+    function onDimChange() {
+        const val = computeI_cm4();
+        document.getElementById('computedIValue').textContent =
+            (val !== null && val > 0) ? val.toFixed(3) + ' cm⁴' : '— cm⁴';
+    }
+
+    function computeI_cm4() {
+        const type = document.getElementById('sectionType').value;
+        let I_m4;
+        try {
+            if (type === 'custom_I') {
+                const v = parseFloat(document.getElementById('customI').value);
+                return isNaN(v) || v <= 0 ? null : v;
+            }
+            if (type === 'rect') {
+                const b = parseFloat(document.getElementById('rect_b').value) / 1000;
+                const h = parseFloat(document.getElementById('rect_h').value) / 1000;
+                I_m4 = b * h * h * h / 12;
+            } else if (type === 'circle') {
+                const d = parseFloat(document.getElementById('circ_d').value) / 1000;
+                I_m4 = Math.PI * Math.pow(d, 4) / 64;
+            } else if (type === 'hollow_rect') {
+                const b = parseFloat(document.getElementById('hrect_b').value) / 1000;
+                const h = parseFloat(document.getElementById('hrect_h').value) / 1000;
+                const t = parseFloat(document.getElementById('hrect_t').value) / 1000;
+                if (2*t >= b || 2*t >= h) return null;
+                const bi = b - 2*t, hi = h - 2*t;
+                I_m4 = (b*Math.pow(h,3) - bi*Math.pow(hi,3)) / 12;
+            } else if (type === 'ibeam') {
+                const bf = parseFloat(document.getElementById('ib_bf').value) / 1000;
+                const tf = parseFloat(document.getElementById('ib_tf').value) / 1000;
+                const hw = parseFloat(document.getElementById('ib_hw').value) / 1000;
+                const tw = parseFloat(document.getElementById('ib_tw').value) / 1000;
+                if (tw >= bf) return null;
+                const H = hw + 2*tf;
+                I_m4 = (bf*Math.pow(H,3) - (bf-tw)*Math.pow(hw,3)) / 12;
+            } else if (type === 'tube') {
+                const D = parseFloat(document.getElementById('tube_D').value) / 1000;
+                const d = parseFloat(document.getElementById('tube_d').value) / 1000;
+                if (d >= D) return null;
+                I_m4 = Math.PI * (Math.pow(D,4) - Math.pow(d,4)) / 64;
+            }
+        } catch(e) { return null; }
+        if (!isFinite(I_m4) || I_m4 <= 0) return null;
+        return I_m4 * 1e8;
+    }
+
+    function getI_m4() {
+        const cm4 = computeI_cm4();
+        return cm4 === null ? null : cm4 * 1e-8;
+    }
+
+    // ============================================================
+    //  LOAD / SUPPORT UI HANDLERS
+    // ============================================================
+    function onLoadTypeChange() {
+        const lt  = document.getElementById('loadType').value;
+        const sg  = document.getElementById('sliderGroup');
+        const lbl = document.getElementById('loadLabel');
+        if (lt === 'udl') {
+            sg.style.opacity = '0.3';
+            sg.style.pointerEvents = 'none';
+            lbl.innerHTML = 'Load Intensity w <span class="unit">(N/m)</span>';
+        } else {
+            sg.style.opacity = '1';
+            sg.style.pointerEvents = 'auto';
+            lbl.innerHTML = 'Load Magnitude P <span class="unit">(N)</span>';
+        }
+        drawPosPreview();
+    }
+
+    function onSupportChange() {
+        const st = document.getElementById('supportType').value;
+        document.getElementById('cardRB').classList.toggle('hidden', st === 'cantilever');
+        document.getElementById('cardMA').classList.toggle('hidden', st !== 'cantilever');
+        drawPosPreview();
+    }
+
+    function onPosChange() {
+        const pct = parseFloat(document.getElementById('loadPos').value);
+        document.getElementById('posLabel').textContent = pct.toFixed(1) + '% of L';
+        drawPosPreview();
+    }
+
+    // ============================================================
+    //  POSITION PREVIEW CANVAS
+    // ============================================================
+    function drawPosPreview() {
+        const canvas = document.getElementById('posCanvas');
+        const W = canvas.offsetWidth || 400;
+        const H = 38;
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width  = W * dpr; canvas.height = H * dpr;
+        canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+        const ctx = canvas.getContext('2d');
+        ctx.scale(dpr, dpr);
+
+        const support  = document.getElementById('supportType').value;
+        const loadType = document.getElementById('loadType').value;
+        const pct      = parseFloat(document.getElementById('loadPos').value) / 100;
+        const PAD = 28, bx0 = PAD, bx1 = W - PAD, bLen = bx1 - bx0, by = H / 2;
+
+        ctx.clearRect(0, 0, W, H);
+        ctx.fillStyle = '#161b22';
+        ctx.fillRect(0, 0, W, H);
+
+        ctx.strokeStyle = '#58a6ff'; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.moveTo(bx0, by); ctx.lineTo(bx1, by); ctx.stroke();
+
+        drawMiniSup(ctx, bx0, by, support === 'cantilever' ? 'fixed'  : 'pin',    true);
+        drawMiniSup(ctx, bx1, by, support === 'cantilever' ? 'free'   : 'roller', false);
+
+        ctx.strokeStyle = '#f0883e'; ctx.fillStyle = '#f0883e'; ctx.lineWidth = 1.4;
+        if (loadType === 'point') {
+            const px = bx0 + pct * bLen;
+            ctx.beginPath(); ctx.moveTo(px, 3); ctx.lineTo(px, by - 2); ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(px - 4, by - 8); ctx.lineTo(px, by - 2); ctx.lineTo(px + 4, by - 8);
+            ctx.fill();
+        } else {
+            const n = 7;
+            for (let i = 0; i <= n; i++) {
+                const px = bx0 + (i / n) * bLen;
+                ctx.beginPath(); ctx.moveTo(px, 3); ctx.lineTo(px, by - 2); ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(px - 3, by - 7); ctx.lineTo(px, by - 2); ctx.lineTo(px + 3, by - 7);
+                ctx.fill();
+            }
+            ctx.beginPath(); ctx.moveTo(bx0, 3); ctx.lineTo(bx1, 3); ctx.stroke();
+        }
+    }
+
+    function drawMiniSup(ctx, x, y, type, isLeft) {
+        ctx.lineWidth = 1.5;
+        if (type === 'fixed') {
+            ctx.strokeStyle = '#58a6ff';
+            ctx.beginPath(); ctx.moveTo(x, y - 9); ctx.lineTo(x, y + 9); ctx.stroke();
+            ctx.strokeStyle = '#484f58';
+            const dir = isLeft ? -1 : 1;
+            for (let i = -2; i <= 2; i++) {
+                ctx.beginPath(); ctx.moveTo(x, y + i*4); ctx.lineTo(x + dir*7, y + i*4 + 4); ctx.stroke();
+            }
+        } else if (type === 'free') {
+            ctx.fillStyle = '#3fb950';
+            ctx.beginPath(); ctx.arc(x, y, 3, 0, Math.PI*2); ctx.fill();
+        } else if (type === 'pin') {
+            ctx.strokeStyle = '#58a6ff'; ctx.fillStyle = '#0d1117';
+            ctx.beginPath();
+            ctx.moveTo(x - 6, y + 3); ctx.lineTo(x, y); ctx.lineTo(x + 6, y + 3);
+            ctx.closePath(); ctx.stroke(); ctx.fill();
+            ctx.strokeStyle = '#484f58';
+            ctx.beginPath(); ctx.moveTo(x - 8, y + 3); ctx.lineTo(x + 8, y + 3); ctx.stroke();
+        } else if (type === 'roller') {
+            ctx.strokeStyle = '#58a6ff'; ctx.fillStyle = '#0d1117';
+            ctx.beginPath();
+            ctx.moveTo(x - 6, y + 3); ctx.lineTo(x, y); ctx.lineTo(x + 6, y + 3);
+            ctx.stroke();
+            ctx.strokeStyle = '#58a6ff';
+            ctx.beginPath(); ctx.arc(x, y + 7, 3.5, 0, Math.PI*2); ctx.stroke();
+            ctx.strokeStyle = '#484f58';
+            ctx.beginPath(); ctx.moveTo(x - 8, y + 11); ctx.lineTo(x + 8, y + 11); ctx.stroke();
+        }
+    }
+
+    // ============================================================
+    //  NUMERICAL SLOPE via central differences
+    // ============================================================
+    function computeSlopes(xs, ys) {
+        const n = xs.length;
+        const slopes = new Array(n);
+        const dx = xs[1] - xs[0];
+        slopes[0] = (ys[1] - ys[0]) / dx;
+        slopes[n-1] = (ys[n-1] - ys[n-2]) / dx;
+        for (let i = 1; i < n-1; i++) {
+            slopes[i] = (ys[i+1] - ys[i-1]) / (2 * dx);
+        }
+        return slopes;
+    }
+
+    // ============================================================
+    //  MAIN ANALYSIS
+    // ============================================================
+    function analyze() {
+        const support  = document.getElementById('supportType').value;
+        const loadType = document.getElementById('loadType').value;
+        const P        = parseFloat(document.getElementById('loadMag').value);
+        const L        = parseFloat(document.getElementById('beamLength').value);
+        const E        = parseFloat(document.getElementById('elasticMod').value) * 1e9;
+        const I        = getI_m4();
+        const EI       = E * I;
+        const pct      = parseFloat(document.getElementById('loadPos').value) / 100;
+        const a        = pct * L;
+        const b        = L - a;
+
+        const errEl = document.getElementById('errorMsg');
+        if (isNaN(P) || P < 0 || isNaN(L) || L <= 0 || isNaN(E) || E <= 0 || I === null || EI <= 0) {
+            errEl.textContent = '⚠ Check all inputs — ensure all values are positive and valid.';
+            errEl.classList.remove('hidden');
+            return;
+        }
+        errEl.classList.add('hidden');
+
+        const N  = 400;
+        const xs = Array.from({length: N+1}, (_, i) => i * L / N);
+        let Vs = [], Ms = [], ys = [];
+        let RA, RB = 0, MA = 0;
+
+        if (support === 'simply_supported') {
+            if (loadType === 'point') {
+                RA = P * b / L; RB = P * a / L;
+                xs.forEach(x => {
+                    Vs.push(x <= a ? RA : RA - P);
+                    Ms.push(x <= a ? RA * x : RA * x - P * (x - a));
+                    ys.push(x <= a
+                        ? P*b*x*(L*L - b*b - x*x) / (6*EI*L)
+                        : P*a*(L-x)*(2*L*x - a*a - x*x) / (6*EI*L));
+                });
+                document.getElementById('sfdFormula').textContent = 'V = Pb/L → Pb/L−P';
+                document.getElementById('bmdFormula').textContent = 'M = Pbx/L, Pa(L−x)/L';
+                document.getElementById('defFormula').textContent = 'Superposition';
+            } else {
+                const w = P;
+                RA = RB = w * L / 2;
+                xs.forEach(x => {
+                    Vs.push(w*L/2 - w*x);
+                    Ms.push(w*x*(L-x)/2);
+                    ys.push(w*x*(L*L*L - 2*L*x*x + x*x*x) / (24*EI));
+                });
+                document.getElementById('sfdFormula').textContent = 'V = wL/2 − wx';
+                document.getElementById('bmdFormula').textContent = 'M = wx(L−x)/2';
+                document.getElementById('defFormula').textContent = '5wL⁴/384EI max';
+            }
+        } else { // cantilever
+            if (loadType === 'point') {
+                RA = P; MA = P * a;
+                xs.forEach(x => {
+                    Vs.push(x <= a ? P : 0);
+                    Ms.push(x <= a ? P*(a - x) : 0);
+                    ys.push(x <= a
+                        ? P*x*x*(3*a - x) / (6*EI)
+                        : P*a*a*(3*x - a) / (6*EI));
+                });
+                document.getElementById('sfdFormula').textContent = 'V = P (x≤a), 0 (x>a)';
+                document.getElementById('bmdFormula').textContent = 'M = P(a−x) (x≤a)';
+                document.getElementById('defFormula').textContent = 'Pa²(3x−a)/6EI';
+            } else {
+                const w = P;
+                RA = w * L; MA = w * L * L / 2;
+                xs.forEach(x => {
+                    const rem = L - x;
+                    Vs.push(w * rem);
+                    Ms.push(w * rem * rem / 2);
+                    ys.push(w*x*x*(6*L*L - 4*L*x + x*x) / (24*EI));
+                });
+                document.getElementById('sfdFormula').textContent = 'V = w(L−x)';
+                document.getElementById('bmdFormula').textContent = 'M = w(L−x)²/2';
+                document.getElementById('defFormula').textContent = 'wL⁴/8EI max';
+            }
+        }
+
+        const slopes   = computeSlopes(xs, ys);
+        const maxDelta = Math.max(...ys.map(Math.abs));
+        const maxTheta = Math.max(...slopes.map(Math.abs));
+        const maxV     = Math.max(...Vs.map(Math.abs));
+        const maxM     = Math.max(...Ms.map(Math.abs));
+
+        // Store globally for hover tooltips
+        G = { xs, Vs, Ms, ys, slopes, L, support, loadType, P, a, RA, RB, MA, EI,
+              maxDelta, maxTheta, maxV, maxM };
+
+        // Populate cards
+        setCard('res-RA', 'res-RA-unit', RA, 'force');
+        setCard('res-RB', 'res-RB-unit', RB, 'force');
+        setCard('res-MA', 'res-MA-unit', MA, 'moment');
+        setCard('res-maxV', 'res-maxV-unit', maxV, 'force');
+        setCard('res-maxM', 'res-maxM-unit', maxM, 'moment');
+
+        // Deflection card
+        const dMm = maxDelta * 1000;
+        if (dMm >= 0.01) {
+            document.getElementById('res-delta').textContent    = dMm.toPrecision(4);
+            document.getElementById('res-delta-unit').textContent = 'mm';
+        } else {
+            document.getElementById('res-delta').textContent    = (maxDelta * 1e6).toPrecision(4);
+            document.getElementById('res-delta-unit').textContent = 'μm';
+        }
+
+        // Slope card
+        const thetaMrad = maxTheta * 1000;
+        if (thetaMrad >= 0.1) {
+            document.getElementById('res-theta').textContent    = thetaMrad.toPrecision(4);
+            document.getElementById('res-theta-unit').textContent = 'mrad';
+        } else {
+            document.getElementById('res-theta').textContent    = (maxTheta * 1e6).toPrecision(4);
+            document.getElementById('res-theta-unit').textContent = 'μrad';
+        }
+
+        document.getElementById('cardRB').classList.toggle('hidden', support === 'cantilever');
+        document.getElementById('cardMA').classList.toggle('hidden', support !== 'cantilever');
+
+        document.getElementById('results').classList.remove('hidden');
+
+        setTimeout(() => {
+            drawBeamDiagram();
+            drawSFD();
+            drawBMD();
+            drawDefDiagram();
+            drawSlopeDiagram();
+            attachHover('sfdCanvas',   'sfd');
+            attachHover('bmdCanvas',   'bmd');
+            attachHover('defCanvas',   'def');
+            attachHover('slopeCanvas', 'slope');
+            detachHover('beamCanvas');
+        }, 60);
+
+        document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function setCard(valId, unitId, val, type) {
+        const el   = document.getElementById(valId);
+        const unit = document.getElementById(unitId);
+        if (type === 'force') {
+            if (Math.abs(val) >= 1e6)      { el.textContent = (val/1e6).toPrecision(4); unit.textContent = 'MN'; }
+            else if (Math.abs(val) >= 1e3) { el.textContent = (val/1e3).toPrecision(4); unit.textContent = 'kN'; }
+            else                           { el.textContent = val.toPrecision(4);        unit.textContent = 'N'; }
+        } else {
+            if (Math.abs(val) >= 1e6)      { el.textContent = (val/1e6).toPrecision(4); unit.textContent = 'MN·m'; }
+            else if (Math.abs(val) >= 1e3) { el.textContent = (val/1e3).toPrecision(4); unit.textContent = 'kN·m'; }
+            else                           { el.textContent = val.toPrecision(4);        unit.textContent = 'N·m'; }
+        }
+    }
+
+    function resetTool() {
+        G = null;
+        document.getElementById('results').classList.add('hidden');
+        document.getElementById('errorMsg').classList.add('hidden');
+        hideTooltip();
+    }
+
+    // ============================================================
+    //  CANVAS SETUP HELPER
+    // ============================================================
+    function setupCanvas(id, cssH) {
+        const canvas = document.getElementById(id);
+        const dpr = window.devicePixelRatio || 1;
+        const W   = canvas.offsetWidth || canvas.parentElement.offsetWidth || 700;
+        const H   = cssH;
+        canvas.width  = W * dpr; canvas.height = H * dpr;
+        canvas.style.height = H + 'px';
+        const ctx = canvas.getContext('2d');
+        ctx.scale(dpr, dpr);
+        return { ctx, W, H };
+    }
+
+    // ============================================================
+    //  PNG EXPORT
+    // ============================================================
+    function exportPNG(canvasId, filename) {
+        const canvas = document.getElementById(canvasId);
+        const link   = document.createElement('a');
+        link.download = filename + '.png';
+        link.href     = canvas.toDataURL('image/png');
+        link.click();
+    }
+
+    // ============================================================
+    //  HOVER TOOLTIP SYSTEM
+    // ============================================================
+    const hoverListeners = {};
+
+    function attachHover(canvasId, mode) {
+        const canvas  = document.getElementById(canvasId);
+        const tooltip = document.getElementById('chartTooltip');
+
+        // Remove previous if any
+        detachHover(canvasId);
+
+        const onMove = (e) => {
+            if (!G) return;
+            const rect = canvas.getBoundingClientRect();
+            const mx   = e.clientX - rect.left;
+            const cssW = rect.width;
+
+            // Diagram margins (must match drawDiagram)
+            const ML = 68, MR = 24;
+            const ax0 = ML, ax1 = cssW - MR;
+            const aLen = ax1 - ax0;
+            if (mx < ax0 || mx > ax1) { hideTooltip(); return; }
+
+            const frac = (mx - ax0) / aLen;
+            const xVal = frac * G.L;
+            const idx  = Math.min(Math.round(frac * G.xs.length), G.xs.length - 1);
+
+            // Redraw with crosshair
+            if      (mode === 'sfd')   drawSFD(xVal);
+            else if (mode === 'bmd')   drawBMD(xVal);
+            else if (mode === 'def')   drawDefDiagram(xVal);
+            else if (mode === 'slope') drawSlopeDiagram(xVal);
+
+            // Build tooltip content
+            const V   = G.Vs[idx], M = G.Ms[idx];
+            const y   = G.ys[idx], th = G.slopes[idx];
+            const rows = [
+                { lbl: mode === 'sfd'   ? 'V(x)' :
+                       mode === 'bmd'   ? 'M(x)' :
+                       mode === 'def'   ? 'δ(x)' : 'θ(x)',
+                  val: mode === 'sfd'   ? fmtForce(V) :
+                       mode === 'bmd'   ? fmtMoment(M) :
+                       mode === 'def'   ? fmtDelta(y) :
+                                          fmtTheta(th) }
+            ];
+            // Show secondary value
+            if (mode === 'sfd')   rows.push({ lbl: 'M(x)', val: fmtMoment(M) });
+            if (mode === 'bmd')   rows.push({ lbl: 'V(x)', val: fmtForce(V) });
+            if (mode === 'def')   rows.push({ lbl: 'θ(x)', val: fmtTheta(th) });
+            if (mode === 'slope') rows.push({ lbl: 'δ(x)', val: fmtDelta(y) });
+
+            document.getElementById('ttX').textContent = 'x = ' + xVal.toFixed(3) + ' m';
+            document.getElementById('ttRows').innerHTML = rows.map(r =>
+                `<div class="tt-row"><span class="tt-lbl">${r.lbl}</span><span style="color:#e6edf3">${r.val}</span></div>`
+            ).join('');
+
+            tooltip.classList.add('visible');
+            const offX = e.clientX + 14, offY = e.clientY - 36;
+            const tw = tooltip.offsetWidth;
+            tooltip.style.left = (offX + tw > window.innerWidth - 8 ? e.clientX - tw - 14 : offX) + 'px';
+            tooltip.style.top  = Math.max(4, offY) + 'px';
+        };
+
+        const onLeave = () => {
+            hideTooltip();
+            // Redraw clean
+            if      (mode === 'sfd')   drawSFD();
+            else if (mode === 'bmd')   drawBMD();
+            else if (mode === 'def')   drawDefDiagram();
+            else if (mode === 'slope') drawSlopeDiagram();
+        };
+
+        canvas.addEventListener('mousemove',  onMove);
+        canvas.addEventListener('mouseleave', onLeave);
+        canvas.style.cursor = 'crosshair';
+        hoverListeners[canvasId] = { onMove, onLeave };
+    }
+
+    function detachHover(canvasId) {
+        const canvas = document.getElementById(canvasId);
+        if (hoverListeners[canvasId]) {
+            canvas.removeEventListener('mousemove',  hoverListeners[canvasId].onMove);
+            canvas.removeEventListener('mouseleave', hoverListeners[canvasId].onLeave);
+            delete hoverListeners[canvasId];
+        }
+        canvas.style.cursor = '';
+    }
+
+    function hideTooltip() {
+        document.getElementById('chartTooltip').classList.remove('visible');
+    }
+
+    // ============================================================
+    //  FORMAT HELPERS
+    // ============================================================
+    function fmtForce(v) {
+        if (Math.abs(v) >= 1e6) return (v/1e6).toPrecision(3) + ' MN';
+        if (Math.abs(v) >= 1e3) return (v/1e3).toPrecision(3) + ' kN';
+        return v.toPrecision(3) + ' N';
+    }
+    function fmtMoment(v) {
+        if (Math.abs(v) >= 1e6) return (v/1e6).toPrecision(3) + ' MN·m';
+        if (Math.abs(v) >= 1e3) return (v/1e3).toPrecision(3) + ' kN·m';
+        return v.toPrecision(3) + ' N·m';
+    }
+    function fmtDelta(v) {
+        const mm = v * 1000;
+        if (Math.abs(mm) >= 0.01) return mm.toPrecision(3) + ' mm';
+        return (v * 1e6).toPrecision(3) + ' μm';
+    }
+    function fmtTheta(v) {
+        const mr = v * 1000;
+        if (Math.abs(mr) >= 0.1) return mr.toPrecision(3) + ' mrad';
+        return (v * 1e6).toPrecision(3) + ' μrad';
+    }
+
+    // ============================================================
+    //  BEAM SCHEMATIC DIAGRAM
+    // ============================================================
+    function drawBeamDiagram() {
+        if (!G) return;
+        const { xs, ys, L, support, loadType, P, a, RA, RB, MA } = G;
+        const { ctx, W, H } = setupCanvas('beamCanvas', 230);
+        const ML = 72, MR = 55, MT = 52, MB = 44;
+        const beamY = H * 0.40;
+        const bx0   = ML, bx1 = W - MR, bxLen = bx1 - bx0;
+        const scX   = x => bx0 + (x / L) * bxLen;
+
+        ctx.fillStyle = '#0d1117';
+        ctx.fillRect(0, 0, W, H);
+
+        // Grid
+        ctx.strokeStyle = 'rgba(255,255,255,0.025)'; ctx.lineWidth = 1;
+        for (let i = 0; i <= 10; i++) {
+            const gx = bx0 + i * bxLen / 10;
+            ctx.beginPath(); ctx.moveTo(gx, 8); ctx.lineTo(gx, H - 10); ctx.stroke();
+        }
+
+        const maxYabs = Math.max(...ys.map(Math.abs));
+        const yAmp    = (H - MT - MB) * 0.36;
+        const scaleY  = maxYabs > 0 ? yAmp / maxYabs : 1;
+
+        // Deflected fill
+        ctx.beginPath();
+        ctx.moveTo(scX(xs[0]), beamY + ys[0] * scaleY);
+        xs.forEach((x, i) => ctx.lineTo(scX(x), beamY + ys[i] * scaleY));
+        ctx.lineTo(scX(xs[xs.length-1]), beamY);
+        ctx.lineTo(scX(xs[0]), beamY);
+        ctx.closePath();
+        ctx.fillStyle = 'rgba(63,185,80,0.07)'; ctx.fill();
+
+        // Deflected line
+        ctx.beginPath();
+        ctx.moveTo(scX(xs[0]), beamY + ys[0] * scaleY);
+        xs.forEach((x, i) => ctx.lineTo(scX(x), beamY + ys[i] * scaleY));
+        ctx.strokeStyle = '#3fb950'; ctx.lineWidth = 2.2; ctx.setLineDash([]); ctx.stroke();
+
+        // Max deflection marker
+        const maxIdx = ys.indexOf(maxYabs);
+        const mxPx   = scX(xs[maxIdx]);
+        const myPx   = beamY + maxYabs * scaleY;
+        ctx.strokeStyle = '#3fb950'; ctx.lineWidth = 1; ctx.setLineDash([3, 4]);
+        ctx.beginPath(); ctx.moveTo(mxPx, beamY - 2); ctx.lineTo(mxPx, myPx); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.beginPath(); ctx.arc(mxPx, myPx, 4, 0, Math.PI*2);
+        ctx.fillStyle = '#3fb950'; ctx.fill();
+        ctx.fillStyle = '#3fb950';
+        ctx.font = "11px 'IBM Plex Mono', monospace";
+        ctx.textAlign = 'center';
+        ctx.fillText('δ = ' + fmtDelta(maxYabs), mxPx, myPx + 16);
+
+        // Beam bar
+        ctx.strokeStyle = '#58a6ff'; ctx.lineWidth = 7; ctx.lineCap = 'butt'; ctx.setLineDash([]);
+        ctx.beginPath(); ctx.moveTo(bx0, beamY); ctx.lineTo(bx1, beamY); ctx.stroke();
+        ctx.strokeStyle = 'rgba(88,166,255,0.5)'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(bx0, beamY - 10); ctx.lineTo(bx0, beamY + 10); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(bx1, beamY - 10); ctx.lineTo(bx1, beamY + 10); ctx.stroke();
+
+        // Supports
+        if (support === 'cantilever') {
+            drawFixedWall(ctx, bx0, beamY, 13);
+            ctx.fillStyle = '#3fb950';
+            ctx.beginPath(); ctx.arc(bx1, beamY, 4, 0, Math.PI*2); ctx.fill();
+            ctx.strokeStyle = '#3fb950'; ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(bx1, beamY - 10); ctx.lineTo(bx1, beamY + 10); ctx.stroke();
+        } else {
+            drawPinSup(ctx, bx0, beamY, 11);
+            drawRollerSup(ctx, bx1, beamY, 11);
+        }
+
+        // Load arrows
+        const arrowH = 28;
+        if (loadType === 'point') {
+            const ax = scX(a);
+            drawArrow(ctx, ax, beamY - arrowH - 4, ax, beamY - 3, '#f0883e', 2.2);
+            ctx.fillStyle = '#f0883e';
+            ctx.font = "11px 'IBM Plex Mono', monospace"; ctx.textAlign = 'center';
+            ctx.fillText('P = ' + fmtForce(P), ax, beamY - arrowH - 11);
+        } else {
+            const nArr = 8;
+            for (let i = 0; i <= nArr; i++) {
+                drawArrow(ctx, bx0 + (i/nArr)*bxLen, beamY - arrowH - 4, bx0 + (i/nArr)*bxLen, beamY - 3, '#f0883e', 1.6);
+            }
+            ctx.strokeStyle = '#f0883e'; ctx.lineWidth = 1.6;
+            ctx.beginPath(); ctx.moveTo(bx0, beamY - arrowH - 4); ctx.lineTo(bx1, beamY - arrowH - 4); ctx.stroke();
+            ctx.fillStyle = '#f0883e';
+            ctx.font = "11px 'IBM Plex Mono', monospace"; ctx.textAlign = 'center';
+            ctx.fillText('w = ' + fmtForce(P) + '/m', (bx0+bx1)/2, beamY - arrowH - 12);
+        }
+
+        // Reactions
+        const rH = 26;
+        drawArrow(ctx, bx0, beamY + rH + 3, bx0, beamY + 3, '#58a6ff', 2);
+        ctx.fillStyle = '#8b949e'; ctx.font = "10px 'IBM Plex Mono', monospace"; ctx.textAlign = 'center';
+        ctx.fillText('R_A=' + fmtForce(RA), bx0, beamY + rH + 18);
+        if (support === 'simply_supported') {
+            drawArrow(ctx, bx1, beamY + rH + 3, bx1, beamY + 3, '#58a6ff', 2);
+            ctx.fillText('R_B=' + fmtForce(RB), bx1, beamY + rH + 18);
+        } else {
+            ctx.fillStyle = '#e3b341'; ctx.textAlign = 'left';
+            ctx.fillText('M_A=' + fmtMoment(MA), bx0 + 3, beamY + rH + 18);
+        }
+
+        // Dimension line
+        const dimY = H - 10;
+        ctx.strokeStyle = '#30363d'; ctx.lineWidth = 1; ctx.setLineDash([4,4]);
+        ctx.beginPath(); ctx.moveTo(bx0, beamY + 14); ctx.lineTo(bx0, dimY - 5); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(bx1, beamY + 14); ctx.lineTo(bx1, dimY - 5); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.strokeStyle = '#484f58';
+        ctx.beginPath(); ctx.moveTo(bx0, dimY); ctx.lineTo(bx1, dimY); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(bx0, dimY-4); ctx.lineTo(bx0, dimY+4); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(bx1, dimY-4); ctx.lineTo(bx1, dimY+4); ctx.stroke();
+        ctx.fillStyle = '#484f58'; ctx.font = "10px 'IBM Plex Mono', monospace"; ctx.textAlign = 'center';
+        ctx.fillText('L = ' + L.toFixed(2) + ' m', (bx0+bx1)/2, dimY - 5);
+
+        if (loadType === 'point') {
+            const ax = scX(a);
+            ctx.setLineDash([3,4]); ctx.strokeStyle = 'rgba(240,136,62,0.25)';
+            ctx.beginPath(); ctx.moveTo(ax, beamY+8); ctx.lineTo(ax, dimY); ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.fillStyle = 'rgba(240,136,62,0.75)'; ctx.font = "9px 'IBM Plex Mono', monospace"; ctx.textAlign = 'center';
+            ctx.fillText('a=' + a.toFixed(2) + 'm', ax, dimY + 10);
+        }
+
+        // Scale legend
+        const lx = W - MR - 4;
+        ctx.font = "10px 'IBM Plex Sans', sans-serif";
+        ctx.strokeStyle = '#58a6ff'; ctx.lineWidth = 3.5; ctx.setLineDash([]);
+        ctx.beginPath(); ctx.moveTo(lx-22, 12); ctx.lineTo(lx, 12); ctx.stroke();
+        ctx.fillStyle = '#8b949e'; ctx.textAlign = 'right'; ctx.fillText('Original', lx-26, 16);
+        ctx.strokeStyle = '#3fb950'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(lx-22, 26); ctx.lineTo(lx, 26); ctx.stroke();
+        ctx.fillStyle = '#8b949e'; ctx.fillText('Deflected (×' + scaleY.toFixed(0) + ')', lx-26, 30);
+    }
+
+    function drawFixedWall(ctx, x, y, sz) {
+        ctx.strokeStyle = '#58a6ff'; ctx.lineWidth = 2.5;
+        ctx.beginPath(); ctx.moveTo(x, y - sz*1.3); ctx.lineTo(x, y + sz*1.3); ctx.stroke();
+        ctx.strokeStyle = '#484f58'; ctx.lineWidth = 1.2;
+        for (let i = -2; i <= 2; i++) {
+            ctx.beginPath(); ctx.moveTo(x, y + i*5); ctx.lineTo(x - 9, y + i*5 + 6); ctx.stroke();
+        }
+    }
+    function drawPinSup(ctx, x, y, sz) {
+        ctx.strokeStyle = '#58a6ff'; ctx.fillStyle = '#0d1117'; ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(x - sz, y + sz*1.7); ctx.lineTo(x, y); ctx.lineTo(x + sz, y + sz*1.7);
+        ctx.closePath(); ctx.stroke(); ctx.fill();
+        ctx.strokeStyle = '#484f58';
+        ctx.beginPath(); ctx.moveTo(x - sz*1.3, y + sz*1.7); ctx.lineTo(x + sz*1.3, y + sz*1.7); ctx.stroke();
+        for (let i = -2; i <= 2; i++) {
+            ctx.beginPath(); ctx.moveTo(x + i*5 - 3, y + sz*1.7); ctx.lineTo(x + i*5 - 7, y + sz*1.7 + 5); ctx.stroke();
+        }
+    }
+    function drawRollerSup(ctx, x, y, sz) {
+        ctx.strokeStyle = '#58a6ff'; ctx.fillStyle = '#0d1117'; ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(x - sz, y + sz*1.7); ctx.lineTo(x, y); ctx.lineTo(x + sz, y + sz*1.7);
+        ctx.stroke();
+        ctx.beginPath(); ctx.arc(x, y + sz*1.7 + 4.5, 4.5, 0, Math.PI*2); ctx.stroke(); ctx.fill();
+        ctx.strokeStyle = '#484f58';
+        ctx.beginPath(); ctx.moveTo(x - sz*1.3, y + sz*1.7 + 10); ctx.lineTo(x + sz*1.3, y + sz*1.7 + 10); ctx.stroke();
+    }
+    function drawArrow(ctx, x1, y1, x2, y2, color, lw) {
+        const dx = x2-x1, dy = y2-y1;
+        const len = Math.sqrt(dx*dx + dy*dy);
+        if (len === 0) return;
+        const ux = dx/len, uy = dy/len, hl = 9, ha = 0.42;
+        ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = lw; ctx.setLineDash([]);
+        ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x2, y2);
+        ctx.lineTo(x2 - hl*(ux*Math.cos(ha) - uy*Math.sin(ha)), y2 - hl*(uy*Math.cos(ha) + ux*Math.sin(ha)));
+        ctx.lineTo(x2 - hl*(ux*Math.cos(-ha) - uy*Math.sin(-ha)), y2 - hl*(uy*Math.cos(-ha) + ux*Math.sin(-ha)));
+        ctx.closePath(); ctx.fill();
+    }
+
+    // ============================================================
+    //  SFD / BMD / DEFLECTION / SLOPE
+    // ============================================================
+    function drawSFD(hoverX) {
+        if (!G) return;
+        const { ctx, W, H } = setupCanvas('sfdCanvas', 185);
+        drawDiagram(ctx, W, H, G.xs, G.Vs, G.L, G.maxV, '#f0883e', 'N', 'V', hoverX);
+    }
+    function drawBMD(hoverX) {
+        if (!G) return;
+        const { ctx, W, H } = setupCanvas('bmdCanvas', 185);
+        drawDiagram(ctx, W, H, G.xs, G.Ms, G.L, G.maxM, '#e3b341', 'N·m', 'M', hoverX);
+    }
+    function drawDefDiagram(hoverX) {
+        if (!G) return;
+        const { ctx, W, H } = setupCanvas('defCanvas', 185);
+        drawDiagram(ctx, W, H, G.xs, G.ys, G.L, G.maxDelta, '#3fb950', 'm', 'δ', hoverX, true);
+    }
+    function drawSlopeDiagram(hoverX) {
+        if (!G) return;
+        const { ctx, W, H } = setupCanvas('slopeCanvas', 185);
+        drawDiagram(ctx, W, H, G.xs, G.slopes, G.L, G.maxTheta, '#bc8cff', 'rad', 'θ', hoverX);
+    }
+
+    // ============================================================
+    //  CORE DIAGRAM RENDERER
+    // ============================================================
+    function drawDiagram(ctx, W, H, xs, vals, L, maxAbs, color, unit, sym, hoverX, isDeflection) {
+        const ML = 68, MR = 24, MT = 22, MB = 36;
+        const ax0 = ML, ax1 = W - MR, aLen = ax1 - ax0;
+        const zeroY = H / 2 + 4;
+        const amp   = ((H - MT - MB) / 2) * 0.82;
+        const scX   = x => ax0 + (x / L) * aLen;
+        const scY   = v => zeroY - (maxAbs > 0 ? (v / maxAbs) * amp : 0);
+
+        ctx.fillStyle = '#0d1117';
+        ctx.fillRect(0, 0, W, H);
+
+        // Faint grid
+        ctx.strokeStyle = 'rgba(255,255,255,0.03)'; ctx.lineWidth = 1;
+        for (let i = 0; i <= 10; i++) {
+            const gx = ax0 + i * aLen / 10;
+            ctx.beginPath(); ctx.moveTo(gx, MT); ctx.lineTo(gx, H - MB); ctx.stroke();
+        }
+        [0.5, -0.5].forEach(f => {
+            const gy = zeroY - f * amp;
+            ctx.beginPath(); ctx.moveTo(ax0, gy); ctx.lineTo(ax1, gy); ctx.stroke();
+        });
+
+        // Zero axis
+        ctx.strokeStyle = '#30363d'; ctx.lineWidth = 1.2; ctx.setLineDash([5,5]);
+        ctx.beginPath(); ctx.moveTo(ax0, zeroY); ctx.lineTo(ax1, zeroY); ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Positive fill
+        ctx.save();
+        ctx.beginPath(); ctx.rect(ax0, MT, aLen, zeroY - MT); ctx.clip();
+        ctx.beginPath();
+        ctx.moveTo(scX(xs[0]), zeroY);
+        xs.forEach((x, i) => ctx.lineTo(scX(x), scY(vals[i])));
+        ctx.lineTo(scX(xs[xs.length-1]), zeroY);
+        ctx.closePath();
+        ctx.fillStyle = color + '28'; ctx.fill();
+        ctx.restore();
+
+        // Negative fill
+        ctx.save();
+        ctx.beginPath(); ctx.rect(ax0, zeroY, aLen, H - MB - zeroY + 1); ctx.clip();
+        ctx.beginPath();
+        ctx.moveTo(scX(xs[0]), zeroY);
+        xs.forEach((x, i) => ctx.lineTo(scX(x), scY(vals[i])));
+        ctx.lineTo(scX(xs[xs.length-1]), zeroY);
+        ctx.closePath();
+        ctx.fillStyle = (isDeflection ? color : '#f78166') + '28'; ctx.fill();
+        ctx.restore();
+
+        // Outline
+        ctx.beginPath();
+        ctx.moveTo(scX(xs[0]), scY(vals[0]));
+        xs.forEach((x, i) => ctx.lineTo(scX(x), scY(vals[i])));
+        ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.setLineDash([]); ctx.stroke();
+
+        // End verticals
+        ctx.strokeStyle = color + '80'; ctx.lineWidth = 1.2;
+        ctx.beginPath(); ctx.moveTo(scX(xs[0]), zeroY); ctx.lineTo(scX(xs[0]), scY(vals[0])); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(scX(xs[xs.length-1]), zeroY); ctx.lineTo(scX(xs[xs.length-1]), scY(vals[vals.length-1])); ctx.stroke();
+
+        // Axes
+        ctx.strokeStyle = '#484f58'; ctx.lineWidth = 1.5; ctx.setLineDash([]);
+        ctx.beginPath(); ctx.moveTo(ax0, MT); ctx.lineTo(ax0, H - MB); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(ax0, zeroY); ctx.lineTo(ax1, zeroY); ctx.stroke();
+
+        // Y-axis labels
+        const scaleDiv = maxAbs >= 1e6 ? 1e6 : maxAbs >= 1e3 ? 1e3 : maxAbs >= 1 ? 1 : maxAbs >= 1e-3 ? 1e-3 : 1e-6;
+        const scalePfx = maxAbs >= 1e6 ? 'M' : maxAbs >= 1e3 ? 'k' : maxAbs >= 1 ? '' : maxAbs >= 1e-3 ? 'm' : 'μ';
+        ctx.font = "10px 'IBM Plex Mono', monospace";
+        ctx.fillStyle = '#8b949e'; ctx.textAlign = 'right';
+        [1, 0.5, 0, -0.5, -1].forEach(f => {
+            const gy = zeroY - f * amp;
+            const lv = (f * maxAbs / scaleDiv).toPrecision(3);
+            ctx.fillStyle = '#8b949e';
+            ctx.fillText(lv, ax0 - 4, gy + 4);
+            ctx.strokeStyle = '#21262d'; ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(ax0 - 3, gy); ctx.lineTo(ax0 + 3, gy); ctx.stroke();
+        });
+        ctx.fillStyle = '#484f58'; ctx.textAlign = 'center';
+        ctx.font = "9px 'IBM Plex Mono', monospace";
+        ctx.fillText(scalePfx + unit, ax0 - 4, MT - 6);
+        ctx.fillText('x (m)', (ax0+ax1)/2, H - 2);
+
+        // X-axis ticks
+        [0, 0.25, 0.5, 0.75, 1.0].forEach(f => {
+            const gx = ax0 + f * aLen;
+            ctx.strokeStyle = '#30363d'; ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(gx, zeroY - 4); ctx.lineTo(gx, zeroY + 4); ctx.stroke();
+            ctx.fillStyle = '#484f58'; ctx.textAlign = 'center';
+            ctx.font = "10px 'IBM Plex Mono', monospace";
+            ctx.fillText((f * L).toFixed(2), gx, H - MB + 14);
+        });
+
+        // Peak dot + label
+        const absVals = vals.map(Math.abs);
+        const maxIdx  = absVals.indexOf(Math.max(...absVals));
+        const mxPx = scX(xs[maxIdx]), myPx = scY(vals[maxIdx]);
+        ctx.beginPath(); ctx.arc(mxPx, myPx, 4.5, 0, Math.PI*2);
+        ctx.fillStyle = color; ctx.fill();
+        ctx.font = "bold 10px 'IBM Plex Mono', monospace";
+        ctx.fillStyle = color; ctx.textAlign = 'center';
+        const peakFmt = (maxAbs / scaleDiv).toPrecision(3) + ' ' + scalePfx + unit;
+        const lblY = vals[maxIdx] >= 0 ? myPx - 12 : myPx + 18;
+        ctx.fillText(peakFmt, mxPx, lblY);
+
+        // Zero crossings
+        for (let i = 0; i < vals.length - 1; i++) {
+            if (vals[i] * vals[i+1] < 0) {
+                const frac = -vals[i] / (vals[i+1] - vals[i]);
+                const zxPx = scX(xs[i] + frac * (xs[i+1] - xs[i]));
+                ctx.beginPath(); ctx.arc(zxPx, zeroY, 3, 0, Math.PI*2);
+                ctx.fillStyle = '#484f58'; ctx.fill();
+                ctx.fillStyle = '#484f58'; ctx.font = "9px 'IBM Plex Mono', monospace"; ctx.textAlign = 'center';
+                const xZero = xs[i] + frac * (xs[i+1] - xs[i]);
+                ctx.fillText(xZero.toFixed(2)+'m', zxPx, zeroY + 13);
+            }
+        }
+
+        // ===== HOVER CROSSHAIR =====
+        if (hoverX !== undefined && hoverX !== null) {
+            const hxPx = scX(hoverX);
+            const frac  = hoverX / L;
+            const idx   = Math.min(Math.round(frac * xs.length), xs.length - 1);
+            const hyPx  = scY(vals[idx]);
+
+            // Vertical crosshair line
+            ctx.save();
+            ctx.setLineDash([4,4]);
+            ctx.strokeStyle = 'rgba(255,255,255,0.18)';
+            ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(hxPx, MT); ctx.lineTo(hxPx, H - MB); ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.restore();
+
+            // Horizontal crosshair line
+            ctx.save();
+            ctx.setLineDash([4,4]);
+            ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+            ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(ax0, hyPx); ctx.lineTo(ax1, hyPx); ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.restore();
+
+            // Circle on line
+            ctx.beginPath(); ctx.arc(hxPx, hyPx, 5, 0, Math.PI*2);
+            ctx.fillStyle = '#fff';
+            ctx.fill();
+            ctx.beginPath(); ctx.arc(hxPx, hyPx, 3.5, 0, Math.PI*2);
+            ctx.fillStyle = color; ctx.fill();
+
+            // x value on axis
+            ctx.fillStyle = color;
+            ctx.font = "bold 9px 'IBM Plex Mono', monospace";
+            ctx.textAlign = 'center';
+            ctx.fillText(hoverX.toFixed(3)+'m', hxPx, H - MB + 26);
+
+            // Y value marker on y-axis
+            const yAxisVal = vals[idx] / scaleDiv;
+            ctx.fillStyle = '#1c2128';
+            const tw2 = 42;
+            ctx.fillRect(ax0 - tw2 - 4, hyPx - 8, tw2, 16);
+            ctx.strokeStyle = color; ctx.lineWidth = 1;
+            ctx.strokeRect(ax0 - tw2 - 4, hyPx - 8, tw2, 16);
+            ctx.fillStyle = color;
+            ctx.font = "bold 9px 'IBM Plex Mono', monospace";
+            ctx.textAlign = 'right';
+            ctx.fillText(yAxisVal.toPrecision(3), ax0 - 7, hyPx + 4);
+        }
+    }
+
+    // ============================================================
+    //  INIT
+    // ============================================================
+    window.addEventListener('load', () => {
+        onMaterialChange();
+        onDimChange();
+        onSupportChange();
+        onLoadTypeChange();
+        setTimeout(drawPosPreview, 100);
+    });
+    window.addEventListener('resize', drawPosPreview);
+    </script>
+</body>
+</html>

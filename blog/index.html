@@ -1,0 +1,102 @@
+<!DOCTYPE HTML>
+<!--
+  =====================================================================
+  BLOG INDEX PAGE
+  =====================================================================
+  HOW TO ADD A NEW POST TO THIS LISTING:
+  1. Copy the block between "BEGIN POST CARD" and "END POST CARD"
+  2. Paste it at the TOP of the .blog-list div (newest first)
+  3. Update: href, title, date, and excerpt text
+  4. Also add a card to the #blog section in ASM/index.html
+  =====================================================================
+-->
+<html>
+	<head>
+		<title>Blog - Andrew Morrissey</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="../assets/css/main.css" />
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+		<style>
+			.blog-list { margin-top: 1.5em; max-width: 700px; }
+			.blog-post-card { background: #f9f9f9; border-radius: 8px; padding: 1.4em 1.6em; margin-bottom: 1.4em; box-shadow: 0 2px 4px rgba(0,0,0,0.07); transition: box-shadow 0.2s ease; }
+			.blog-post-card:hover { box-shadow: 0 4px 10px rgba(0,0,0,0.12); }
+			.blog-post-card h3 { margin: 0 0 0.3em 0; font-size: 1.1em; }
+			.blog-post-card h3 a { color: #444; text-decoration: none; }
+			.blog-post-card h3 a:hover { color: #4CAF50; }
+			.post-meta { color: #aaa; font-size: 0.85em; margin-bottom: 0.7em; }
+			.blog-post-card p.excerpt { margin: 0 0 0.9em 0; font-size: 0.95em; color: #555; line-height: 1.6; }
+			.read-more { color: #4CAF50; font-weight: 600; text-decoration: none; font-size: 0.9em; }
+			.read-more:hover { color: #45a049; }
+		</style>
+		<script async src="https://www.googletagmanager.com/gtag/js?id=GTM-N34CKH5Q"></script>
+		<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','GTM-N34CKH5Q');</script>
+	</head>
+	<body class="is-preload">
+
+		<div id="header">
+			<div class="top">
+				<div id="logo">
+					<span class="image avatar48"><img src="../images/Avatar_1.jpg" alt="" /></span>
+					<h1 id="title">Andrew Morrissey</h1>
+					<p>Mechanical Engineer</p>
+				</div>
+				<nav id="nav">
+					<ul>
+						<li><a href="../index.html#top"><span class="icon solid fa-home">Intro</span></a></li>
+						<li><a href="../index.html#portfolio"><span class="icon solid fa-th">Portfolio</span></a></li>
+						<li><a href="../index.html#tools"><span class="icon solid fa-wrench">Tools</span></a></li>
+						<li><a href="../index.html#blog"><span class="icon solid fa-pen-nib">Blog</span></a></li>
+						<li><a href="../index.html#about"><span class="icon solid fa-user">About Me</span></a></li>
+						<li><a href="../index.html#contact"><span class="icon solid fa-envelope">Contact</span></a></li>
+					</ul>
+				</nav>
+			</div>
+			<div class="bottom">
+				<ul class="icons">
+					<li><a href="https://www.linkedin.com/in/asmorrissey" class="icon brands fa-linkedin" target="_blank"><span class="label">LinkedIn</span></a></li>
+					<li><a href="mailto:asmspartan21@gmail.com" class="icon solid fa-envelope"><span class="label">Email</span></a></li>
+					<li><a href="https://github.com/ASM-21" class="icon brands fa-github" target="_blank"><span class="label">Github</span></a></li>
+				</ul>
+			</div>
+		</div>
+
+		<div id="main">
+			<section id="blog-listing" class="two">
+				<div class="container">
+					<header>
+						<h2>Blog</h2>
+					</header>
+					<p>Notes on things I've learned and would like to share.</p>
+
+					<div class="blog-list">
+
+						<!-- ==================== BEGIN POST CARD ==================== -->
+						<div class="blog-post-card">
+							<h3><a href="post-2026-03-16-getting-started.html">Getting Started: Literature Review Guide</a></h3>
+							<p class="post-meta"><i class="fas fa-calendar-alt"></i> April 5, 2026</p>
+							<p class="excerpt">A quick introduction to my literature review workflow that I've used for my MS research.</p>
+							<a href="post-2026-03-16-getting-started.html" class="read-more">Read more →</a>
+						</div>
+						<!-- ===================== END POST CARD ===================== -->
+
+					</div>
+				</div>
+			</section>
+		</div>
+
+		<div id="footer">
+			<ul class="copyright">
+				<li>&copy; Andrew Morrissey. All rights reserved.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+			</ul>
+		</div>
+
+		<script src="../assets/js/jquery.min.js"></script>
+		<script src="../assets/js/jquery.scrolly.min.js"></script>
+		<script src="../assets/js/jquery.scrollex.min.js"></script>
+		<script src="../assets/js/browser.min.js"></script>
+		<script src="../assets/js/breakpoints.min.js"></script>
+		<script src="../assets/js/util.js"></script>
+		<script src="../assets/js/main.js"></script>
+	</body>
+</html>

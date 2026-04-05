@@ -1,0 +1,1115 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <title>Electronics Calculator Hub - Andrew Morrissey</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+  <link rel="stylesheet" href="../assets/css/main.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <script async src="https://www.googletagmanager.com/gtag/js?id=GTM-N34CKH5Q"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','GTM-N34CKH5Q');</script>
+  <style>
+    #hub-wrap {
+      display: flex; max-width: 1020px; margin: 0 auto;
+      background: #fff; border-radius: 12px;
+      box-shadow: 0 4px 24px rgba(0,0,0,.10); overflow: hidden; min-height: 660px;
+    }
+    #hub-nav { width: 212px; flex-shrink: 0; background: #1c1c1c; display: flex; flex-direction: column; }
+    #hub-nav-header { padding: 18px 14px 12px; border-bottom: 1px solid #2a2a2a; }
+    #hub-nav-header .t1 { font-size: 15px; font-weight: 800; color: #fff; line-height: 1.2; }
+    #hub-nav-header .t2 { font-size: 15px; font-weight: 800; color: #4CAF50; line-height: 1.2; }
+    #hub-nav-header .sub { font-size: 10px; color: #888; margin-top: 4px; }
+    #hub-search-wrap { padding: 9px 12px; border-bottom: 1px solid #2a2a2a; position: relative; }
+    #hub-search {
+      width: 100%; padding: 6px 28px 6px 10px; background: #2a2a2a; border: 1px solid #3a3a3a;
+      border-radius: 6px; color: #ddd; font-size: 12px; outline: none; box-sizing: border-box;
+    }
+    #hub-search::placeholder { color: #666; }
+    #hub-search:focus { border-color: #4CAF50; background: #2e2e2e; }
+    #hub-search-clear {
+      position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; color: #666; font-size: 14px; cursor: pointer;
+      line-height: 1; padding: 0 2px; display: none;
+    }
+    #hub-search-clear:hover { color: #aaa; }
+    #nav-no-results { display: none; padding: 12px 14px; font-size: 12px; color: #666; font-style: italic; }
+    #hub-nav-list { flex: 1; overflow-y: auto; padding: 6px 0; }
+    .nav-cat { font-size: 9px; font-weight: 700; color: #777; letter-spacing: .12em; text-transform: uppercase; padding: 10px 14px 3px; }
+    .nav-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 14px; cursor: pointer; font-size: 12px; color: #999;
+      transition: background .1s, color .1s; border-left: 3px solid transparent;
+    }
+    .nav-item:hover { background: #242424; color: #ddd; }
+    .nav-item.active { background: #1a2e1a; color: #4CAF50; border-left-color: #4CAF50; font-weight: 600; }
+    .nav-item.hidden { display: none; }
+    .nav-item .ni { width: 13px; text-align: center; font-size: 10px; flex-shrink: 0; }
+    #hub-nav-footer { padding: 10px 14px; border-top: 1px solid #2a2a2a; font-size: 10px; color: #777; line-height: 1.6; }
+    #hub-content { flex: 1; padding: 26px 28px; overflow-y: auto; background: #fafafa; }
+    #hub-content h2 { margin: 0 0 4px; font-size: 19px; color: #222; }
+    .calc-desc { font-size: 13px; color: #666; margin: 0 0 18px; line-height: 1.6; }
+    .schematic { display: block; margin: 0 auto 18px; }
+    .field-group { margin-bottom: 13px; }
+    .field-label { font-size: 11px; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
+    .field-row { display: flex; gap: 6px; }
+    .field-row input[type="number"] {
+      flex: 1; padding: 7px 10px; border: 1px solid #ddd; border-radius: 6px;
+      font-size: 13px; color: #222; background: #fff; outline: none; transition: border-color .15s;
+    }
+    .field-row input[type="number"]:focus { border-color: #4CAF50; }
+    .field-row select {
+      width: 66px; flex-shrink: 0; padding: 7px 5px; border: 1px solid #ddd;
+      border-radius: 6px; font-size: 12px; background: #fff; color: #333; outline: none; cursor: pointer;
+    }
+    .field-hint { font-size: 11px; color: #aaa; margin-top: 3px; }
+    select.full-select {
+      width: 100%; padding: 7px 10px; border: 1px solid #ddd; border-radius: 6px;
+      font-size: 13px; background: #fff; color: #333; outline: none; cursor: pointer;
+    }
+    select.full-select:focus { border-color: #4CAF50; }
+    .slider-row { display: flex; align-items: center; gap: 10px; }
+    .slider-row input[type="range"] { flex: 1; accent-color: #4CAF50; }
+    .mode-toggle { display: flex; gap: 7px; margin-bottom: 14px; flex-wrap: wrap; }
+    .mode-btn {
+      flex: 1; padding: 7px 8px; border-radius: 6px; font-size: 12px; font-weight: 600;
+      cursor: pointer; border: 1.5px solid #ddd; background: #fff !important; background-image: none !important; color: #555 !important; transition: all .13s;
+    }
+    .mode-btn:hover { background: #f3f3f3 !important; color: #333 !important; }
+    .mode-btn.active { border-color: #4CAF50; background: #4CAF50 !important; background-image: none !important; color: #fff !important; }
+    .preset-pills { display: flex; gap: 5px; flex-wrap: wrap; margin: 5px 0 8px; }
+    .preset-pill {
+      padding: 4px 9px; border-radius: 5px; font-size: 11px; cursor: pointer;
+      border: 1.5px solid #ddd; background: #fff !important; background-image: none !important; color: #555 !important; transition: all .12s;
+    }
+    .preset-pill:hover { background: #f3f3f3 !important; color: #333 !important; }
+    .preset-pill.active { border-color: #4CAF50; background: #4CAF50 !important; background-image: none !important; color: #fff !important; }
+    .result-box {
+      margin-top: 16px; background: #f0fdf4; border: 1.5px solid #4CAF50;
+      border-radius: 8px; padding: 14px 16px;
+    }
+    .result-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .result-title { font-size: 9px; font-weight: 800; color: #4CAF50; letter-spacing: .12em; text-transform: uppercase; }
+    .copy-btn {
+      font-size: 10px; color: #4CAF50 !important; background: none !important; background-image: none !important; border: 1px solid #bbf7d0;
+      border-radius: 4px; padding: 3px 8px; cursor: pointer; transition: all .12s;
+    }
+    .copy-btn:hover { background: #4CAF50 !important; color: #fff !important; }
+    .copy-btn.copied { background: #4CAF50 !important; color: #fff !important; }
+    .result-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 5px; }
+    .result-label { font-size: 13px; color: #555; }
+    .result-value { font-size: 15px; font-weight: 700; color: #15803d; }
+    .result-divider { border: none; border-top: 1px solid #bbf7d0; margin: 8px 0; }
+    .result-note { font-size: 12px; color: #555; font-style: italic; margin-bottom: 5px; line-height: 1.5; }
+    .formula-line {
+      margin-top: 10px; padding-top: 9px; border-top: 1px solid #bbf7d0;
+      font-size: 11px; color: #4CAF50; font-family: monospace; line-height: 1.7;
+    }
+    .error-box {
+      margin-top: 14px; background: #fff5f5; border: 1px solid #fca5a5;
+      border-radius: 8px; padding: 10px 14px; color: #b91c1c; font-size: 13px;
+    }
+    .empty-state { margin-top: 16px; font-size: 13px; color: #ccc; text-align: center; padding: 20px; }
+    .formula-cat { font-size: 11px; font-weight: 700; color: #4CAF50; text-transform: uppercase; letter-spacing: .08em; margin: 18px 0 8px; }
+    .formula-cat:first-child { margin-top: 0; }
+    .formula-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .formula-card { background: #fff; border: 1px solid #e5e5e5; border-radius: 7px; padding: 10px 12px; }
+    .formula-card .fc-name { font-size: 11px; font-weight: 700; color: #333; margin-bottom: 5px; }
+    .formula-card .fc-eq { font-family: monospace; font-size: 12px; color: #15803d; line-height: 1.8; }
+    .formula-card .fc-note { font-size: 10px; color: #aaa; margin-top: 4px; }
+  </style>
+</head>
+<body class="is-preload">
+
+  <div id="header">
+    <div class="top">
+      <div id="logo">
+        <span class="image avatar48"><img src="../images/Avatar_1.jpg" alt="" /></span>
+        <h1 id="title">Andrew Morrissey</h1>
+        <p>Mechanical Engineer</p>
+      </div>
+      <nav id="nav">
+        <ul>
+          <li><a href="../index.html#top"><span class="icon solid fa-home">Intro</span></a></li>
+          <li><a href="../index.html#portfolio"><span class="icon solid fa-th">Portfolio</span></a></li>
+          <li><a href="../index.html#tools"><span class="icon solid fa-wrench">Tools</span></a></li>
+          <li><a href="../index.html#blog"><span class="icon solid fa-pen-nib">Blog</span></a></li>
+          <li><a href="../index.html#about"><span class="icon solid fa-user">About Me</span></a></li>
+          <li><a href="../index.html#contact"><span class="icon solid fa-envelope">Contact</span></a></li>
+        </ul>
+      </nav>
+    </div>
+    <div class="bottom">
+      <ul class="icons">
+        <li><a href="https://www.linkedin.com/in/asmorrissey" class="icon brands fa-linkedin" target="_blank"><span class="label">LinkedIn</span></a></li>
+        <li><a href="mailto:asmspartan21@gmail.com" class="icon solid fa-envelope"><span class="label">Email</span></a></li>
+        <li><a href="https://github.com/ASM-21" class="icon brands fa-github" target="_blank"><span class="label">Github</span></a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div id="main">
+    <section id="electronics-hub" class="two">
+      <div class="container">
+        <header>
+          <h2>Electronics Calculator Hub</h2>
+          <p>17 tools — passive circuits, power, signal, components. Live results, engineering notation, E24 standard resistor lookup.</p>
+        </header>
+
+        <div id="hub-wrap">
+          <div id="hub-nav">
+            <div id="hub-nav-header">
+              <div class="t1">Electronics</div>
+              <div class="t2">Calculator Hub</div>
+              <div class="sub">17 tools · live results · unit prefixes</div>
+            </div>
+            <div id="hub-search-wrap">
+              <input id="hub-search" type="text" placeholder="Search calculators..." oninput="filterNav(this.value)">
+              <button id="hub-search-clear" onclick="clearSearch()" title="Clear search">&#10005;</button>
+            </div>
+            <div id="hub-nav-list">
+              <div id="nav-no-results">No calculators match your search.</div>
+              <div class="nav-cat" data-cat>Reference</div>
+              <div class="nav-item active" data-calc="formulas"><span class="ni"><i class="fa fa-book"></i></span>Formula Sheet</div>
+              <div class="nav-cat" data-cat>Passive / Basic</div>
+              <div class="nav-item" data-calc="ohm"><span class="ni"><i class="fa fa-bolt"></i></span>Ohm's Law</div>
+              <div class="nav-item" data-calc="series"><span class="ni"><i class="fa fa-minus"></i></span>Series Resistors</div>
+              <div class="nav-item" data-calc="parallel"><span class="ni"><i class="fa fa-columns"></i></span>Parallel Resistors</div>
+              <div class="nav-item" data-calc="divider"><span class="ni"><i class="fa fa-divide"></i></span>Voltage Divider</div>
+              <div class="nav-item" data-calc="current_div"><span class="ni"><i class="fa fa-code-branch"></i></span>Current Divider</div>
+              <div class="nav-item" data-calc="thevenin"><span class="ni"><i class="fa fa-compress-arrows-alt"></i></span>Thevenin / Norton</div>
+              <div class="nav-cat" data-cat>Reactive / Timing</div>
+              <div class="nav-item" data-calc="rc"><span class="ni"><i class="fa fa-clock"></i></span>RC Time Constant</div>
+              <div class="nav-item" data-calc="lc"><span class="ni"><i class="fa fa-wave-square"></i></span>LC Resonance</div>
+              <div class="nav-item" data-calc="cap"><span class="ni"><i class="fa fa-charging-station"></i></span>Capacitor V(t)</div>
+              <div class="nav-item" data-calc="timer555"><span class="ni"><i class="fa fa-stopwatch"></i></span>555 Timer</div>
+              <div class="nav-cat" data-cat>Power &amp; Components</div>
+              <div class="nav-item" data-calc="led"><span class="ni"><i class="fa fa-lightbulb"></i></span>LED Resistor</div>
+              <div class="nav-item" data-calc="zener"><span class="ni"><i class="fa fa-shield-alt"></i></span>Zener Regulator</div>
+              <div class="nav-item" data-calc="battery"><span class="ni"><i class="fa fa-battery-half"></i></span>Battery Life</div>
+              <div class="nav-item" data-calc="power"><span class="ni"><i class="fa fa-fire"></i></span>Power Dissipation</div>
+              <div class="nav-cat" data-cat>Signal / Amplifiers</div>
+              <div class="nav-item" data-calc="opamp"><span class="ni"><i class="fa fa-microchip"></i></span>Op-Amp Gain</div>
+              <div class="nav-item" data-calc="db"><span class="ni"><i class="fa fa-signal"></i></span>dB / dBm</div>
+              <div class="nav-item" data-calc="awg"><span class="ni"><i class="fa fa-ruler"></i></span>Wire Gauge (AWG)</div>
+            </div>
+            <div id="hub-nav-footer">All values update live.<br>Prefixes: p n μ m k M G</div>
+          </div>
+
+          <div id="hub-content"></div>
+        </div>
+
+        <p style="margin-top:14px;font-size:13px;color:#aaa;">
+          <a href="../index.html#tools" style="color:#4CAF50;">← Back to Tools</a>
+        </p>
+      </div>
+    </section>
+  </div>
+
+  <div id="footer">
+    <ul class="copyright">
+      <li>&copy; Andrew Morrissey. All rights reserved.</li>
+      <li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+    </ul>
+  </div>
+
+  <script src="../assets/js/jquery.min.js"></script>
+  <script src="../assets/js/jquery.scrolly.min.js"></script>
+  <script src="../assets/js/jquery.scrollex.min.js"></script>
+  <script src="../assets/js/browser.min.js"></script>
+  <script src="../assets/js/breakpoints.min.js"></script>
+  <script src="../assets/js/util.js"></script>
+  <script src="../assets/js/main.js"></script>
+
+  <script>
+  // ── CONSTANTS ────────────────────────────────────────────────────────────
+  const MUL={p:1e-12,n:1e-9,'μ':1e-6,m:1e-3,'':1,k:1e3,M:1e6,G:1e9};
+  const E24=[1.0,1.1,1.2,1.3,1.5,1.6,1.8,2.0,2.2,2.4,2.7,3.0,
+             3.3,3.6,3.9,4.3,4.7,5.1,5.6,6.2,6.8,7.5,8.2,9.1];
+  const AWG_TABLE=[
+    [0,8.25,150,125],[2,6.54,100,95],[4,5.19,70,70],[6,4.11,55,55],
+    [8,3.26,40,40],[10,2.59,30,30],[12,2.05,20,20],[14,1.63,15,15],
+    [16,1.29,13,13],[18,1.02,10,10],[20,0.812,7.5,7.5],[22,0.644,5,3],
+    [24,0.511,3.5,2],[26,0.405,2.2,1],[28,0.321,0.8,0.5],[30,0.255,0.5,0.3]
+  ];
+  const LED_P=[{name:'Red',vf:2.0},{name:'Yellow',vf:2.1},{name:'Green',vf:2.2},
+               {name:'Blue',vf:3.3},{name:'White',vf:3.3},{name:'IR',vf:1.5},
+               {name:'UV',vf:3.5},{name:'Custom',vf:null}];
+
+  // ── HELPERS ──────────────────────────────────────────────────────────────
+  function eng(v,unit){
+    if(v===null||v===undefined||isNaN(v)||!isFinite(v))return'—';
+    if(v===0)return`0 ${unit}`;
+    const a=Math.abs(v);let p,d;
+    if(a>=1e9){p='G';d=1e9;}else if(a>=1e6){p='M';d=1e6;}else if(a>=1e3){p='k';d=1e3;}
+    else if(a>=1){p='';d=1;}else if(a>=1e-3){p='m';d=1e-3;}else if(a>=1e-6){p='μ';d=1e-6;}
+    else if(a>=1e-9){p='n';d=1e-9;}else{p='p';d=1e-12;}
+    return`${parseFloat((v/d).toPrecision(3))} ${p}${unit}`;
+  }
+  function nearestE24(r){
+    if(!r||r<=0)return null;
+    const base=Math.floor(Math.log10(r))-1;
+    let best=null,bd=Infinity;
+    for(let e=base;e<=base+2;e++)for(const v of E24){const c=v*Math.pow(10,e),d=Math.abs(r-c);if(d<bd){bd=d;best=c;}}
+    return best;
+  }
+  function minWatt(p){
+    if(!p||p<=0)return null;
+    for(const r of[0.125,0.25,0.5,1,2,5,10,25,50])if(r>=p*2)return`${r} W`;
+    return'> 50 W';
+  }
+  function getF(id){
+    const inp=document.getElementById(`inp-${id}`);
+    const pfx=document.getElementById(`pfx-${id}`);
+    if(!inp)return null;
+    const n=parseFloat(inp.value);
+    return isNaN(n)?null:n*(MUL[pfx?pfx.value:'']!==undefined?MUL[pfx?pfx.value:'']:1);
+  }
+
+  // ── STATE ────────────────────────────────────────────────────────────────
+  const S={
+    activeCalc:'formulas',capMode:'charge',opampMode:'inverting',
+    timer555Mode:'astable',ledPresetIdx:0,ledCurrent:20,
+    battEff:85,dbMode:'voltage',awgVal:22
+  };
+  window._lastResultText='';
+
+  // ── HTML BUILDERS ────────────────────────────────────────────────────────
+  function fieldHTML(id,label,prefixes,defaultPfx,unit,hint=''){
+    const opts=prefixes.map(p=>`<option value="${p}"${p===defaultPfx?' selected':''}>${p?p+unit:unit}</option>`).join('');
+    return`<div class="field-group">
+      <div class="field-label">${label}</div>
+      <div class="field-row">
+        <input type="number" step="any" placeholder="—" id="inp-${id}" oninput="recalc()">
+        <select id="pfx-${id}" onchange="recalc()">${opts}</select>
+      </div>${hint?`<div class="field-hint">${hint}</div>`:''}
+    </div>`;
+  }
+  function resultHTML(rows,formula=''){
+    if(!rows||!rows.length)return`<div class="empty-state">Enter values above to see results.</div>`;
+    let plain='';
+    let h=`<div class="result-box"><div class="result-header"><div class="result-title">Results</div><button class="copy-btn" id="copy-btn" onclick="copyResults()">Copy</button></div>`;
+    for(const r of rows){
+      if(r.hr)h+=`<hr class="result-divider">`;
+      else if(r.note!==undefined)h+=`<div class="result-note">${r.note}</div>`;
+      else{h+=`<div class="result-row"><span class="result-label">${r.l}</span><span class="result-value">${r.v}</span></div>`;plain+=`${r.l}: ${r.v}\n`;}
+    }
+    if(formula)h+=`<div class="formula-line">${formula}</div>`;
+    h+=`</div>`;
+    window._lastResultText=plain.trim();
+    return h;
+  }
+  function errorHTML(msg){return`<div class="error-box">&#9888; ${msg}</div>`;}
+  function modeBtns(key,opts){
+    return`<div class="mode-toggle">${opts.map(([val,lbl])=>
+      `<button class="mode-btn${S[key]===val?' active':''}" onclick="S['${key}']='${val}';switchCalc(S.activeCalc)">${lbl}</button>`
+    ).join('')}</div>`;
+  }
+  function copyResults(){
+    if(!window._lastResultText)return;
+    navigator.clipboard.writeText(window._lastResultText).then(()=>{
+      const btn=document.getElementById('copy-btn');
+      if(btn){btn.textContent='Copied!';btn.classList.add('copied');setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('copied');},1500);}
+    });
+  }
+
+  // ── CALCULATORS ──────────────────────────────────────────────────────────
+  const CALCS={
+
+    formulas:{
+      title:'Formula Sheet',
+      desc:'Quick reference for all equations used across this calculator hub.',
+      render(){return`
+        <div class="formula-cat">Ohm\'s Law &amp; Power</div>
+        <div class="formula-grid">
+          <div class="formula-card"><div class="fc-name">Ohm\'s Law</div><div class="fc-eq">V = I · R<br>I = V / R<br>R = V / I</div></div>
+          <div class="formula-card"><div class="fc-name">Power</div><div class="fc-eq">P = V · I<br>P = I² · R<br>P = V² / R</div></div>
+          <div class="formula-card"><div class="fc-name">Series Resistance</div><div class="fc-eq">Rt = R1 + R2 + ...</div><div class="fc-note">Voltage divides proportionally</div></div>
+          <div class="formula-card"><div class="fc-name">Parallel Resistance</div><div class="fc-eq">1/Rt = 1/R1 + 1/R2 + ...<br>Two: Rt = R1·R2 / (R1+R2)</div></div>
+          <div class="formula-card"><div class="fc-name">Voltage Divider</div><div class="fc-eq">Vout = Vin · R2 / (R1+R2)</div><div class="fc-note">Load &ge;10&times;R2 for stability</div></div>
+          <div class="formula-card"><div class="fc-name">Current Divider</div><div class="fc-eq">I1 = It · R2 / (R1+R2)<br>I2 = It · R1 / (R1+R2)</div></div>
+        </div>
+        <div class="formula-cat">Reactive Circuits</div>
+        <div class="formula-grid">
+          <div class="formula-card"><div class="fc-name">RC Time Constant</div><div class="fc-eq">&#964; = R · C<br>fc = 1 / (2&#960;·R·C)</div><div class="fc-note">63.2% at &#964;, ~99% at 5&#964;</div></div>
+          <div class="formula-card"><div class="fc-name">Capacitor Charge</div><div class="fc-eq">V(t) = Vs·(1 &#8722; e^(&#8722;t/&#964;))</div></div>
+          <div class="formula-card"><div class="fc-name">Capacitor Discharge</div><div class="fc-eq">V(t) = Vs · e^(&#8722;t/&#964;)</div></div>
+          <div class="formula-card"><div class="fc-name">LC Resonance</div><div class="fc-eq">f0 = 1 / (2&#960;&#8730;(L·C))<br>Z0 = &#8730;(L/C)</div></div>
+          <div class="formula-card"><div class="fc-name">Capacitive Reactance</div><div class="fc-eq">Xc = 1 / (2&#960;·f·C)</div></div>
+          <div class="formula-card"><div class="fc-name">Inductive Reactance</div><div class="fc-eq">XL = 2&#960; · f · L</div></div>
+        </div>
+        <div class="formula-cat">555 Timer</div>
+        <div class="formula-grid">
+          <div class="formula-card"><div class="fc-name">Astable Frequency</div><div class="fc-eq">f = 1.44 / ((Ra+2Rb)·C)</div></div>
+          <div class="formula-card"><div class="fc-name">Astable Duty Cycle</div><div class="fc-eq">D = (Ra+Rb) / (Ra+2Rb)</div></div>
+          <div class="formula-card"><div class="fc-name">Monostable Pulse</div><div class="fc-eq">t = 1.1 · R · C</div></div>
+          <div class="formula-card"><div class="fc-name">High/Low Times</div><div class="fc-eq">tH = 0.693·(Ra+Rb)·C<br>tL = 0.693·Rb·C</div></div>
+        </div>
+        <div class="formula-cat">Components &amp; Regulators</div>
+        <div class="formula-grid">
+          <div class="formula-card"><div class="fc-name">LED Resistor</div><div class="fc-eq">R = (Vs &#8722; Vf) / If</div></div>
+          <div class="formula-card"><div class="fc-name">Zener Regulator</div><div class="fc-eq">Rs = (Vs &#8722; Vz) / (Iz + IL)<br>Pz = Iz · Vz</div></div>
+          <div class="formula-card"><div class="fc-name">Thevenin Voltage</div><div class="fc-eq">Vth = open-circuit voltage</div></div>
+          <div class="formula-card"><div class="fc-name">Max Power Transfer</div><div class="fc-eq">Pmax = Vth&#178; / (4·Rth)<br>when RL = Rth</div></div>
+        </div>
+        <div class="formula-cat">Signal &amp; Amplifiers</div>
+        <div class="formula-grid">
+          <div class="formula-card"><div class="fc-name">Op-Amp Inverting</div><div class="fc-eq">Av = &#8722;Rf / Rin</div></div>
+          <div class="formula-card"><div class="fc-name">Op-Amp Non-Inv.</div><div class="fc-eq">Av = 1 + Rf / R1</div></div>
+          <div class="formula-card"><div class="fc-name">Voltage dB</div><div class="fc-eq">dB = 20·log&#8321;&#8320;(Vout/Vin)</div></div>
+          <div class="formula-card"><div class="fc-name">Power dB / dBm</div><div class="fc-eq">dB = 10·log&#8321;&#8320;(P2/P1)<br>dBm = 10·log&#8321;&#8320;(P/1mW)</div></div>
+        </div>`;}
+    },
+
+    ohm:{
+      title:"Ohm's Law",
+      desc:"Solve for voltage, current, or resistance. Enter any two values — results update live. Includes nearest E24 standard resistor and minimum power rating.",
+      schema:`<svg class="schematic" viewBox="0 0 300 100" width="268">
+        <line x1="20" y1="30" x2="66" y2="30" stroke="#aaa" stroke-width="1.5"/>
+        <rect x="66" y="18" width="60" height="24" fill="none" stroke="#aaa" stroke-width="1.5" rx="2"/>
+        <text x="96" y="33" font-size="12" fill="#888" text-anchor="middle">R</text>
+        <line x1="126" y1="30" x2="206" y2="30" stroke="#aaa" stroke-width="1.5"/>
+        <text x="162" y="22" font-size="10" fill="#4CAF50">&#8594; I</text>
+        <line x1="206" y1="30" x2="206" y2="80" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="20" y1="80" x2="206" y2="80" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="20" y1="30" x2="20" y2="49" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="12" y1="53" x2="28" y2="53" stroke="#aaa" stroke-width="3"/>
+        <line x1="15" y1="61" x2="25" y2="61" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="20" y1="66" x2="20" y2="80" stroke="#aaa" stroke-width="1.5"/>
+        <text x="4" y="60" font-size="11" fill="#888">V</text>
+        <text x="150" y="97" font-size="9" fill="#bbb" text-anchor="middle">V = I&#xB7;R  |  P = V&#xB7;I = I&#xB2;R = V&#xB2;/R</text>
+      </svg>`,
+      fields:()=>`
+        ${fieldHTML('oV','Voltage V',['m','','k'],'','V')}
+        ${fieldHTML('oI','Current I',['μ','m','','k'],'m','A')}
+        ${fieldHTML('oR','Resistance R',['','k','M'],'k','Ω')}`,
+      calc:()=>{
+        let V=getF('oV'),I=getF('oI'),R=getF('oR');
+        if([V,I,R].filter(x=>x!==null).length<2)return null;
+        if(V===null&&I!==null&&R!==null)V=I*R;
+        else if(I===null&&V!==null&&R!==null&&R>0)I=V/R;
+        else if(R===null&&V!==null&&I!==null&&I!==0)R=V/I;
+        if(!R||R<=0)return errorHTML('Resistance must be positive.');
+        if(V===null||I===null)return errorHTML('Cannot solve — provide two known values.');
+        const P=V*I,nr=nearestE24(R);
+        const epct=nr?Math.abs(R-nr)/R*100:0;
+        return resultHTML([
+          {l:'Voltage',v:eng(V,'V')},{l:'Current',v:eng(I,'A')},
+          {l:'Resistance',v:eng(R,'Ω')},{l:'Power',v:eng(P,'W')},{hr:1},
+          {note:`Nearest E24: <strong>${eng(nr,'Ω')}</strong> (${epct<0.1?'exact':epct.toFixed(1)+'% off'})`},
+          {note:`Minimum wattage rating: <strong>${minWatt(P)}</strong>`}
+        ],'V = I·R  |  P = V·I');
+      }
+    },
+
+    series:{
+      title:'Series Resistors',
+      desc:"Total resistance adds directly in series. Each resistor's share of the total voltage is shown.",
+      schema:`<svg class="schematic" viewBox="0 0 310 52" width="278">
+        <line x1="5" y1="26" x2="26" y2="26" stroke="#aaa" stroke-width="1.5"/>
+        ${[0,1,2].map(i=>`<rect x="${26+i*82}" y="14" width="56" height="24" fill="none" stroke="#aaa" stroke-width="1.5" rx="2"/>
+        <text x="${54+i*82}" y="29" font-size="11" fill="#888" text-anchor="middle">R${i+1}</text>
+        <line x1="${82+i*82}" y1="26" x2="${108+i*82}" y2="26" stroke="#aaa" stroke-width="1.5"/>`).join('')}
+        <text x="265" y="30" font-size="14" fill="#ccc">&#xB7;&#xB7;&#xB7;</text>
+      </svg>`,
+      fields:()=>[0,1,2,3,4].map(i=>fieldHTML(`sr${i}`,`R${i+1}${i>=2?' (optional)':''}`,['','k','M'],'k','Ω')).join(''),
+      calc:()=>{
+        const vals=[0,1,2,3,4].map(i=>getF(`sr${i}`)).filter(v=>v!==null&&v>0);
+        if(vals.length<2)return null;
+        const Rt=vals.reduce((s,v)=>s+v,0),nr=nearestE24(Rt);
+        return resultHTML([
+          {l:'Total Resistance',v:eng(Rt,'Ω')},{hr:1},
+          ...vals.map((v,i)=>({l:`R${i+1} voltage share`,v:`${(v/Rt*100).toFixed(1)}%`})),{hr:1},
+          {note:`Nearest E24: <strong>${eng(nr,'Ω')}</strong>`}
+        ],'Rt = R1 + R2 + R3 + ...');
+      }
+    },
+
+    parallel:{
+      title:'Parallel Resistors',
+      desc:"Total resistance is always less than the smallest branch. Each branch's current share is shown.",
+      schema:`<svg class="schematic" viewBox="0 0 210 110" width="175">
+        <line x1="10" y1="55" x2="34" y2="55" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="34" y1="15" x2="34" y2="95" stroke="#aaa" stroke-width="1.5"/>
+        ${[15,55,95].map((y,i)=>`<line x1="34" y1="${y}" x2="56" y2="${y}" stroke="#aaa" stroke-width="1.5"/>
+        <rect x="56" y="${y-12}" width="56" height="24" fill="none" stroke="#aaa" stroke-width="1.5" rx="2"/>
+        <text x="84" y="${y+4}" font-size="11" fill="#888" text-anchor="middle">R${i+1}</text>
+        <line x1="112" y1="${y}" x2="134" y2="${y}" stroke="#aaa" stroke-width="1.5"/>`).join('')}
+        <line x1="134" y1="15" x2="134" y2="95" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="134" y1="55" x2="160" y2="55" stroke="#aaa" stroke-width="1.5"/>
+        <text x="146" y="50" font-size="12" fill="#ccc">&#xB7;&#xB7;&#xB7;</text>
+      </svg>`,
+      fields:()=>[0,1,2,3,4].map(i=>fieldHTML(`pr${i}`,`R${i+1}${i>=2?' (optional)':''}`,['','k','M'],'k','Ω')).join(''),
+      calc:()=>{
+        const vals=[0,1,2,3,4].map(i=>getF(`pr${i}`)).filter(v=>v!==null&&v>0);
+        if(vals.length<2)return null;
+        const Rt=1/vals.reduce((s,v)=>s+1/v,0),nr=nearestE24(Rt);
+        return resultHTML([
+          {l:'Total Resistance',v:eng(Rt,'Ω')},
+          {l:'Smallest branch',v:eng(Math.min(...vals),'Ω')},{hr:1},
+          ...vals.map((v,i)=>({l:`R${i+1} current share`,v:`${(Rt/v*100).toFixed(1)}%`})),{hr:1},
+          {note:`Nearest E24: <strong>${eng(nr,'Ω')}</strong>`}
+        ],'1/Rt = 1/R1 + 1/R2 + ...  |  Two: Rt = R1·R2/(R1+R2)');
+      }
+    },
+
+    divider:{
+      title:'Voltage Divider',
+      desc:'Scale a voltage down using two series resistors. Output load should be at least 10x R2 to avoid loading effects.',
+      schema:`<svg class="schematic" viewBox="0 0 155 165" width="128">
+        <line x1="75" y1="5" x2="75" y2="36" stroke="#aaa" stroke-width="1.5"/>
+        <text x="50" y="18" font-size="11" fill="#888">Vin</text>
+        <rect x="48" y="36" width="54" height="26" fill="none" stroke="#aaa" stroke-width="1.5" rx="2"/>
+        <text x="75" y="52" font-size="11" fill="#888" text-anchor="middle">R1</text>
+        <line x1="75" y1="62" x2="75" y2="82" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="75" y1="82" x2="124" y2="82" stroke="#4CAF50" stroke-width="1.5" stroke-dasharray="3"/>
+        <text x="127" y="86" font-size="10" fill="#4CAF50">Vout</text>
+        <rect x="48" y="82" width="54" height="26" fill="none" stroke="#aaa" stroke-width="1.5" rx="2"/>
+        <text x="75" y="98" font-size="11" fill="#888" text-anchor="middle">R2</text>
+        <line x1="75" y1="108" x2="75" y2="128" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="60" y1="130" x2="90" y2="130" stroke="#aaa" stroke-width="2.5"/>
+        <line x1="65" y1="137" x2="85" y2="137" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="70" y1="144" x2="80" y2="144" stroke="#aaa" stroke-width="1"/>
+      </svg>`,
+      fields:()=>`
+        ${fieldHTML('dVin','Input Voltage (Vin)',['m','','k'],'','V')}
+        ${fieldHTML('dR1','R1 — top',['','k','M'],'k','Ω')}
+        ${fieldHTML('dR2','R2 — bottom',['','k','M'],'k','Ω','Vout measured across R2')}`,
+      calc:()=>{
+        const Vin=getF('dVin'),R1=getF('dR1'),R2=getF('dR2');
+        if(Vin===null||R1===null||R2===null)return null;
+        if(R1<=0||R2<=0)return errorHTML('Resistances must be positive.');
+        const Vout=Vin*R2/(R1+R2),ratio=R2/(R1+R2),Iin=Vin/(R1+R2),P=Vin*Iin;
+        return resultHTML([
+          {l:'Output Voltage',v:eng(Vout,'V')},{l:'Divider Ratio',v:ratio.toFixed(4)},
+          {l:'Current Draw',v:eng(Iin,'A')},{l:'Total Power',v:eng(P,'W')},{hr:1},
+          {note:`Min load impedance: <strong>${eng(R2*10,'Ω')}</strong> (10x R2 rule)`},
+          {note:`${(ratio*100).toFixed(1)}% of Vin at output.`}
+        ],'Vout = Vin · R2 / (R1 + R2)');
+      }
+    },
+
+    current_div:{
+      title:'Current Divider',
+      desc:'Split a total current between two parallel resistors. Higher resistance carries less current.',
+      schema:`<svg class="schematic" viewBox="0 0 220 110" width="190">
+        <line x1="8" y1="55" x2="36" y2="55" stroke="#aaa" stroke-width="1.5"/>
+        <text x="4" y="48" font-size="10" fill="#4CAF50">It &#8594;</text>
+        <line x1="36" y1="20" x2="36" y2="90" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="36" y1="20" x2="60" y2="20" stroke="#aaa" stroke-width="1.5"/>
+        <text x="42" y="14" font-size="9" fill="#888">I1 &#8594;</text>
+        <rect x="60" y="8" width="56" height="24" fill="none" stroke="#aaa" stroke-width="1.5" rx="2"/>
+        <text x="88" y="23" font-size="11" fill="#888" text-anchor="middle">R1</text>
+        <line x1="116" y1="20" x2="140" y2="20" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="36" y1="90" x2="60" y2="90" stroke="#aaa" stroke-width="1.5"/>
+        <text x="42" y="84" font-size="9" fill="#888">I2 &#8594;</text>
+        <rect x="60" y="78" width="56" height="24" fill="none" stroke="#aaa" stroke-width="1.5" rx="2"/>
+        <text x="88" y="93" font-size="11" fill="#888" text-anchor="middle">R2</text>
+        <line x1="116" y1="90" x2="140" y2="90" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="140" y1="20" x2="140" y2="90" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="140" y1="55" x2="165" y2="55" stroke="#aaa" stroke-width="1.5"/>
+      </svg>`,
+      fields:()=>`
+        ${fieldHTML('cdIt','Total Current (It)',['μ','m','','k'],'m','A')}
+        ${fieldHTML('cdR1','R1',['','k','M'],'k','Ω')}
+        ${fieldHTML('cdR2','R2',['','k','M'],'k','Ω')}`,
+      calc:()=>{
+        const It=getF('cdIt'),R1=getF('cdR1'),R2=getF('cdR2');
+        if(It===null||R1===null||R2===null)return null;
+        if(R1<=0||R2<=0)return errorHTML('Resistances must be positive.');
+        const I1=It*R2/(R1+R2),I2=It*R1/(R1+R2),V=I1*R1;
+        return resultHTML([
+          {l:'Current through R1',v:eng(I1,'A')},{l:'Current through R2',v:eng(I2,'A')},
+          {l:'Voltage across both',v:eng(V,'V')},{hr:1},
+          {note:`R1 carries ${(I1/It*100).toFixed(1)}% | R2 carries ${(I2/It*100).toFixed(1)}%`},
+          {note:'Higher resistance always carries less current.'}
+        ],'I1 = It · R2/(R1+R2)  |  I2 = It · R1/(R1+R2)');
+      }
+    },
+
+    thevenin:{
+      title:'Thevenin / Norton',
+      desc:'Convert between Thevenin and Norton equivalent circuits. Enter open-circuit voltage and short-circuit current to find Rth and max power transfer.',
+      schema:`<svg class="schematic" viewBox="0 0 300 120" width="275">
+        <text x="18" y="16" font-size="10" font-weight="700" fill="#555">Thevenin</text>
+        <line x1="18" y1="28" x2="52" y2="28" stroke="#aaa" stroke-width="1.5"/>
+        <rect x="52" y="16" width="50" height="24" fill="none" stroke="#aaa" stroke-width="1.5" rx="2"/>
+        <text x="77" y="31" font-size="10" fill="#888" text-anchor="middle">Rth</text>
+        <line x1="102" y1="28" x2="140" y2="28" stroke="#aaa" stroke-width="1.5"/>
+        <circle cx="140" cy="28" r="3" fill="#4CAF50"/>
+        <text x="146" y="32" font-size="10" fill="#4CAF50">A</text>
+        <line x1="18" y1="28" x2="18" y2="55" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="11" y1="59" x2="25" y2="59" stroke="#aaa" stroke-width="2.5"/>
+        <line x1="14" y1="65" x2="22" y2="65" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="17" y1="71" x2="19" y2="71" stroke="#aaa" stroke-width="1"/>
+        <line x1="18" y1="76" x2="18" y2="88" stroke="#aaa" stroke-width="1.5"/>
+        <text x="2" y="66" font-size="10" fill="#888">Vth</text>
+        <line x1="18" y1="88" x2="140" y2="88" stroke="#aaa" stroke-width="1.5"/>
+        <circle cx="140" cy="88" r="3" fill="#4CAF50"/>
+        <text x="146" y="92" font-size="10" fill="#4CAF50">B</text>
+        <text x="168" y="16" font-size="10" font-weight="700" fill="#555">Norton</text>
+        <line x1="168" y1="28" x2="198" y2="28" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="198" y1="14" x2="198" y2="42" stroke="#aaa" stroke-width="1.5"/>
+        <rect x="193" y="42" width="10" height="36" fill="none" stroke="#aaa" stroke-width="1.5" rx="2"/>
+        <text x="208" y="64" font-size="10" fill="#888">Rn</text>
+        <line x1="198" y1="78" x2="198" y2="88" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="198" y1="28" x2="270" y2="28" stroke="#aaa" stroke-width="1.5"/>
+        <circle cx="270" cy="28" r="3" fill="#4CAF50"/>
+        <text x="276" y="32" font-size="10" fill="#4CAF50">A</text>
+        <line x1="168" y1="88" x2="270" y2="88" stroke="#aaa" stroke-width="1.5"/>
+        <circle cx="270" cy="88" r="3" fill="#4CAF50"/>
+        <text x="276" y="92" font-size="10" fill="#4CAF50">B</text>
+        <line x1="168" y1="28" x2="168" y2="52" stroke="#aaa" stroke-width="1.5"/>
+        <circle cx="168" cy="60" r="10" fill="none" stroke="#aaa" stroke-width="1.5"/>
+        <text x="168" y="64" font-size="11" fill="#888" text-anchor="middle">In</text>
+        <line x1="168" y1="70" x2="168" y2="88" stroke="#aaa" stroke-width="1.5"/>
+      </svg>`,
+      fields:()=>`
+        ${fieldHTML('thVoc','Open-Circuit Voltage (Voc)',['m','','k'],'','V','= Thevenin voltage Vth')}
+        ${fieldHTML('thIsc','Short-Circuit Current (Isc)',['μ','m','','k'],'m','A','= Norton current In')}
+        ${fieldHTML('thRl','Load Resistance (optional)',['','k','M'],'k','Ω','Leave blank for max power info only')}`,
+      calc:()=>{
+        const Voc=getF('thVoc'),Isc=getF('thIsc'),Rl=getF('thRl');
+        if(Voc===null||Isc===null)return null;
+        if(Isc===0)return errorHTML('Short-circuit current cannot be zero.');
+        const Rth=Voc/Isc;
+        if(Rth<=0)return errorHTML('Rth = Voc/Isc must be positive.');
+        const Pmax=Voc*Voc/(4*Rth);
+        let rows=[
+          {l:'Thevenin Voltage (Vth)',v:eng(Voc,'V')},
+          {l:'Norton Current (In)',v:eng(Isc,'A')},
+          {l:'Thevenin / Norton Resistance',v:eng(Rth,'Ω')},{hr:1},
+          {l:'Max Power Transfer',v:eng(Pmax,'W')},
+          {note:`Max power when RL = Rth = ${eng(Rth,'Ω')}`}
+        ];
+        if(Rl!==null&&Rl>0){
+          const Il=Voc/(Rth+Rl),Vl=Il*Rl,Pl=Il*Il*Rl;
+          rows=[...rows,{hr:1},
+            {l:`Load Voltage (RL=${eng(Rl,'Ω')})`,v:eng(Vl,'V')},
+            {l:'Load Current',v:eng(Il,'A')},{l:'Load Power',v:eng(Pl,'W')},
+            {note:Rl<Rth*0.9?'RL < Rth — more current, less power transfer.':Rl>Rth*1.1?'RL > Rth — more voltage, less power transfer.':'Near maximum power transfer.'}
+          ];
+        }
+        return resultHTML(rows,'Rth = Voc / Isc  |  Pmax = Vth² / (4·Rth)');
+      }
+    },
+
+    rc:{
+      title:'RC Time Constant',
+      desc:'Time constant τ = RC governs capacitor charge rate. Also gives the -3 dB cutoff frequency for RC low-pass and high-pass filters.',
+      schema:`<svg class="schematic" viewBox="0 0 268 88" width="250">
+        <line x1="14" y1="30" x2="50" y2="30" stroke="#aaa" stroke-width="1.5"/>
+        <rect x="50" y="18" width="56" height="24" fill="none" stroke="#aaa" stroke-width="1.5" rx="2"/>
+        <text x="78" y="33" font-size="12" fill="#888" text-anchor="middle">R</text>
+        <line x1="106" y1="30" x2="134" y2="30" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="134" y1="12" x2="134" y2="48" stroke="#aaa" stroke-width="4"/>
+        <line x1="143" y1="12" x2="143" y2="48" stroke="#aaa" stroke-width="4"/>
+        <line x1="143" y1="30" x2="206" y2="30" stroke="#aaa" stroke-width="1.5"/>
+        <text x="148" y="11" font-size="11" fill="#888">C</text>
+        <line x1="206" y1="30" x2="206" y2="78" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="14" y1="78" x2="206" y2="78" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="14" y1="30" x2="14" y2="78" stroke="#aaa" stroke-width="1.5"/>
+        <text x="130" y="87" font-size="9" fill="#bbb" text-anchor="middle">&#964; = R&#xB7;C  |  fc = 1/(2&#960;&#xB7;R&#xB7;C)</text>
+      </svg>`,
+      fields:()=>`
+        ${fieldHTML('rcR','Resistance R',['','k','M'],'k','Ω')}
+        ${fieldHTML('rcC','Capacitance C',['p','n','μ','m'],'μ','F')}`,
+      calc:()=>{
+        const R=getF('rcR'),C=getF('rcC');
+        if(!R||!C||R<=0||C<=0)return null;
+        const tau=R*C,fc=1/(2*Math.PI*R*C);
+        return resultHTML([
+          {l:'Time Constant (τ)',v:eng(tau,'s')},{l:'Cutoff Frequency (fc)',v:eng(fc,'Hz')},{hr:1},
+          {note:`63.2% charged at τ = ${eng(tau,'s')}`},
+          {note:`99% complete at 5τ = ${eng(5*tau,'s')}`},
+          {note:`Low-pass passes below ${eng(fc,'Hz')}; high-pass passes above.`}
+        ],'τ = R·C  |  fc = 1 / (2π·R·C)');
+      }
+    },
+
+    lc:{
+      title:'LC Resonance',
+      desc:'Resonant frequency of an LC tank circuit. At resonance, inductive and capacitive reactances cancel and net impedance is purely resistive.',
+      schema:`<svg class="schematic" viewBox="0 0 268 88" width="250">
+        <line x1="14" y1="30" x2="50" y2="30" stroke="#aaa" stroke-width="1.5"/>
+        <path d="M50,30 Q55,18 62,30 Q69,42 76,30 Q83,18 90,30 Q97,42 104,30" fill="none" stroke="#aaa" stroke-width="1.5"/>
+        <text x="77" y="14" font-size="11" fill="#888" text-anchor="middle">L</text>
+        <line x1="104" y1="30" x2="132" y2="30" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="132" y1="12" x2="132" y2="48" stroke="#aaa" stroke-width="4"/>
+        <line x1="141" y1="12" x2="141" y2="48" stroke="#aaa" stroke-width="4"/>
+        <line x1="141" y1="30" x2="206" y2="30" stroke="#aaa" stroke-width="1.5"/>
+        <text x="146" y="11" font-size="11" fill="#888">C</text>
+        <line x1="206" y1="30" x2="206" y2="78" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="14" y1="78" x2="206" y2="78" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="14" y1="30" x2="14" y2="78" stroke="#aaa" stroke-width="1.5"/>
+        <text x="110" y="87" font-size="9" fill="#bbb" text-anchor="middle">f&#8320; = 1 / (2&#960;&#8730;(L&#xB7;C))</text>
+      </svg>`,
+      fields:()=>`
+        ${fieldHTML('lcL','Inductance L',['μ','m','','k'],'m','H')}
+        ${fieldHTML('lcC','Capacitance C',['p','n','μ'],'n','F')}`,
+      calc:()=>{
+        const L=getF('lcL'),C=getF('lcC');
+        if(!L||!C||L<=0||C<=0)return null;
+        const f0=1/(2*Math.PI*Math.sqrt(L*C)),Z0=Math.sqrt(L/C);
+        return resultHTML([
+          {l:'Resonant Frequency',v:eng(f0,'Hz')},
+          {l:'Angular Frequency (ω₀)',v:eng(2*Math.PI*f0,'rad/s')},
+          {l:'Characteristic Impedance',v:eng(Z0,'Ω')},{hr:1},
+          {note:'At f₀: XL = XC, net reactance = 0.'},
+          {note:'Add series R to set Q-factor and bandwidth.'}
+        ],'f₀ = 1 / (2π√(L·C))  |  Z₀ = √(L/C)');
+      }
+    },
+
+    cap:{
+      title:'Capacitor V(t)',
+      desc:'Voltage across a capacitor at any time t during charge or discharge, using the standard RC exponential model.',
+      schema:null,
+      fields:()=>`
+        ${modeBtns('capMode',[['charge','Charging'],['discharge','Discharging']])}
+        ${fieldHTML('capR','Resistance R',['','k','M'],'k','Ω')}
+        ${fieldHTML('capC','Capacitance C',['p','n','μ','m'],'μ','F')}
+        ${fieldHTML('capVs','Supply Voltage (Vs)',['m','','k'],'','V')}
+        ${fieldHTML('capT','Time (t)',['μ','m','','k'],'m','s')}`,
+      calc:()=>{
+        const R=getF('capR'),C=getF('capC'),Vs=getF('capVs'),t=getF('capT');
+        if(!R||!C||Vs===null||t===null||R<=0||C<=0||t<0)return null;
+        const tau=R*C;
+        const Vt=S.capMode==='charge'?Vs*(1-Math.exp(-t/tau)):Vs*Math.exp(-t/tau);
+        return resultHTML([
+          {l:'Voltage at t',v:eng(Vt,'V')},
+          {l:'% of supply',v:`${(Vt/Vs*100).toFixed(2)}%`},
+          {l:'Time Constant τ',v:eng(tau,'s')},{hr:1},
+          {note:`50%: ${eng(0.693*tau,'s')} | 90%: ${eng(2.303*tau,'s')} | 99%: ${eng(4.605*tau,'s')}`}
+        ],S.capMode==='charge'?'V(t) = Vs·(1 − e^(−t/τ))':'V(t) = Vs·e^(−t/τ)');
+      }
+    },
+
+    timer555:{
+      title:'555 Timer',
+      desc:'Frequency, duty cycle, and pulse timing for the 555 IC. Astable mode generates a continuous square wave; monostable produces a single timed pulse.',
+      schema:`<svg class="schematic" viewBox="0 0 290 155" width="265">
+        <rect x="88" y="28" width="114" height="102" fill="none" stroke="#aaa" stroke-width="1.5" rx="4"/>
+        <text x="145" y="84" font-size="14" font-weight="700" fill="#888" text-anchor="middle">555</text>
+        <line x1="18" y1="48" x2="88" y2="48" stroke="#aaa" stroke-width="1.5"/>
+        <text x="12" y="42" font-size="9" fill="#888">Vcc</text>
+        <line x1="18" y1="108" x2="88" y2="108" stroke="#aaa" stroke-width="1.5"/>
+        <text x="8" y="112" font-size="9" fill="#888">GND</text>
+        <line x1="202" y1="79" x2="260" y2="79" stroke="#4CAF50" stroke-width="1.5"/>
+        <text x="232" y="73" font-size="9" fill="#4CAF50">OUT</text>
+        <line x1="54" y1="48" x2="54" y2="18" stroke="#aaa" stroke-width="1.5"/>
+        <rect x="28" y="18" width="52" height="18" fill="none" stroke="#aaa" stroke-width="1.5" rx="2"/>
+        <text x="54" y="30" font-size="10" fill="#888" text-anchor="middle">Ra</text>
+        <line x1="54" y1="48" x2="54" y2="66" stroke="#aaa" stroke-width="1.5"/>
+        <rect x="28" y="66" width="52" height="18" fill="none" stroke="#aaa" stroke-width="1.5" rx="2"/>
+        <text x="54" y="78" font-size="10" fill="#888" text-anchor="middle">Rb</text>
+        <line x1="54" y1="84" x2="54" y2="108" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="54" y1="98" x2="88" y2="98" stroke="#aaa" stroke-width="1.2" stroke-dasharray="3"/>
+        <line x1="54" y1="108" x2="54" y2="120" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="46" y1="122" x2="62" y2="122" stroke="#aaa" stroke-width="3"/>
+        <line x1="49" y1="128" x2="59" y2="128" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="52" y1="134" x2="56" y2="134" stroke="#aaa" stroke-width="1"/>
+        <text x="54" y="148" font-size="9" fill="#888" text-anchor="middle">C</text>
+      </svg>`,
+      fields:()=>`
+        ${modeBtns('timer555Mode',[['astable','Astable (oscillator)'],['monostable','Monostable (one-shot)']])}
+        ${S.timer555Mode==='astable'
+          ?fieldHTML('t5Ra','Ra — charge resistor',['','k','M'],'k','Ω')
+          :fieldHTML('t5Rm','R — timing resistor',['','k','M'],'k','Ω')}
+        ${S.timer555Mode==='astable'?fieldHTML('t5Rb','Rb — discharge resistor',['','k','M'],'k','Ω'):''}
+        ${fieldHTML('t5C','Timing Capacitor C',['p','n','μ'],'μ','F')}`,
+      calc:()=>{
+        const C=getF('t5C');
+        if(!C||C<=0)return null;
+        if(S.timer555Mode==='astable'){
+          const Ra=getF('t5Ra'),Rb=getF('t5Rb');
+          if(!Ra||!Rb||Ra<=0||Rb<=0)return null;
+          const f=1.44/((Ra+2*Rb)*C),T=1/f,tH=0.693*(Ra+Rb)*C,tL=0.693*Rb*C,duty=(Ra+Rb)/(Ra+2*Rb);
+          return resultHTML([
+            {l:'Frequency',v:eng(f,'Hz')},{l:'Period',v:eng(T,'s')},
+            {l:'Duty Cycle',v:`${(duty*100).toFixed(1)}%`},
+            {l:'High Time (tH)',v:eng(tH,'s')},{l:'Low Time (tL)',v:eng(tL,'s')},{hr:1},
+            {note:duty>0.9?'Very high duty cycle. Use diode trick for 50% output.':
+                  duty<0.55?'Near-symmetric square wave.':'Asymmetric output — adjust Ra/Rb ratio.'}
+          ],'f = 1.44 / ((Ra + 2Rb)·C)  |  D = (Ra+Rb)/(Ra+2Rb)');
+        }else{
+          const R=getF('t5Rm');
+          if(!R||R<=0)return null;
+          const t=1.1*R*C;
+          return resultHTML([
+            {l:'Pulse Width',v:eng(t,'s')},{l:'Freq. equivalent',v:eng(1/t,'Hz')},{hr:1},
+            {note:`Output HIGH for ${eng(t,'s')} after trigger pulse.`},
+            {note:'Non-retriggerable — retrigger before end of pulse has no effect.'}
+          ],'t = 1.1 · R · C');
+        }
+      }
+    },
+
+    led:{
+      title:'LED Resistor',
+      desc:'Find the current-limiting resistor for an LED given supply voltage, forward voltage, and desired current. Includes nearest standard resistor and wattage rating.',
+      schema:`<svg class="schematic" viewBox="0 0 275 90" width="250">
+        <line x1="14" y1="30" x2="52" y2="30" stroke="#aaa" stroke-width="1.5"/>
+        <rect x="52" y="18" width="56" height="24" fill="none" stroke="#aaa" stroke-width="1.5" rx="2"/>
+        <text x="80" y="33" font-size="11" fill="#888" text-anchor="middle">R</text>
+        <line x1="108" y1="30" x2="144" y2="30" stroke="#aaa" stroke-width="1.5"/>
+        <polygon points="144,18 144,42 164,30" fill="none" stroke="#4CAF50" stroke-width="1.5"/>
+        <line x1="164" y1="18" x2="164" y2="42" stroke="#4CAF50" stroke-width="2"/>
+        <line x1="164" y1="30" x2="206" y2="30" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="158" y1="14" x2="170" y2="4" stroke="#4CAF50" stroke-width="1.2"/>
+        <line x1="152" y1="10" x2="164" y2="0" stroke="#4CAF50" stroke-width="1.2"/>
+        <line x1="206" y1="30" x2="206" y2="78" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="14" y1="78" x2="206" y2="78" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="14" y1="30" x2="14" y2="78" stroke="#aaa" stroke-width="1.5"/>
+        <text x="5" y="58" font-size="11" fill="#888">Vs</text>
+        <text x="108" y="88" font-size="9" fill="#bbb" text-anchor="middle">R = (Vs &#8722; Vf) / If</text>
+      </svg>`,
+      fields:()=>{
+        const pre=LED_P[S.ledPresetIdx];
+        return`${fieldHTML('ledVs','Supply Voltage (Vs)',['m','','k'],'','V')}
+        <div class="field-group">
+          <div class="field-label">LED type — forward voltage (Vf)</div>
+          <div class="preset-pills">${LED_P.map((p,i)=>`<button class="preset-pill${S.ledPresetIdx===i?' active':''}" onclick="S.ledPresetIdx=${i};switchCalc(S.activeCalc)">${p.name}${p.vf?' '+p.vf+'V':''}</button>`).join('')}</div>
+          ${pre.vf===null?`<div style="margin-top:6px">${fieldHTML('ledVf','Custom forward voltage (Vf)',['m','','k'],'','V')}</div>`:''}
+        </div>
+        <div class="field-group">
+          <div class="field-label">LED current: <span style="color:#15803d;font-weight:700">${S.ledCurrent} mA</span></div>
+          <div class="slider-row"><input type="range" min="1" max="350" value="${S.ledCurrent}" step="1" oninput="S.ledCurrent=+this.value;recalc()"></div>
+          <div class="field-hint">Typical 5–20 mA · High-power up to 350 mA</div>
+        </div>`;
+      },
+      calc:()=>{
+        const Vs=getF('ledVs');
+        const pre=LED_P[S.ledPresetIdx];
+        const Vf=pre.vf!==null?pre.vf:getF('ledVf');
+        const If=S.ledCurrent/1000;
+        if(Vs===null||Vf===null||!If)return null;
+        if(Vs<=Vf)return errorHTML(`Supply (${Vs} V) must exceed LED Vf (${Vf} V).`);
+        const R=(Vs-Vf)/If,nr=nearestE24(R),P=If*(Vs-Vf),Iactual=nr?(Vs-Vf)/nr:null;
+        return resultHTML([
+          {l:'Required R',v:eng(R,'Ω')},{l:'Nearest E24',v:eng(nr,'Ω')},
+          {l:'Resistor Power',v:eng(P,'W')},{l:'Min Watt Rating',v:minWatt(P)},{hr:1},
+          {note:`With ${eng(nr,'Ω')}: actual If ≈ <strong>${eng(Iactual,'A')}</strong>`},
+          {note:`LED gets ${(Vf/Vs*100).toFixed(0)}% of supply voltage.`}
+        ],'R = (Vs − Vf) / If');
+      }
+    },
+
+    zener:{
+      title:'Zener Voltage Regulator',
+      desc:'Size the series resistor for a zener shunt regulator. The zener clamps output at Vz across a variable load.',
+      schema:`<svg class="schematic" viewBox="0 0 280 110" width="258">
+        <line x1="14" y1="28" x2="56" y2="28" stroke="#aaa" stroke-width="1.5"/>
+        <text x="10" y="20" font-size="10" fill="#888">Vs</text>
+        <rect x="56" y="16" width="50" height="24" fill="none" stroke="#aaa" stroke-width="1.5" rx="2"/>
+        <text x="81" y="31" font-size="10" fill="#888" text-anchor="middle">Rs</text>
+        <line x1="106" y1="28" x2="154" y2="28" stroke="#aaa" stroke-width="1.5"/>
+        <text x="156" y="20" font-size="10" fill="#4CAF50">Vout=Vz</text>
+        <line x1="154" y1="28" x2="154" y2="46" stroke="#aaa" stroke-width="1.5"/>
+        <polygon points="144,46 164,46 154,66" fill="none" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="144" y1="66" x2="147" y2="66" stroke="#aaa" stroke-width="2.5"/>
+        <line x1="161" y1="66" x2="164" y2="66" stroke="#aaa" stroke-width="2.5"/>
+        <line x1="154" y1="66" x2="154" y2="88" stroke="#aaa" stroke-width="1.5"/>
+        <text x="133" y="86" font-size="10" fill="#888">Zener</text>
+        <line x1="154" y1="28" x2="220" y2="28" stroke="#aaa" stroke-width="1.5"/>
+        <rect x="220" y="16" width="46" height="24" fill="none" stroke="#aaa" stroke-width="1.2" rx="2"/>
+        <text x="243" y="31" font-size="10" fill="#888" text-anchor="middle">RL</text>
+        <line x1="266" y1="28" x2="276" y2="28" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="14" y1="88" x2="276" y2="88" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="14" y1="28" x2="14" y2="88" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="276" y1="28" x2="276" y2="88" stroke="#aaa" stroke-width="1.5"/>
+        <text x="145" y="102" font-size="9" fill="#bbb" text-anchor="middle">Rs = (Vs &#8722; Vz) / (Iz + IL)</text>
+      </svg>`,
+      fields:()=>`
+        ${fieldHTML('znVs','Supply Voltage (Vs)',['m','','k'],'','V')}
+        ${fieldHTML('znVz','Zener Voltage (Vz)',['m','','k'],'','V','e.g. 3.3 V, 5.1 V, 12 V')}
+        ${fieldHTML('znIl','Max Load Current (IL)',['μ','m','','k'],'m','A')}
+        ${fieldHTML('znIzmin','Min Zener Current (Iz_min)',['μ','m','','k'],'m','A','Optional — defaults to 10% of IL')}`,
+      calc:()=>{
+        const Vs=getF('znVs'),Vz=getF('znVz'),IL=getF('znIl');
+        if(Vs===null||Vz===null||IL===null)return null;
+        if(Vs<=Vz)return errorHTML(`Supply (${Vs} V) must be greater than Vz (${Vz} V).`);
+        const Izmin=getF('znIzmin')??IL*0.1;
+        const Rs=(Vs-Vz)/(Izmin+IL);
+        const nr=nearestE24(Rs);
+        const Prs=Math.pow(Vs-Vz,2)/Rs;
+        const IzMax=(Vs-Vz)/(nr||Rs);
+        return resultHTML([
+          {l:'Series Resistor Rs',v:eng(Rs,'Ω')},{l:'Nearest E24',v:eng(nr,'Ω')},
+          {l:'Rs Power Dissipation',v:eng(Prs,'W')},{l:'Rs Min Rating',v:minWatt(Prs)},
+          {l:'Zener Power (Iz·Vz)',v:eng(Izmin*Vz,'W')},{hr:1},
+          {note:`Max Iz at no load: <strong>${eng(IzMax,'A')}</strong> — verify against zener Iz_max in datasheet.`},
+          {note:`Output regulated at ${Vz} V ± zener tolerance.`}
+        ],'Rs = (Vs − Vz) / (Iz + IL)  |  Pz = Iz · Vz');
+      }
+    },
+
+    battery:{
+      title:'Battery Life Estimator',
+      desc:'Estimate runtime from battery capacity and average load current. Adjust efficiency for chemistry type.',
+      schema:`<svg class="schematic" viewBox="0 0 210 82" width="190">
+        <rect x="28" y="18" width="128" height="50" fill="none" stroke="#aaa" stroke-width="1.5" rx="4"/>
+        <rect x="36" y="26" width="22" height="34" fill="#4CAF50" fill-opacity=".25" stroke="#4CAF50" stroke-width="1" rx="2"/>
+        <rect x="62" y="26" width="22" height="34" fill="#4CAF50" fill-opacity=".5" stroke="#4CAF50" stroke-width="1" rx="2"/>
+        <rect x="88" y="26" width="22" height="34" fill="#4CAF50" fill-opacity=".75" stroke="#4CAF50" stroke-width="1" rx="2"/>
+        <rect x="114" y="26" width="22" height="34" fill="#4CAF50" stroke="#4CAF50" stroke-width="1" rx="2"/>
+        <line x1="156" y1="32" x2="168" y2="32" stroke="#aaa" stroke-width="3"/>
+        <line x1="156" y1="52" x2="168" y2="52" stroke="#aaa" stroke-width="1.5"/>
+        <text x="105" y="78" font-size="9" fill="#bbb" text-anchor="middle">Runtime = Capacity / Load &times; Efficiency</text>
+      </svg>`,
+      fields:()=>`
+        ${fieldHTML('batCap','Battery Capacity',['m','','k'],'','Ah','e.g. 2000 mAh: enter 2000 and select mAh')}
+        ${fieldHTML('batLoad','Average Load Current',['μ','m','','k'],'m','A')}
+        <div class="field-group">
+          <div class="field-label">Efficiency: <span style="color:#15803d;font-weight:700">${S.battEff}%</span></div>
+          <div class="slider-row"><input type="range" min="50" max="99" value="${S.battEff}" step="1" oninput="S.battEff=+this.value;recalc()"></div>
+          <div class="field-hint">LiPo ~90% · Alkaline ~80% · NiMH ~75% · Lead-acid ~70%</div>
+        </div>`,
+      calc:()=>{
+        const cap=getF('batCap'),load=getF('batLoad');
+        if(!cap||!load||cap<=0||load<=0)return null;
+        const hrs=cap/load*(S.battEff/100);
+        let rt;
+        if(hrs>=720)rt=`${(hrs/720).toFixed(1)} months`;
+        else if(hrs>=48)rt=`${(hrs/24).toFixed(1)} days`;
+        else if(hrs>=1)rt=`${hrs.toFixed(2)} hours`;
+        else rt=`${(hrs*60).toFixed(0)} minutes`;
+        return resultHTML([
+          {l:'Estimated Runtime',v:rt},{l:'Capacity',v:eng(cap,'Ah')},
+          {l:'Load Current',v:eng(load,'A')},{l:'Efficiency',v:`${S.battEff}%`},{hr:1},
+          {note:hrs<0.5?'Very short runtime — increase capacity or reduce load.':
+                hrs>168?'Lasts over a week — battery is well-sized.':'Runtime looks reasonable.'}
+        ],'Runtime (h) = Capacity (Ah) / Load (A) × Efficiency');
+      }
+    },
+
+    power:{
+      title:'Power Dissipation',
+      desc:'Calculate power dissipated in a component. Enter any two of V, I, R — the third is solved automatically.',
+      schema:`<svg class="schematic" viewBox="0 0 240 88" width="218">
+        <line x1="14" y1="30" x2="56" y2="30" stroke="#aaa" stroke-width="1.5"/>
+        <rect x="56" y="14" width="120" height="32" fill="none" stroke="#aaa" stroke-width="1.5" rx="4"/>
+        <text x="116" y="26" font-size="11" fill="#888" text-anchor="middle">Component</text>
+        <text x="116" y="40" font-size="10" fill="#4CAF50" text-anchor="middle">P = V · I</text>
+        <line x1="176" y1="30" x2="218" y2="30" stroke="#aaa" stroke-width="1.5"/>
+        <text x="28" y="22" font-size="9" fill="#888">&#8594; I</text>
+        <text x="180" y="22" font-size="9" fill="#888">&#8594; I</text>
+        <line x1="14" y1="30" x2="14" y2="78" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="14" y1="78" x2="218" y2="78" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="218" y1="30" x2="218" y2="78" stroke="#aaa" stroke-width="1.5"/>
+        <text x="6" y="58" font-size="11" fill="#888">V</text>
+      </svg>`,
+      fields:()=>`
+        ${fieldHTML('pwV','Voltage V',['m','','k'],'','V')}
+        ${fieldHTML('pwI','Current I',['μ','m','','k'],'m','A')}
+        ${fieldHTML('pwR','Resistance R (auto-solved if blank)',['','k','M'],'k','Ω')}`,
+      calc:()=>{
+        let V=getF('pwV'),I=getF('pwI'),R=getF('pwR');
+        if([V,I,R].filter(x=>x!==null).length<2)return null;
+        if(V===null&&I!==null&&R!==null)V=I*R;
+        if(I===null&&V!==null&&R!==null)I=V/R;
+        if(R===null&&V!==null&&I!==null&&I!==0)R=V/I;
+        if(V===null||I===null)return errorHTML('Need at least two of V, I, R.');
+        const P=V*I;
+        return resultHTML([
+          {l:'Power Dissipated',v:eng(P,'W')},{l:'Voltage',v:eng(V,'V')},
+          {l:'Current',v:eng(I,'A')},{l:'Resistance',v:eng(R,'Ω')},{hr:1},
+          {note:`Minimum watt rating (2× derating): <strong>${minWatt(P)}</strong>`},
+          {note:P>1?'Over 1 W — consider heatsinking or a power resistor.':'Standard through-hole or SMD resistor is fine.'}
+        ],'P = V·I = I²·R = V²/R');
+      }
+    },
+
+    opamp:{
+      title:'Op-Amp Gain',
+      desc:'Closed-loop gain for inverting and non-inverting op-amp configurations, using the ideal op-amp model.',
+      schema:`<svg class="schematic" viewBox="0 0 255 120" width="235">
+        <polygon points="62,18 62,102 150,60" fill="none" stroke="#aaa" stroke-width="1.5"/>
+        <text x="76" y="44" font-size="13" fill="#888">&#8722;</text>
+        <text x="76" y="80" font-size="13" fill="#888">+</text>
+        <line x1="12" y1="38" x2="62" y2="38" stroke="#aaa" stroke-width="1.5"/>
+        <text x="18" y="32" font-size="9" fill="#888">Vin</text>
+        <line x1="12" y1="82" x2="62" y2="82" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="150" y1="60" x2="198" y2="60" stroke="#aaa" stroke-width="1.5"/>
+        <text x="200" y="64" font-size="10" fill="#4CAF50">Vout</text>
+        <line x1="34" y1="38" x2="34" y2="8" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="152" y1="8" x2="152" y2="60" stroke="#aaa" stroke-width="1.5" stroke-dasharray="3"/>
+        <rect x="64" y="0" width="56" height="18" fill="none" stroke="#4CAF50" stroke-width="1.2" rx="2"/>
+        <text x="92" y="13" font-size="10" fill="#4CAF50" text-anchor="middle">Rf</text>
+        <line x1="34" y1="8" x2="64" y2="8" stroke="#aaa" stroke-width="1.5"/>
+        <line x1="120" y1="8" x2="152" y2="8" stroke="#aaa" stroke-width="1.5"/>
+      </svg>`,
+      fields:()=>`
+        ${modeBtns('opampMode',[['inverting','Inverting'],['noninverting','Non-Inverting']])}
+        ${fieldHTML('oaRf','Feedback Resistor (Rf)',['','k','M'],'k','Ω')}
+        ${fieldHTML('oaRin',S.opampMode==='inverting'?'Input Resistor (Rin)':'Ground Resistor (R1)',['','k','M'],'k','Ω')}
+        ${fieldHTML('oaVin','Input Voltage (optional)',['m','','k'],'','V','Leave blank for gain only')}`,
+      calc:()=>{
+        const Rf=getF('oaRf'),Rin=getF('oaRin'),Vin=getF('oaVin');
+        if(!Rf||!Rin||Rf<=0||Rin<=0)return null;
+        const gain=S.opampMode==='inverting'?-(Rf/Rin):(1+Rf/Rin);
+        const Vout=Vin!==null?gain*Vin:null;
+        return resultHTML([
+          {l:'Voltage Gain (Av)',v:`${gain.toFixed(3)}×`},
+          {l:'Gain (dB)',v:`${(20*Math.log10(Math.abs(gain))).toFixed(2)} dB`},
+          ...(Vout!==null?[{l:'Output Voltage',v:eng(Vout,'V')}]:[]),{hr:1},
+          {note:S.opampMode==='inverting'
+            ?`Av = −Rf/Rin = −${(Rf/Rin).toFixed(2)}×. Output is phase-inverted.`
+            :`Av = 1 + Rf/R1 = ${gain.toFixed(2)}×. Output is in-phase.`},
+          {note:'Bandwidth ≈ GBW / |Av|. Check op-amp datasheet.'}
+        ],S.opampMode==='inverting'?'Av = −Rf / Rin':'Av = 1 + Rf / R1');
+      }
+    },
+
+    db:{
+      title:'dB / dBm Converter',
+      desc:'Convert between decibels and linear ratios for voltage and power. dBm references power to 1 mW.',
+      schema:`<svg class="schematic" viewBox="0 0 260 78" width="238">
+        <rect x="8" y="18" width="60" height="38" fill="none" stroke="#aaa" stroke-width="1.5" rx="4"/>
+        <text x="38" y="41" font-size="11" fill="#888" text-anchor="middle">Input</text>
+        <line x1="68" y1="37" x2="98" y2="37" stroke="#aaa" stroke-width="1.5"/>
+        <rect x="98" y="12" width="62" height="50" fill="none" stroke="#4CAF50" stroke-width="1.5" rx="4"/>
+        <text x="129" y="34" font-size="10" fill="#4CAF50" text-anchor="middle">dB</text>
+        <text x="129" y="50" font-size="9" fill="#4CAF50" text-anchor="middle">dBm</text>
+        <line x1="160" y1="37" x2="190" y2="37" stroke="#aaa" stroke-width="1.5"/>
+        <rect x="190" y="18" width="60" height="38" fill="none" stroke="#aaa" stroke-width="1.5" rx="4"/>
+        <text x="220" y="41" font-size="11" fill="#888" text-anchor="middle">Output</text>
+      </svg>`,
+      fields:()=>`
+        ${modeBtns('dbMode',[['voltage','Voltage dB'],['power','Power dB'],['dbm','dBm']])}
+        ${S.dbMode==='voltage'
+          ?`${fieldHTML('dbVin','Input Voltage (Vin)',['μ','m','','k'],'','V')}${fieldHTML('dbVout','Output Voltage (Vout)',['μ','m','','k'],'','V')}`
+          :S.dbMode==='power'
+          ?`${fieldHTML('dbP1','Input Power (P1)',['μ','m','','k'],'m','W')}${fieldHTML('dbP2','Output Power (P2)',['μ','m','','k'],'m','W')}`
+          :fieldHTML('dbPmw','Power',['n','μ','m','','k'],'m','W','Select prefix for your unit')}`,
+      calc:()=>{
+        if(S.dbMode==='voltage'){
+          const Vin=getF('dbVin'),Vout=getF('dbVout');
+          if(Vin===null||Vout===null||Vin===0)return null;
+          const dB=20*Math.log10(Math.abs(Vout/Vin)),ratio=Vout/Vin;
+          return resultHTML([
+            {l:'Gain (dB)',v:`${dB.toFixed(3)} dB`},{l:'Voltage Ratio',v:`${ratio.toFixed(4)}×`},{hr:1},
+            {note:dB>0?`+${dB.toFixed(1)} dB — amplification.`:dB<0?`${dB.toFixed(1)} dB — attenuation.`:'Unity gain.'},
+            {note:`Power equivalent: ${(10*Math.log10(ratio*ratio)).toFixed(2)} dB`}
+          ],'dB = 20 · log₁₀(Vout / Vin)');
+        }else if(S.dbMode==='power'){
+          const P1=getF('dbP1'),P2=getF('dbP2');
+          if(P1===null||P2===null||P1<=0)return null;
+          const dB=10*Math.log10(P2/P1);
+          return resultHTML([
+            {l:'Gain (dB)',v:`${dB.toFixed(3)} dB`},{l:'Power Ratio',v:`${(P2/P1).toFixed(4)}×`},
+            {l:'P1 in dBm',v:`${(10*Math.log10(P1/0.001)).toFixed(2)} dBm`},
+            {l:'P2 in dBm',v:`${(10*Math.log10(P2/0.001)).toFixed(2)} dBm`}
+          ],'dB = 10 · log₁₀(P2 / P1)');
+        }else{
+          const P=getF('dbPmw');
+          if(P===null||P<=0)return null;
+          const dBm=10*Math.log10(P/0.001);
+          return resultHTML([
+            {l:'Power (dBm)',v:`${dBm.toFixed(3)} dBm`},{l:'Power (W)',v:eng(P,'W')},{hr:1},
+            {note:dBm>30?'High power — above 1 W.':dBm===0?'Exactly 1 mW = 0 dBm.':dBm>0?'Above 1 mW reference.':'Below 1 mW — negative dBm is normal for low power.'}
+          ],'dBm = 10 · log₁₀(P / 1 mW)');
+        }
+      }
+    },
+
+    awg:{
+      title:'Wire Gauge (AWG)',
+      desc:'Ampacity, diameter, and resistance for standard AWG wire sizes. Smaller AWG number = thicker wire = more current capacity.',
+      schema:`<svg class="schematic" viewBox="0 0 240 68" width="218">
+        ${[0,1,2,3].map(i=>`<line x1="18" y1="${12+i*12}" x2="218" y2="${12+i*12}" stroke="#aaa" stroke-width="${4.5-i*1.1}" stroke-linecap="round"/>`).join('')}
+        <text x="222" y="16" font-size="9" fill="#888">AWG 0</text>
+        <text x="222" y="28" font-size="9" fill="#888">AWG 10</text>
+        <text x="222" y="40" font-size="9" fill="#888">AWG 22</text>
+        <text x="222" y="52" font-size="9" fill="#888">AWG 30</text>
+        <text x="116" y="66" font-size="9" fill="#bbb" text-anchor="middle">Smaller number = thicker wire = more current</text>
+      </svg>`,
+      fields:()=>`
+        <div class="field-group">
+          <div class="field-label">AWG Size</div>
+          <select class="full-select" id="awg-sel" onchange="S.awgVal=+this.value;recalc()">
+            ${AWG_TABLE.map(r=>`<option value="${r[0]}"${r[0]===S.awgVal?' selected':''}>AWG ${r[0]} — ${r[1]} mm diameter</option>`).join('')}
+          </select>
+        </div>
+        ${fieldHTML('awgLen','Wire Length (optional — calculates total resistance)',['m','','k'],'','m','Leave blank to skip')}`,
+      calc:()=>{
+        const row=AWG_TABLE.find(r=>r[0]===S.awgVal);
+        if(!row)return null;
+        const[gauge,diam_mm,chassis_A,power_A]=row;
+        const rho=1.68e-8,A=Math.PI*Math.pow(diam_mm/2000,2);
+        const resist_km=rho*1000/A;
+        const len=getF('awgLen');
+        const Rtotal=len!==null?rho*len/A:null;
+        return resultHTML([
+          {l:'Diameter',v:`${diam_mm} mm`},
+          {l:'Chassis wiring ampacity',v:`${chassis_A} A`},
+          {l:'Power transmission',v:`${power_A} A`},
+          {l:'Resistance',v:`${resist_km.toFixed(2)} Ω/km`},
+          ...(Rtotal!==null?[{l:`Total resistance (${eng(len,'m')})`,v:eng(Rtotal,'Ω')}]:[]),{hr:1},
+          {note:chassis_A>30?'Heavy gauge — high-current power wiring.':
+                chassis_A>15?'Mid gauge — appliance and automotive wiring.':
+                             'Light gauge — signal or low-current use.'}
+        ],'R = ρ·L / A  (copper ρ = 1.68×10⁻⁸ Ω·m)');
+      }
+    }
+
+  }; // end CALCS
+
+  // ── ENGINE ───────────────────────────────────────────────────────────────
+  function recalc(){
+    const c=CALCS[S.activeCalc];
+    if(!c||!c.calc)return;
+    const result=c.calc();
+    const el=document.getElementById('calc-result-area');
+    if(el)el.innerHTML=result||`<div class="empty-state">Enter values above to see results.</div>`;
+  }
+
+  function switchCalc(id){
+    S.activeCalc=id;
+    document.querySelectorAll('.nav-item[data-calc]').forEach(el=>el.classList.toggle('active',el.dataset.calc===id));
+    const c=CALCS[id];
+    const content=document.getElementById('hub-content');
+    if(id==='formulas'){
+      content.innerHTML=`<h2>${c.title}</h2><p class="calc-desc">${c.desc}</p>${c.render()}`;
+      return;
+    }
+    content.innerHTML=`
+      <h2>${c.title}</h2>
+      <p class="calc-desc">${c.desc}</p>
+      ${c.schema||''}
+      ${c.fields?c.fields():''}
+      <div id="calc-result-area"><div class="empty-state">Enter values above to see results.</div></div>`;
+    if(id==='awg')setTimeout(recalc,0);
+    content.querySelectorAll('input[type="number"]').forEach(inp=>inp.addEventListener('input',recalc));
+    content.querySelectorAll('select').forEach(sel=>sel.addEventListener('change',recalc));
+  }
+
+  function filterNav(q){
+    const term=q.toLowerCase().trim();
+    const clearBtn=document.getElementById('hub-search-clear');
+    if(clearBtn)clearBtn.style.display=term?'block':'none';
+    let anyVisible=false;
+    document.querySelectorAll('.nav-item[data-calc]').forEach(el=>{
+      const matches=term===''||el.textContent.toLowerCase().includes(term);
+      el.classList.toggle('hidden',!matches);
+      if(matches)anyVisible=true;
+    });
+    document.querySelectorAll('.nav-cat[data-cat]').forEach(cat=>{
+      if(!term){cat.style.display='';return;}
+      let sib=cat.nextElementSibling,any=false;
+      while(sib&&!sib.hasAttribute('data-cat')){if(!sib.classList.contains('hidden'))any=true;sib=sib.nextElementSibling;}
+      cat.style.display=any?'':'none';
+    });
+    const noRes=document.getElementById('nav-no-results');
+    if(noRes)noRes.style.display=(term&&!anyVisible)?'block':'none';
+  }
+  function clearSearch(){
+    const inp=document.getElementById('hub-search');
+    if(inp){inp.value='';inp.focus();}
+    filterNav('');
+  }
+
+  document.querySelectorAll('.nav-item[data-calc]').forEach(el=>el.addEventListener('click',()=>switchCalc(el.dataset.calc)));
+  switchCalc('formulas');
+  </script>
+</body>
+</html>

@@ -1,0 +1,1704 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Stress &amp; Strain Calculator — Andrew Morrissey</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="../assets/css/main.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=GTM-N34CKH5Q"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'GTM-N34CKH5Q');
+    </script>
+
+    <style>
+        /* ===== BASE (matches beam tool) ===== */
+        .tool-wrapper * { box-sizing: border-box; }
+        .tool-wrapper {
+            font-family: 'IBM Plex Sans', sans-serif;
+            background: #0d1117;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #30363d;
+            margin-top: 2em;
+            width: 100%;
+        }
+
+        /* ===== TOP BAR ===== */
+        .tool-topbar {
+            background: #161b22;
+            padding: 0.85em 1.6em;
+            border-bottom: 1px solid #30363d;
+            display: flex;
+            align-items: center;
+            gap: 0.75em;
+        }
+        .status-dot {
+            width: 8px; height: 8px;
+            background: #3fb950;
+            border-radius: 50%;
+            box-shadow: 0 0 8px rgba(63,185,80,0.55);
+            flex-shrink: 0;
+            animation: pulse 2.5s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%,100% { box-shadow: 0 0 6px rgba(63,185,80,0.4); }
+            50%      { box-shadow: 0 0 14px rgba(63,185,80,0.8); }
+        }
+        .topbar-title {
+            font-size: 0.75em;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            color: #8b949e;
+            font-weight: 500;
+        }
+        .topbar-badges { margin-left: auto; display: flex; gap: 0.5em; }
+        .badge {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.68em;
+            color: #484f58;
+            background: #21262d;
+            padding: 0.2em 0.55em;
+            border-radius: 4px;
+            border: 1px solid #30363d;
+        }
+
+        /* ===== SECTION LABELS ===== */
+        .sec-label {
+            font-size: 0.7em;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            color: #58a6ff;
+            font-weight: 600;
+            margin-bottom: 1em;
+            padding-bottom: 0.5em;
+            border-bottom: 1px solid #21262d;
+            display: flex;
+            align-items: center;
+            gap: 0.5em;
+        }
+        .sec-label i { opacity: 0.8; }
+
+        /* ===== INPUT GRID ===== */
+        .input-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            border-bottom: 1px solid #30363d;
+        }
+        @media (max-width: 800px) { .input-grid { grid-template-columns: 1fr; } }
+        .input-panel {
+            padding: 1.4em 1.6em;
+            border-right: 1px solid #30363d;
+        }
+        .input-panel:last-child { border-right: none; }
+
+        /* ===== FORM CONTROLS ===== */
+        .fg { margin-bottom: 0.95em; }
+        .fg label {
+            display: block;
+            font-size: 0.8em;
+            color: #8b949e;
+            margin-bottom: 0.3em;
+            font-weight: 500;
+        }
+        .fg label .unit {
+            color: #484f58;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.9em;
+        }
+        .fg input[type="number"], .fg select {
+            width: 100%;
+            background: #161b22;
+            border: 1px solid #30363d;
+            color: #e6edf3;
+            padding: 0.52em 0.8em;
+            border-radius: 6px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.88em;
+            transition: border-color 0.18s, box-shadow 0.18s;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        .fg select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238b949e' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            padding-right: 32px;
+            cursor: pointer;
+        }
+        .fg input:focus, .fg select:focus {
+            outline: none;
+            border-color: #58a6ff;
+            box-shadow: 0 0 0 3px rgba(88,166,255,0.1);
+        }
+        .fg input[readonly] {
+            color: #58a6ff;
+            border-color: rgba(88,166,255,0.3);
+            background: rgba(88,166,255,0.05);
+            cursor: default;
+        }
+        /* Solved-for field styling — highlighted green output */
+        .fg input.is-output {
+            color: #3fb950;
+            border-color: rgba(63,185,80,0.4);
+            background: rgba(63,185,80,0.05);
+            cursor: default;
+            font-weight: 600;
+        }
+        /* Disabled/not-needed field */
+        .fg.input-inactive {
+            opacity: 0.35;
+            pointer-events: none;
+        }
+
+        /* ===== SOLVE-FOR BUTTON GROUP ===== */
+        .solve-group {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.4em;
+            margin-bottom: 1em;
+        }
+        .solve-btn {
+            background: #161b22;
+            border: 1px solid #30363d;
+            color: #8b949e;
+            padding: 0.5em 0.4em;
+            border-radius: 6px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.8em;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.15s;
+            line-height: 1.3;
+        }
+        .solve-btn:hover {
+            border-color: #484f58;
+            color: #e6edf3;
+        }
+        .solve-btn.active {
+            background: rgba(63,185,80,0.12);
+            border-color: #3fb950;
+            color: #3fb950;
+            font-weight: 600;
+        }
+        .solve-btn .btn-sym {
+            display: block;
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+        .solve-btn .btn-desc {
+            display: block;
+            font-size: 0.75em;
+            color: inherit;
+            opacity: 0.7;
+            margin-top: 0.1em;
+        }
+
+        /* ===== COMPUTED / INFO DISPLAY ===== */
+        .computed-val {
+            background: #0a0e14;
+            border: 1px solid #30363d;
+            border-left: 3px solid #3fb950;
+            border-radius: 6px;
+            padding: 0.6em 1em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0.8em;
+        }
+        .cv-label { font-size: 0.78em; color: #8b949e; }
+        .cv-value {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.95em;
+            color: #3fb950;
+            font-weight: 600;
+        }
+
+        /* E sanity / material match display */
+        .material-match {
+            background: #0a0e14;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 0.6em 1em;
+            margin-top: 0.6em;
+            display: none;
+        }
+        .material-match.visible { display: block; }
+        .mm-label {
+            font-size: 0.7em;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #484f58;
+            margin-bottom: 0.4em;
+        }
+        .mm-row {
+            display: flex;
+            align-items: center;
+            gap: 0.6em;
+        }
+        .mm-dot {
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .mm-text {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.82em;
+            color: #e6edf3;
+        }
+
+        /* ===== ANALYZE ROW ===== */
+        .analyze-row {
+            padding: 1.1em 1.6em;
+            border-bottom: 1px solid #30363d;
+            display: flex;
+            align-items: center;
+            gap: 1em;
+            flex-wrap: wrap;
+        }
+        .btn-analyze {
+            background: #238636;
+            color: #fff;
+            border: 1px solid #2ea043;
+            padding: 0.65em 1.8em;
+            border-radius: 6px;
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-size: 0.88em;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.55em;
+            transition: background 0.18s, box-shadow 0.18s;
+        }
+        .btn-analyze:hover { background: #2ea043; box-shadow: 0 0 14px rgba(46,160,67,0.4); }
+        .btn-reset {
+            background: transparent;
+            color: #8b949e;
+            border: 1px solid #30363d;
+            padding: 0.65em 1.3em;
+            border-radius: 6px;
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-size: 0.88em;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5em;
+            transition: border-color 0.18s, color 0.18s;
+        }
+        .btn-reset:hover { border-color: #8b949e; color: #e6edf3; }
+        .error-msg {
+            color: #f78166;
+            font-size: 0.82em;
+            font-family: 'IBM Plex Mono', monospace;
+        }
+
+        /* ===== RESULTS ===== */
+        #results { padding: 0 1.6em 1.8em; }
+        .results-header {
+            font-size: 0.7em;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            color: #58a6ff;
+            font-weight: 600;
+            padding: 1.2em 0 0.8em;
+            border-bottom: 1px solid #21262d;
+            margin-bottom: 1.2em;
+            display: flex;
+            align-items: center;
+            gap: 0.5em;
+        }
+
+        /* ===== RESULT CARDS ===== */
+        .result-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 0.75em;
+            margin-bottom: 1.6em;
+        }
+        .rc {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 0.9em 1em;
+            text-align: center;
+            transition: border-color 0.2s;
+        }
+        .rc:hover { border-color: #484f58; }
+        /* Primary result card (solved-for value) gets accent border */
+        .rc.rc-primary {
+            border-color: #3fb950;
+            background: rgba(63,185,80,0.04);
+        }
+        .rc-lbl {
+            font-size: 0.68em;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #8b949e;
+            font-weight: 500;
+            margin-bottom: 0.45em;
+        }
+        .rc-val {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 1.2em;
+            font-weight: 600;
+            line-height: 1.15;
+            word-break: break-all;
+        }
+        .rc-unit {
+            font-size: 0.72em;
+            color: #8b949e;
+            margin-top: 0.2em;
+            font-family: 'IBM Plex Mono', monospace;
+        }
+        /* FoS card changes color based on safety margin */
+        .rc-fos-safe   { color: #3fb950; }
+        .rc-fos-margin { color: #e3b341; }
+        .rc-fos-unsafe { color: #f78166; }
+        .c-green  { color: #3fb950; }
+        .c-blue   { color: #58a6ff; }
+        .c-amber  { color: #e3b341; }
+        .c-orange { color: #f0883e; }
+        .c-purple { color: #bc8cff; }
+
+        /* ===== DIAGRAM CARD ===== */
+        .diagrams-wrap { display: flex; flex-direction: column; gap: 0.9em; }
+        .diagram-card {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            overflow: visible;
+            position: relative;
+        }
+        .diagram-hdr {
+            padding: 0.65em 1.1em;
+            border-bottom: 1px solid #21262d;
+            display: flex;
+            align-items: center;
+            gap: 0.55em;
+            border-radius: 8px 8px 0 0;
+            overflow: hidden;
+        }
+        .dhd { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+        .dhd-green  { background: #3fb950; }
+        .dhd-blue   { background: #58a6ff; }
+        .dhd-orange { background: #f0883e; }
+        .diagram-hdr span {
+            font-size: 0.75em;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #8b949e;
+            font-weight: 500;
+        }
+        .diagram-hdr .formula-chip {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.7em;
+            color: #484f58;
+            background: #21262d;
+            padding: 0.15em 0.5em;
+            border-radius: 4px;
+        }
+        .hdr-right { margin-left: auto; display: flex; align-items: center; gap: 0.55em; }
+        .btn-export {
+            background: transparent;
+            border: 1px solid #30363d;
+            color: #484f58;
+            padding: 0.22em 0.65em;
+            border-radius: 4px;
+            font-size: 0.72em;
+            font-family: 'IBM Plex Mono', monospace;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35em;
+            transition: border-color 0.15s, color 0.15s;
+        }
+        .btn-export:hover { border-color: #8b949e; color: #e6edf3; }
+        .canvas-wrap {
+            position: relative;
+            display: block;
+            overflow: hidden;
+            border-radius: 0 0 8px 8px;
+        }
+        .canvas-wrap canvas { display: block; width: 100%; }
+
+        /* ===== FORMULA REFERENCE ROW ===== */
+        .formula-row {
+            padding: 0.8em 1.6em;
+            border-bottom: 1px solid #30363d;
+            display: flex;
+            gap: 1.5em;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .formula-pill {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.78em;
+            color: #484f58;
+            background: #161b22;
+            border: 1px solid #21262d;
+            padding: 0.25em 0.7em;
+            border-radius: 20px;
+        }
+        .formula-pill.active {
+            color: #58a6ff;
+            border-color: rgba(88,166,255,0.3);
+            background: rgba(88,166,255,0.06);
+        }
+
+        /* ===== BACK BUTTON ===== */
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5em;
+            margin-top: 1.6em;
+            padding: 0.65em 1.4em;
+            background: #238636;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 6px;
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-size: 0.88em;
+            font-weight: 500;
+            transition: background 0.18s;
+        }
+        .back-btn:hover { background: #2ea043; color: #fff; }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body class="is-preload">
+
+    <div id="header">
+        <div class="top">
+            <div id="logo">
+                <span class="image avatar48"><img src="../images/Avatar_1.jpg" alt="" /></span>
+                <h1 id="title">Andrew Morrissey</h1>
+                <p>Mechanical Engineer</p>
+            </div>
+            <nav id="nav">
+                <ul>
+                    <li><a href="../index.html#top"><span class="icon solid fa-home">Intro</span></a></li>
+                    <li><a href="../index.html#portfolio"><span class="icon solid fa-th">Portfolio</span></a></li>
+                    <li><a href="../index.html#tools"><span class="icon solid fa-wrench">Tools</span></a></li>
+                    <li><a href="../index.html#blog"><span class="icon solid fa-pen-nib">Blog</span></a></li>
+                    <li><a href="../index.html#about"><span class="icon solid fa-user">About Me</span></a></li>
+                    <li><a href="../index.html#contact"><span class="icon solid fa-envelope">Contact</span></a></li>
+                </ul>
+            </nav>
+        </div>
+        <div class="bottom">
+            <ul class="icons">
+                <li><a href="https://www.linkedin.com/in/asmorrissey" class="icon brands fa-linkedin" target="_blank"><span class="label">LinkedIn</span></a></li>
+                <li><a href="mailto:asmspartan21@gmail.com" class="icon solid fa-envelope"><span class="label">Email</span></a></li>
+                <li><a href="https://github.com/ASM-21" class="icon brands fa-github" target="_blank"><span class="label">Github</span></a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="main">
+        <section id="stress-strain-tool" class="two">
+            <div class="container">
+                <header>
+                    <h2>Stress &amp; Strain Calculator</h2>
+                    <p>Normal Stress &middot; Axial Strain &middot; Young's Modulus &middot; Factor of Safety</p>
+                </header>
+
+                <div class="tool-wrapper">
+
+                    <!-- Top Bar -->
+                    <div class="tool-topbar">
+                        <div class="status-dot"></div>
+                        <span class="topbar-title">Uniaxial Stress–Strain Analyzer</span>
+                        <div class="topbar-badges">
+                            <span class="badge">Linear Elastic</span>
+                            <span class="badge">v2.0</span>
+                        </div>
+                    </div>
+
+                    <!-- Input Grid -->
+                    <div class="input-grid">
+
+                        <!-- LEFT: Solve config + material -->
+                        <div class="input-panel">
+                            <div class="sec-label">
+                                <i class="fas fa-sliders-h"></i> Solve Configuration
+                            </div>
+
+                            <!-- Solve-for selector -->
+                            <div class="fg">
+                                <label>Solve For</label>
+                                <div class="solve-group">
+                                    <button class="solve-btn active" data-solve="all" onclick="setSolveMode('all')">
+                                        <span class="btn-sym">σ, ε, E</span>
+                                        <span class="btn-desc">All outputs</span>
+                                    </button>
+                                    <button class="solve-btn" data-solve="F" onclick="setSolveMode('F')">
+                                        <span class="btn-sym">F</span>
+                                        <span class="btn-desc">Force</span>
+                                    </button>
+                                    <button class="solve-btn" data-solve="A" onclick="setSolveMode('A')">
+                                        <span class="btn-sym">A</span>
+                                        <span class="btn-desc">Area</span>
+                                    </button>
+                                    <button class="solve-btn" data-solve="dL" onclick="setSolveMode('dL')">
+                                        <span class="btn-sym">ΔL</span>
+                                        <span class="btn-desc">Elongation</span>
+                                    </button>
+                                    <button class="solve-btn" data-solve="E" onclick="setSolveMode('E')">
+                                        <span class="btn-sym">E</span>
+                                        <span class="btn-desc">Modulus</span>
+                                    </button>
+                                    <button class="solve-btn" data-solve="sigma" onclick="setSolveMode('sigma')">
+                                        <span class="btn-sym">σ</span>
+                                        <span class="btn-desc">Stress</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Material preset -->
+                            <div class="fg">
+                                <label>Material Preset</label>
+                                <select id="materialPreset" onchange="onMaterialChange()">
+                                    <option value="steel_a36">Structural Steel A36</option>
+                                    <option value="steel_1045">Steel 1045 (HR)</option>
+                                    <option value="aluminum_6061">Aluminum 6061-T6</option>
+                                    <option value="aluminum_7075">Aluminum 7075-T6</option>
+                                    <option value="stainless_304">Stainless Steel 304</option>
+                                    <option value="titanium">Titanium Ti-6Al-4V</option>
+                                    <option value="cfrp">Carbon Fiber CFRP (0°)</option>
+                                    <option value="concrete">Reinforced Concrete</option>
+                                    <option value="wood">Wood (Douglas Fir)</option>
+                                    <option value="hdpe">HDPE</option>
+                                    <option value="custom">Custom</option>
+                                </select>
+                            </div>
+
+                            <!-- Yield strength (auto-filled from preset, editable) -->
+                            <div class="fg" id="fg-yield">
+                                <label>Yield Strength σ<sub>y</sub> <span class="unit">(MPa)</span></label>
+                                <input type="number" id="yieldStrength" value="250" min="1" step="1" oninput="onInputChange()" />
+                            </div>
+
+                            <!-- E sanity / material match result (shown after calc) -->
+                            <div class="material-match" id="materialMatch">
+                                <div class="mm-label">E Comparison — Closest Known Materials</div>
+                                <div id="mmRows"></div>
+                            </div>
+                        </div>
+
+                        <!-- RIGHT: Numerical inputs -->
+                        <div class="input-panel">
+                            <div class="sec-label">
+                                <i class="fas fa-ruler"></i> Member Properties &amp; Loading
+                            </div>
+
+                            <div class="fg" id="fg-F">
+                                <label id="lbl-F">Applied Force F <span class="unit">(N)</span></label>
+                                <input type="number" id="inputF" placeholder="e.g. 10000" step="any"
+                                       oninput="onInputChange()" />
+                            </div>
+
+                            <div class="fg" id="fg-A">
+                                <label id="lbl-A">Cross-Sectional Area A <span class="unit">(mm²)</span></label>
+                                <input type="number" id="inputA" placeholder="e.g. 50" step="any" min="0.001"
+                                       oninput="onInputChange()" />
+                            </div>
+
+                            <div class="fg" id="fg-sigma">
+                                <label id="lbl-sigma">Normal Stress σ <span class="unit">(MPa)</span>
+                                    <span id="sigma-src-note" style="font-weight:400; color:#484f58;"></span>
+                                </label>
+                                <input type="number" id="inputSigma" placeholder="e.g. 200" step="any"
+                                       oninput="onInputChange()" />
+                            </div>
+
+                            <div class="fg" id="fg-dL">
+                                <label id="lbl-dL">Change in Length ΔL <span class="unit">(mm)</span></label>
+                                <input type="number" id="inputDL" placeholder="e.g. 0.12" step="any"
+                                       oninput="onInputChange()" />
+                            </div>
+
+                            <div class="fg" id="fg-L0">
+                                <label>Original Length L₀ <span class="unit">(mm)</span></label>
+                                <input type="number" id="inputL0" placeholder="e.g. 300" step="any" min="0.001"
+                                       oninput="onInputChange()" />
+                            </div>
+
+                            <div class="fg" id="fg-E">
+                                <label>Elastic Modulus E <span class="unit">(GPa)</span></label>
+                                <input type="number" id="inputE" value="200" min="0.001" step="0.1"
+                                       oninput="onInputChange()" />
+                            </div>
+
+                            <!-- Live computed stress display (shown when F and A are entered) -->
+                            <div class="computed-val hidden" id="liveStress">
+                                <span class="cv-label">σ = F / A</span>
+                                <span class="cv-value" id="liveStressVal">— MPa</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Formula reference row (updates per mode) -->
+                    <div class="formula-row">
+                        <span id="pill-sigma" class="formula-pill active">σ = F / A</span>
+                        <span id="pill-eps"   class="formula-pill active">ε = ΔL / L₀</span>
+                        <span id="pill-E"     class="formula-pill active">E = σ / ε</span>
+                        <span id="pill-fos"   class="formula-pill">FoS = σ<sub>y</sub> / σ</span>
+                    </div>
+
+                    <!-- Analyze row -->
+                    <div class="analyze-row">
+                        <button class="btn-analyze" onclick="calculate()">
+                            <i class="fas fa-calculator"></i> Calculate
+                        </button>
+                        <button class="btn-reset" onclick="resetTool()">
+                            <i class="fas fa-undo"></i> Reset
+                        </button>
+                        <span class="error-msg hidden" id="errorMsg"></span>
+                    </div>
+
+                    <!-- Results -->
+                    <div id="results" class="hidden">
+                        <div class="results-header">
+                            <i class="fas fa-chart-bar"></i> Results
+                        </div>
+
+                        <!-- Result cards (shown/hidden by mode) -->
+                        <div class="result-cards">
+                            <div class="rc" id="card-sigma">
+                                <div class="rc-lbl">Normal Stress σ</div>
+                                <div class="rc-val c-orange" id="res-sigma">—</div>
+                                <div class="rc-unit" id="res-sigma-unit">MPa</div>
+                            </div>
+                            <div class="rc" id="card-eps">
+                                <div class="rc-lbl">Strain ε</div>
+                                <div class="rc-val c-blue" id="res-eps">—</div>
+                                <div class="rc-unit">—</div>
+                            </div>
+                            <div class="rc" id="card-E">
+                                <div class="rc-lbl">Young's Modulus E</div>
+                                <div class="rc-val c-purple" id="res-E">—</div>
+                                <div class="rc-unit" id="res-E-unit">GPa</div>
+                            </div>
+                            <div class="rc" id="card-F">
+                                <div class="rc-lbl">Applied Force F</div>
+                                <div class="rc-val c-blue" id="res-F">—</div>
+                                <div class="rc-unit" id="res-F-unit">N</div>
+                            </div>
+                            <div class="rc" id="card-A">
+                                <div class="rc-lbl">Required Area A</div>
+                                <div class="rc-val c-blue" id="res-A">—</div>
+                                <div class="rc-unit" id="res-A-unit">mm²</div>
+                            </div>
+                            <div class="rc" id="card-dL">
+                                <div class="rc-lbl">Elongation ΔL</div>
+                                <div class="rc-val c-green" id="res-dL">—</div>
+                                <div class="rc-unit" id="res-dL-unit">mm</div>
+                            </div>
+                            <div class="rc" id="card-fos">
+                                <div class="rc-lbl">Factor of Safety</div>
+                                <div class="rc-val" id="res-fos">—</div>
+                                <div class="rc-unit" id="res-fos-note">—</div>
+                            </div>
+                        </div>
+
+                        <!-- Diagrams -->
+                        <div class="diagrams-wrap">
+
+                            <!-- Stress-Strain Diagram -->
+                            <div class="diagram-card">
+                                <div class="diagram-hdr">
+                                    <div class="dhd dhd-green"></div>
+                                    <span>Stress–Strain Diagram</span>
+                                    <div class="hdr-right">
+                                        <span class="formula-chip" id="ssFormula">Linear Elastic Region</span>
+                                        <button class="btn-export" onclick="exportPNG('ssCanvas','stress_strain_diagram')">
+                                            <i class="fas fa-download"></i> PNG
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="canvas-wrap">
+                                    <canvas id="ssCanvas" height="260"></canvas>
+                                </div>
+                            </div>
+
+                            <!-- Member Diagram -->
+                            <div class="diagram-card">
+                                <div class="diagram-hdr">
+                                    <div class="dhd dhd-blue"></div>
+                                    <span>Member Loading Schematic</span>
+                                    <div class="hdr-right">
+                                        <span class="formula-chip">Uniaxial</span>
+                                        <button class="btn-export" onclick="exportPNG('memberCanvas','member_schematic')">
+                                            <i class="fas fa-download"></i> PNG
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="canvas-wrap">
+                                    <canvas id="memberCanvas" height="160"></canvas>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div><!-- end tool-wrapper -->
+
+                <a href="../index.html#tools" class="back-btn">
+                    <i class="fas fa-arrow-left"></i> Back to Tools
+                </a>
+            </div>
+        </section>
+    </div>
+
+    <div id="footer">
+        <ul class="copyright">
+            <li>&copy; Andrew Morrissey. All rights reserved.</li>
+            <li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+        </ul>
+    </div>
+
+    <script src="../assets/js/jquery.min.js"></script>
+    <script src="../assets/js/jquery.scrolly.min.js"></script>
+    <script src="../assets/js/jquery.scrollex.min.js"></script>
+    <script src="../assets/js/browser.min.js"></script>
+    <script src="../assets/js/breakpoints.min.js"></script>
+    <script src="../assets/js/util.js"></script>
+    <script src="../assets/js/main.js"></script>
+
+    <script>
+    // ============================================================
+    //  MATERIAL DATABASE
+    //  E in GPa, yield in MPa, uts in MPa (for diagram sketch)
+    // ============================================================
+    const MATERIALS = {
+        steel_a36:    { label: 'Structural Steel A36',   E: 200,  yield: 250,  uts: 400  },
+        steel_1045:   { label: 'Steel 1045 (HR)',        E: 200,  yield: 310,  uts: 565  },
+        aluminum_6061:{ label: 'Aluminum 6061-T6',       E: 68.9, yield: 276,  uts: 310  },
+        aluminum_7075:{ label: 'Aluminum 7075-T6',       E: 71.7, yield: 503,  uts: 572  },
+        stainless_304:{ label: 'Stainless Steel 304',    E: 193,  yield: 215,  uts: 505  },
+        titanium:     { label: 'Titanium Ti-6Al-4V',     E: 114,  yield: 880,  uts: 950  },
+        cfrp:         { label: 'Carbon Fiber CFRP (0°)', E: 70,   yield: null, uts: 600  },
+        concrete:     { label: 'Reinforced Concrete',    E: 30,   yield: null, uts: 30   },
+        wood:         { label: 'Wood (Douglas Fir)',     E: 13,   yield: null, uts: 50   },
+        hdpe:         { label: 'HDPE',                   E: 1.4,  yield: 26,   uts: 33   },
+        custom:       { label: 'Custom',                 E: null, yield: null, uts: null }
+    };
+
+    // E sanity: sorted list used for nearest-match lookup
+    const E_SANITY = [
+        { name: 'HDPE',                   E: 1.4  },
+        { name: 'Wood (Douglas Fir)',      E: 13   },
+        { name: 'Reinforced Concrete',     E: 30   },
+        { name: 'Carbon Fiber CFRP (0°)',  E: 70   },
+        { name: 'Aluminum 6061-T6',        E: 68.9 },
+        { name: 'Aluminum 7075-T6',        E: 71.7 },
+        { name: 'Titanium Ti-6Al-4V',      E: 114  },
+        { name: 'Stainless Steel 304',     E: 193  },
+        { name: 'Structural Steel A36',    E: 200  },
+        { name: 'Steel 1045 (HR)',         E: 200  },
+    ];
+
+    // ============================================================
+    //  STATE
+    // ============================================================
+    let currentMode = 'all';
+    let R = null;
+
+    // Which input fields exist and what they need per mode
+    // 'all'   → needs F, A, dL, L0, E   → outputs σ, ε, E-check, FoS
+    // 'F'     → needs σ, A              → outputs F
+    // 'A'     → needs F, σ              → outputs A
+    // 'dL'    → needs ε, L0             → outputs ΔL     (or σ,E,L0 → ΔL)
+    // 'E'     → needs F, A, dL, L0      → outputs E
+    // 'sigma' → needs F, A  OR  ε,E     → outputs σ
+
+    const MODE_CONFIG = {
+        all:   { needs: ['F','A','dL','L0','E'],    hides: [],           primary: 'sigma' },
+        F:     { needs: ['sigma','A'],              hides: ['dL','L0'],  primary: 'F'     },
+        A:     { needs: ['F','sigma'],              hides: ['dL','L0'],  primary: 'A'     },
+        dL:    { needs: ['sigma','E','L0'],         hides: ['F'],        primary: 'dL'    },
+        E:     { needs: ['F','A','dL','L0'],        hides: [],           primary: 'E'     },
+        sigma: { needs: ['F','A'],                  hides: ['dL','L0'],  primary: 'sigma' },
+    };
+
+    // ============================================================
+    //  SOLVE-FOR MODE SELECTOR
+    // ============================================================
+    function setSolveMode(mode) {
+        currentMode = mode;
+
+        // Update button states
+        document.querySelectorAll('.solve-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.solve === mode);
+        });
+
+        // Update formula pills
+        const cfg = MODE_CONFIG[mode];
+        updateFormulaPills(mode);
+
+        // Reset output field styling — all fields editable by default
+        ['F','A','sigma','dL','L0','E'].forEach(id => {
+            const fg  = document.getElementById('fg-' + id);
+            const inp = document.getElementById('input' + capFirst(id));
+            if (!fg || !inp) return;
+
+            fg.classList.remove('input-inactive');
+            inp.classList.remove('is-output');
+            inp.readOnly = false;
+        });
+
+        // Mark the solved-for field as output
+        if (mode !== 'all') {
+            const outId = cfg.primary;
+            const inp   = document.getElementById('input' + capFirst(outId));
+            if (inp) {
+                inp.value    = '';
+                inp.readOnly = true;
+                inp.classList.add('is-output');
+                inp.placeholder = '← calculated';
+            }
+        }
+
+        // Dim fields not needed in this mode
+        cfg.hides.forEach(id => {
+            const fg = document.getElementById('fg-' + id);
+            if (fg) fg.classList.add('input-inactive');
+        });
+
+        // Show/hide sigma row based on whether we need direct σ entry
+        const sigmaFg = document.getElementById('fg-sigma');
+        sigmaFg.classList.toggle('hidden',
+            mode === 'all' || mode === 'E' || mode === 'sigma');
+
+        // Show σ input only when we need it as an input (not as output)
+        if (mode === 'F' || mode === 'A' || mode === 'dL') {
+            sigmaFg.classList.remove('hidden');
+        }
+
+        // Hide results when mode changes
+        document.getElementById('results').classList.add('hidden');
+        document.getElementById('errorMsg').classList.add('hidden');
+        document.getElementById('liveStress').classList.add('hidden');
+        document.getElementById('materialMatch').classList.remove('visible');
+        R = null;
+    }
+
+    function capFirst(s) {
+        if (s === 'dL') return 'DL';
+        if (s === 'L0') return 'L0';
+        return s.charAt(0).toUpperCase() + s.slice(1);
+    }
+
+    // ============================================================
+    //  FORMULA PILLS
+    // ============================================================
+    function updateFormulaPills(mode) {
+        const pills = {
+            sigma: document.getElementById('pill-sigma'),
+            eps:   document.getElementById('pill-eps'),
+            E:     document.getElementById('pill-E'),
+            fos:   document.getElementById('pill-fos'),
+        };
+        // Reset all
+        Object.values(pills).forEach(p => p.classList.remove('active'));
+
+        if (mode === 'all') {
+            pills.sigma.classList.add('active');
+            pills.eps.classList.add('active');
+            pills.E.classList.add('active');
+            pills.fos.classList.add('active');
+        } else if (mode === 'F' || mode === 'A' || mode === 'sigma') {
+            pills.sigma.classList.add('active');
+        } else if (mode === 'dL') {
+            pills.eps.classList.add('active');
+            pills.E.classList.add('active');
+        } else if (mode === 'E') {
+            pills.sigma.classList.add('active');
+            pills.eps.classList.add('active');
+            pills.E.classList.add('active');
+        }
+    }
+
+    // ============================================================
+    //  MATERIAL CHANGE
+    // ============================================================
+    function onMaterialChange() {
+        const key = document.getElementById('materialPreset').value;
+        const mat = MATERIALS[key];
+        const eEl = document.getElementById('inputE');
+        const yEl = document.getElementById('yieldStrength');
+
+        if (mat.E !== null) {
+            eEl.value    = mat.E;
+            eEl.readOnly = (currentMode !== 'E');  // lock only when not solving for E
+        } else {
+            eEl.readOnly = false;
+            eEl.value    = '';
+        }
+
+        if (mat.yield !== null) {
+            yEl.value = mat.yield;
+        } else {
+            yEl.value = '';
+            yEl.placeholder = 'N/A for this material';
+        }
+
+        // If in 'E' solve mode, don't lock E field
+        if (currentMode === 'E') {
+            eEl.readOnly = false;
+            eEl.classList.add('is-output');
+        }
+
+        onInputChange();
+    }
+
+    // ============================================================
+    //  LIVE INPUT CHANGE — show live σ = F/A when available
+    // ============================================================
+    function onInputChange() {
+        const F  = parseFloat(document.getElementById('inputF').value);
+        const A  = parseFloat(document.getElementById('inputA').value);
+        const ls = document.getElementById('liveStress');
+
+        if (!isNaN(F) && !isNaN(A) && A > 0 &&
+            currentMode !== 'sigma' && currentMode !== 'F' && currentMode !== 'A') {
+            const sigma = F / A;  // N/mm² = MPa
+            document.getElementById('liveStressVal').textContent = sigma.toPrecision(4) + ' MPa';
+            ls.classList.remove('hidden');
+        } else {
+            ls.classList.add('hidden');
+        }
+    }
+
+    // ============================================================
+    //  MAIN CALCULATE
+    // ============================================================
+    function calculate() {
+        const errEl = document.getElementById('errorMsg');
+        errEl.classList.add('hidden');
+
+        // Read all inputs (NaN if empty)
+        const F_in     = parseFloat(document.getElementById('inputF').value);
+        const A_in     = parseFloat(document.getElementById('inputA').value);
+        const dL_in    = parseFloat(document.getElementById('inputDL').value);
+        const L0_in    = parseFloat(document.getElementById('inputL0').value);
+        const E_in     = parseFloat(document.getElementById('inputE').value);     // GPa
+        const sigma_in = parseFloat(document.getElementById('inputSigma').value); // MPa
+        const yield_in = parseFloat(document.getElementById('yieldStrength').value);
+
+        let sigma, eps, E_GPa, F_out, A_out, dL_out;
+        let err = null;
+
+        // ---- SOLVE ----
+        if (currentMode === 'all') {
+            if (isNaN(F_in) || isNaN(A_in) || A_in <= 0)
+                err = '⚠ Enter valid F (N) and A > 0 (mm²)';
+            else if (isNaN(dL_in) || isNaN(L0_in) || L0_in <= 0)
+                err = '⚠ Enter valid ΔL (mm) and L₀ > 0 (mm)';
+            else if (isNaN(E_in) || E_in <= 0)
+                err = '⚠ Enter valid E > 0 (GPa)';
+            else {
+                sigma = F_in / A_in;            // MPa
+                eps   = dL_in / L0_in;          // dimensionless
+                E_GPa = E_in;                   // user-provided, used for FoS and diagram
+                // Derived E from measurement for sanity check
+                const E_derived = eps !== 0 ? (sigma / eps) / 1000 : null; // GPa
+                R = { mode: 'all', sigma, eps, E_GPa, E_derived,
+                      F: F_in, A: A_in, dL: dL_in, L0: L0_in,
+                      yield: isNaN(yield_in) ? null : yield_in };
+            }
+
+        } else if (currentMode === 'F') {
+            if (isNaN(sigma_in))          err = '⚠ Enter stress σ (MPa)';
+            else if (isNaN(A_in) || A_in <= 0) err = '⚠ Enter area A > 0 (mm²)';
+            else {
+                F_out = sigma_in * A_in;  // N
+                sigma = sigma_in;
+                R = { mode: 'F', sigma, F: F_out, A: A_in,
+                      yield: isNaN(yield_in) ? null : yield_in };
+            }
+
+        } else if (currentMode === 'A') {
+            if (isNaN(F_in))              err = '⚠ Enter force F (N)';
+            else if (isNaN(sigma_in) || sigma_in <= 0) err = '⚠ Enter stress σ > 0 (MPa)';
+            else {
+                A_out = F_in / sigma_in;  // mm²
+                sigma = sigma_in;
+                R = { mode: 'A', sigma, F: F_in, A: A_out,
+                      yield: isNaN(yield_in) ? null : yield_in };
+            }
+
+        } else if (currentMode === 'dL') {
+            if (isNaN(sigma_in))          err = '⚠ Enter stress σ (MPa)';
+            else if (isNaN(E_in) || E_in <= 0) err = '⚠ Enter E > 0 (GPa)';
+            else if (isNaN(L0_in) || L0_in <= 0) err = '⚠ Enter L₀ > 0 (mm)';
+            else {
+                eps   = sigma_in / (E_in * 1000);  // σ(MPa) / E(MPa)
+                dL_out = eps * L0_in;              // mm
+                sigma = sigma_in;
+                E_GPa = E_in;
+                R = { mode: 'dL', sigma, eps, E_GPa, dL: dL_out, L0: L0_in,
+                      yield: isNaN(yield_in) ? null : yield_in };
+            }
+
+        } else if (currentMode === 'E') {
+            if (isNaN(F_in) || isNaN(A_in) || A_in <= 0)
+                err = '⚠ Enter valid F (N) and A > 0 (mm²)';
+            else if (isNaN(dL_in) || isNaN(L0_in) || L0_in <= 0)
+                err = '⚠ Enter valid ΔL (mm) and L₀ > 0 (mm)';
+            else {
+                sigma = F_in / A_in;
+                eps   = dL_in / L0_in;
+                if (Math.abs(eps) < 1e-15) err = '⚠ ΔL/L₀ is effectively zero — cannot compute E';
+                else {
+                    E_GPa = (sigma / eps) / 1000;
+                    R = { mode: 'E', sigma, eps, E_GPa, E_derived: E_GPa,
+                          F: F_in, A: A_in, dL: dL_in, L0: L0_in,
+                          yield: isNaN(yield_in) ? null : yield_in };
+                    // Write result back into E field
+                    document.getElementById('inputE').value = E_GPa.toPrecision(4);
+                }
+            }
+
+        } else if (currentMode === 'sigma') {
+            if (isNaN(F_in) || isNaN(A_in) || A_in <= 0)
+                err = '⚠ Enter valid F (N) and A > 0 (mm²)';
+            else {
+                sigma = F_in / A_in;
+                R = { mode: 'sigma', sigma,
+                      F: F_in, A: A_in,
+                      yield: isNaN(yield_in) ? null : yield_in };
+                document.getElementById('inputSigma').value = sigma.toPrecision(4);
+            }
+        }
+
+        if (err) {
+            errEl.textContent = err;
+            errEl.classList.remove('hidden');
+            return;
+        }
+
+        renderResults();
+    }
+
+    // ============================================================
+    //  RENDER RESULTS
+    // ============================================================
+    function renderResults() {
+        if (!R) return;
+
+        // Hide all cards first, then reveal what we have
+        ['sigma','eps','E','F','A','dL','fos'].forEach(id => {
+            document.getElementById('card-' + id).classList.add('hidden');
+        });
+
+        const show = (id) => document.getElementById('card-' + id).classList.remove('hidden');
+        const setPrimary = (id) => document.getElementById('card-' + id).classList.add('rc-primary');
+
+        const cfg = MODE_CONFIG[currentMode];
+
+        // σ card
+        if (R.sigma !== undefined) {
+            show('sigma');
+            document.getElementById('res-sigma').textContent =
+                fmtStress(R.sigma);
+            document.getElementById('res-sigma-unit').textContent =
+                Math.abs(R.sigma) >= 1000 ? 'GPa' : 'MPa';
+            if (cfg.primary === 'sigma') setPrimary('sigma');
+        }
+
+        // ε card
+        if (R.eps !== undefined) {
+            show('eps');
+            document.getElementById('res-eps').textContent =
+                R.eps.toExponential(3);
+            if (cfg.primary === 'eps') setPrimary('eps');
+        }
+
+        // E card
+        if (R.E_GPa !== undefined) {
+            show('E');
+            document.getElementById('res-E').textContent =
+                R.E_GPa.toPrecision(4);
+            document.getElementById('res-E-unit').textContent = 'GPa';
+            if (cfg.primary === 'E') setPrimary('E');
+        }
+
+        // F card
+        if (R.mode === 'F' && R.F !== undefined) {
+            show('F');
+            const fv = R.F;
+            if (Math.abs(fv) >= 1e6)      { document.getElementById('res-F').textContent = (fv/1e6).toPrecision(4); document.getElementById('res-F-unit').textContent = 'MN'; }
+            else if (Math.abs(fv) >= 1e3) { document.getElementById('res-F').textContent = (fv/1e3).toPrecision(4); document.getElementById('res-F-unit').textContent = 'kN'; }
+            else                           { document.getElementById('res-F').textContent = fv.toPrecision(4);       document.getElementById('res-F-unit').textContent = 'N';  }
+            setPrimary('F');
+        }
+
+        // A card
+        if (R.mode === 'A' && R.A !== undefined) {
+            show('A');
+            document.getElementById('res-A').textContent =
+                R.A.toPrecision(4);
+            document.getElementById('res-A-unit').textContent = 'mm²';
+            setPrimary('A');
+        }
+
+        // ΔL card
+        if (R.dL !== undefined && (R.mode === 'all' || R.mode === 'dL')) {
+            show('dL');
+            const dlv = R.mode === 'dL' ? R.dL : R.dL;
+            document.getElementById('res-dL').textContent =
+                Math.abs(dlv) < 0.001
+                    ? (dlv * 1000).toPrecision(3) + 'e-3'
+                    : dlv.toPrecision(4);
+            document.getElementById('res-dL-unit').textContent = 'mm';
+            if (cfg.primary === 'dL') setPrimary('dL');
+        }
+        // For 'all' mode, derive ΔL from stored inputs
+        if (R.mode === 'all') {
+            show('dL');
+            document.getElementById('res-dL').textContent =
+                Math.abs(R.dL) < 0.001
+                    ? (R.dL * 1e3).toPrecision(3) + 'e-3'
+                    : R.dL.toPrecision(4);
+            document.getElementById('res-dL-unit').textContent = 'mm';
+        }
+
+        // FoS card
+        if (R.yield !== null && R.yield !== undefined && R.sigma !== undefined && R.sigma > 0) {
+            show('fos');
+            const fos = R.yield / R.sigma;
+            const fosEl   = document.getElementById('res-fos');
+            const fosNote = document.getElementById('res-fos-note');
+            fosEl.textContent = fos.toFixed(2);
+            // Remove old color classes
+            fosEl.classList.remove('rc-fos-safe','rc-fos-margin','rc-fos-unsafe','c-green','c-amber','c-orange');
+            if (fos >= 2.0) {
+                fosEl.classList.add('c-green');
+                fosNote.textContent = 'Safe (FoS ≥ 2)';
+            } else if (fos >= 1.0) {
+                fosEl.classList.add('c-amber');
+                fosNote.textContent = fos < 1.25 ? 'Marginal — near yield' : 'Adequate (FoS ≥ 1)';
+            } else {
+                fosEl.classList.add('c-orange');
+                fosNote.textContent = '⚠ Exceeds yield!';
+            }
+            R.fos = fos;
+        }
+
+        // E sanity check (shown when E was computed or provided)
+        if (R.E_derived !== undefined && R.E_derived !== null) {
+            renderESanity(R.E_derived);
+        }
+
+        // Reveal results section
+        document.getElementById('results').classList.remove('hidden');
+
+        // Draw diagrams (Step 3 stubs called here)
+        setTimeout(() => {
+            drawSSCanvas();
+            drawMemberCanvas();
+        }, 60);
+
+        document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // ============================================================
+    //  E SANITY CHECK — nearest material matches
+    // ============================================================
+    function renderESanity(E_computed) {
+        if (E_computed <= 0 || !isFinite(E_computed)) return;
+
+        // Find 3 closest materials by % difference
+        const ranked = E_SANITY
+            .map(m => ({ ...m, pct: Math.abs(m.E - E_computed) / E_computed * 100 }))
+            .sort((a, b) => a.pct - b.pct)
+            .slice(0, 3);
+
+        const container = document.getElementById('materialMatch');
+        const rows      = document.getElementById('mmRows');
+
+        rows.innerHTML = ranked.map(m => {
+            const pct    = m.pct.toFixed(1);
+            const within = m.pct < 5;
+            const color  = m.pct < 5 ? '#3fb950' : m.pct < 20 ? '#e3b341' : '#484f58';
+            return `<div class="mm-row" style="margin-bottom:0.3em;">
+                <div class="mm-dot" style="background:${color}"></div>
+                <span class="mm-text">${m.name}
+                    &nbsp;<span style="color:${color}; font-size:0.85em;">(E=${m.E} GPa, Δ=${pct}%)</span>
+                    ${within ? '<span style="color:#3fb950; font-size:0.8em;"> ✓ match</span>' : ''}
+                </span>
+            </div>`;
+        }).join('');
+
+        container.classList.add('visible');
+    }
+
+    // ============================================================
+    //  FORMAT HELPERS
+    // ============================================================
+    function fmtStress(v) {
+        if (Math.abs(v) >= 1000) return (v / 1000).toPrecision(4);
+        return v.toPrecision(4);
+    }
+
+    // ============================================================
+    //  RESET
+    // ============================================================
+    function resetTool() {
+        R = null;
+        document.getElementById('results').classList.add('hidden');
+        document.getElementById('errorMsg').classList.add('hidden');
+        document.getElementById('liveStress').classList.add('hidden');
+        document.getElementById('materialMatch').classList.remove('visible');
+
+        // Clear all user inputs (but preserve E and yield from material)
+        ['inputF','inputA','inputDL','inputL0','inputSigma'].forEach(id => {
+            const el = document.getElementById(id);
+            el.value = '';
+            el.classList.remove('is-output');
+            el.readOnly = false;
+        });
+
+        setSolveMode(currentMode); // re-apply mode UI state
+        onMaterialChange();        // re-fill E and yield from preset
+    }
+
+    // ============================================================
+    //  CANVAS SETUP HELPER
+    // ============================================================
+    function setupCanvas(id, cssH) {
+        const canvas = document.getElementById(id);
+        const dpr = window.devicePixelRatio || 1;
+        const W   = canvas.offsetWidth || canvas.parentElement.offsetWidth || 700;
+        canvas.width  = W * dpr;
+        canvas.height = cssH * dpr;
+        canvas.style.height = cssH + 'px';
+        const ctx = canvas.getContext('2d');
+        ctx.scale(dpr, dpr);
+        return { ctx, W, H: cssH };
+    }
+
+    // ============================================================
+    //  PNG EXPORT
+    // ============================================================
+    function exportPNG(canvasId, filename) {
+        const canvas = document.getElementById(canvasId);
+        const link   = document.createElement('a');
+        link.download = filename + '.png';
+        link.href     = canvas.toDataURL('image/png');
+        link.click();
+    }
+
+    // ============================================================
+    //  STRESS-STRAIN DIAGRAM
+    // ============================================================
+    function drawSSCanvas() {
+        if (!R) return;
+        const { ctx, W, H } = setupCanvas('ssCanvas', 260);
+        const ML = 72, MR = 30, MT = 28, MB = 42;
+        const ax0 = ML, ax1 = W - MR, aW = ax1 - ax0;
+        const ay0 = MT, ay1 = H - MB, aH = ay1 - ay0;
+
+        // Background
+        ctx.fillStyle = '#0d1117';
+        ctx.fillRect(0, 0, W, H);
+
+        // Faint grid
+        ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+        ctx.lineWidth = 1;
+        for (let i = 0; i <= 10; i++) {
+            const gx = ax0 + i * aW / 10;
+            ctx.beginPath(); ctx.moveTo(gx, ay0); ctx.lineTo(gx, ay1); ctx.stroke();
+        }
+        for (let i = 0; i <= 5; i++) {
+            const gy = ay0 + i * aH / 5;
+            ctx.beginPath(); ctx.moveTo(ax0, gy); ctx.lineTo(ax1, gy); ctx.stroke();
+        }
+
+        // --- Determine axis ranges ---
+        const mat     = MATERIALS[document.getElementById('materialPreset').value];
+        const sigma   = Math.abs(R.sigma || 0);
+        const E_GPa   = R.E_GPa || (mat.E || 200);
+        const E_MPa   = E_GPa * 1000;
+        const yieldS  = R.yield || mat.yield || null;
+        const utsS    = mat.uts  || (yieldS ? yieldS * 1.3 : sigma * 2.0);
+
+        // Compute display operating strain
+        const epsOp = sigma / E_MPa;
+
+        // X axis: strain. Show enough to include operating point + some margin
+        // If we have yield, show up to fracture region
+        let epsMax;
+        if (yieldS) {
+            const epsYield = yieldS / E_MPa;
+            // Show up to ~2× yield strain or 1.5× operating, whichever larger
+            epsMax = Math.max(epsYield * 3.5, epsOp * 2.5, 0.001);
+        } else {
+            epsMax = Math.max(epsOp * 2.5, 0.001);
+        }
+
+        // Y axis: stress in MPa
+        const sigMax = yieldS
+            ? Math.max(utsS * 1.1, sigma * 1.3)
+            : Math.max(sigma * 2.5, 50);
+
+        const scX = eps => ax0 + (eps / epsMax) * aW;
+        const scY = sig => ay1 - (sig / sigMax) * aH;
+
+        // --- Draw schematic stress-strain curve ---
+        ctx.save();
+        ctx.beginPath(); ctx.rect(ax0, ay0, aW, aH); ctx.clip();
+
+        if (yieldS) {
+            const epsY = yieldS / E_MPa;
+            // Plastic region: gentle slope from yield up to UTS, then drop-off
+            const epsUTS  = epsY * 8;
+            const epsFrac = epsY * 12;
+            const sigFrac = utsS * 0.75;
+
+            // Fill under elastic region
+            ctx.beginPath();
+            ctx.moveTo(scX(0), scY(0));
+            ctx.lineTo(scX(epsY), scY(yieldS));
+            ctx.lineTo(scX(epsY), ay1);
+            ctx.closePath();
+            ctx.fillStyle = 'rgba(63,185,80,0.06)';
+            ctx.fill();
+
+            // Fill plastic region
+            ctx.beginPath();
+            ctx.moveTo(scX(epsY),   scY(yieldS));
+            ctx.bezierCurveTo(
+                scX(epsY + (epsUTS-epsY)*0.3), scY(yieldS * 1.02),
+                scX(epsY + (epsUTS-epsY)*0.7), scY(utsS),
+                scX(epsUTS), scY(utsS)
+            );
+            ctx.lineTo(scX(epsFrac), scY(sigFrac));
+            ctx.lineTo(scX(epsFrac), ay1);
+            ctx.lineTo(scX(epsY),    ay1);
+            ctx.closePath();
+            ctx.fillStyle = 'rgba(240,136,62,0.05)';
+            ctx.fill();
+
+            // Draw curve — elastic
+            ctx.beginPath();
+            ctx.moveTo(scX(0), scY(0));
+            ctx.lineTo(scX(epsY), scY(yieldS));
+            ctx.strokeStyle = '#3fb950'; ctx.lineWidth = 2.2; ctx.setLineDash([]);
+            ctx.stroke();
+
+            // Draw curve — plastic + fracture (bezier)
+            ctx.beginPath();
+            ctx.moveTo(scX(epsY), scY(yieldS));
+            ctx.bezierCurveTo(
+                scX(epsY + (epsUTS-epsY)*0.3), scY(yieldS * 1.02),
+                scX(epsY + (epsUTS-epsY)*0.7), scY(utsS),
+                scX(epsUTS), scY(utsS)
+            );
+            ctx.lineTo(scX(epsFrac), scY(sigFrac));
+            ctx.strokeStyle = '#f0883e'; ctx.lineWidth = 1.8; ctx.setLineDash([]);
+            ctx.stroke();
+
+            // Yield point marker
+            ctx.beginPath(); ctx.arc(scX(epsY), scY(yieldS), 5, 0, Math.PI*2);
+            ctx.fillStyle = '#e3b341'; ctx.fill();
+
+            // Yield dashed reference lines
+            ctx.setLineDash([4, 5]);
+            ctx.strokeStyle = 'rgba(227,179,65,0.35)'; ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(ax0, scY(yieldS)); ctx.lineTo(scX(epsY), scY(yieldS)); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(scX(epsY), ay1); ctx.lineTo(scX(epsY), scY(yieldS)); ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Yield label
+            ctx.font = "10px 'IBM Plex Mono', monospace";
+            ctx.fillStyle = '#e3b341'; ctx.textAlign = 'right';
+            ctx.fillText('σ_y=' + yieldS.toFixed(0) + ' MPa', ax0 - 4, scY(yieldS) + 4);
+
+            // Region labels
+            ctx.font = "9px 'IBM Plex Sans', sans-serif";
+            ctx.fillStyle = 'rgba(63,185,80,0.55)'; ctx.textAlign = 'center';
+            ctx.fillText('Elastic', scX(epsY * 0.45), ay0 + 13);
+            ctx.fillStyle = 'rgba(240,136,62,0.55)';
+            ctx.fillText('Plastic', scX(epsY + (epsUTS - epsY) * 0.5), ay0 + 13);
+
+            // UTS marker
+            if (utsS < sigMax) {
+                ctx.beginPath(); ctx.arc(scX(epsUTS), scY(utsS), 4, 0, Math.PI*2);
+                ctx.fillStyle = '#f0883e'; ctx.fill();
+                ctx.font = "9px 'IBM Plex Mono', monospace";
+                ctx.fillStyle = '#f0883e'; ctx.textAlign = 'center';
+                ctx.fillText('UTS', scX(epsUTS), scY(utsS) - 9);
+            }
+
+        } else {
+            // No yield data — draw only elastic line with note
+            ctx.beginPath();
+            ctx.moveTo(scX(0), scY(0));
+            ctx.lineTo(scX(epsOp * 2.2), scY(sigma * 2.2 > sigMax ? sigMax : sigma * 2.2));
+            ctx.strokeStyle = '#3fb950'; ctx.lineWidth = 2.2; ctx.setLineDash([]);
+            ctx.stroke();
+
+            ctx.font = "9px 'IBM Plex Sans', sans-serif";
+            ctx.fillStyle = 'rgba(63,185,80,0.55)'; ctx.textAlign = 'center';
+            ctx.fillText('Elastic (σ_y not available)', (ax0+ax1)/2, ay0 + 13);
+        }
+
+        ctx.restore();
+
+        // --- Operating point ---
+        if (sigma > 0 && epsOp <= epsMax) {
+            const opX = scX(epsOp), opY = scY(sigma);
+
+            // Dashed crosshairs to axes
+            ctx.setLineDash([3, 5]);
+            ctx.strokeStyle = 'rgba(88,166,255,0.3)'; ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(ax0, opY); ctx.lineTo(opX, opY); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(opX, ay1); ctx.lineTo(opX, opY); ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Dot
+            ctx.beginPath(); ctx.arc(opX, opY, 6, 0, Math.PI*2);
+            ctx.fillStyle = '#58a6ff'; ctx.fill();
+            ctx.beginPath(); ctx.arc(opX, opY, 3.5, 0, Math.PI*2);
+            ctx.fillStyle = '#0d1117'; ctx.fill();
+
+            // Operating label
+            const lblAbove = opY > ay0 + 30;
+            ctx.font = "bold 10px 'IBM Plex Mono', monospace";
+            ctx.fillStyle = '#58a6ff'; ctx.textAlign = 'center';
+            ctx.fillText('σ = ' + sigma.toPrecision(4) + ' MPa', opX, lblAbove ? opY - 12 : opY + 20);
+
+            // FoS arc indicator if we have yield
+            if (R.fos !== undefined && yieldS) {
+                const fosColor = R.fos >= 2 ? '#3fb950' : R.fos >= 1 ? '#e3b341' : '#f78166';
+                ctx.font = "10px 'IBM Plex Mono', monospace";
+                ctx.fillStyle = fosColor;
+                ctx.textAlign = 'left';
+                ctx.fillText('FoS = ' + R.fos.toFixed(2), opX + 10, opY + (lblAbove ? 0 : -22));
+            }
+
+            // Axis value labels for operating point
+            ctx.font = "9px 'IBM Plex Mono', monospace";
+            ctx.fillStyle = '#58a6ff'; ctx.textAlign = 'center';
+            ctx.fillText(epsOp.toExponential(2), opX, ay1 + 13);
+            ctx.textAlign = 'right';
+            ctx.fillText(sigma.toPrecision(3), ax0 - 4, opY + 4);
+        }
+
+        // --- Axes ---
+        ctx.strokeStyle = '#484f58'; ctx.lineWidth = 1.5; ctx.setLineDash([]);
+        ctx.beginPath(); ctx.moveTo(ax0, ay0); ctx.lineTo(ax0, ay1); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(ax0, ay1); ctx.lineTo(ax1, ay1); ctx.stroke();
+
+        // Y ticks + labels
+        const yTicks = 5;
+        ctx.font = "10px 'IBM Plex Mono', monospace"; ctx.fillStyle = '#8b949e';
+        for (let i = 0; i <= yTicks; i++) {
+            const sig = (sigMax * i / yTicks);
+            const gy  = scY(sig);
+            ctx.strokeStyle = '#21262d'; ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(ax0-3, gy); ctx.lineTo(ax0+3, gy); ctx.stroke();
+            ctx.fillStyle = '#8b949e'; ctx.textAlign = 'right';
+            ctx.fillText(sig >= 1000 ? (sig/1000).toFixed(1)+'k' : sig.toFixed(0), ax0 - 6, gy + 4);
+        }
+
+        // X ticks + labels
+        const xTicks = 5;
+        for (let i = 0; i <= xTicks; i++) {
+            const eps = epsMax * i / xTicks;
+            const gx  = scX(eps);
+            ctx.strokeStyle = '#21262d'; ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(gx, ay1-3); ctx.lineTo(gx, ay1+3); ctx.stroke();
+            ctx.fillStyle = '#484f58'; ctx.textAlign = 'center';
+            ctx.font = "10px 'IBM Plex Mono', monospace";
+            ctx.fillText(eps.toExponential(1), gx, ay1 + 15);
+        }
+
+        // Axis labels
+        ctx.fillStyle = '#484f58'; ctx.font = "10px 'IBM Plex Mono', monospace";
+        ctx.textAlign = 'center';
+        ctx.fillText('Strain  ε  (mm/mm)', (ax0+ax1)/2, H - 4);
+        ctx.save();
+        ctx.translate(13, (ay0+ay1)/2);
+        ctx.rotate(-Math.PI/2);
+        ctx.fillText('Stress  σ  (MPa)', 0, 0);
+        ctx.restore();
+
+        // E slope annotation (elastic modulus = slope of elastic line)
+        if (E_GPa) {
+            const annoEps = epsMax * 0.18;
+            const annoSig = annoEps * E_MPa;
+            if (annoSig < sigMax * 0.6) {
+                const x1 = scX(0), y1 = scY(0);
+                const x2 = scX(annoEps), y2 = scY(annoSig);
+                // slope bracket
+                ctx.strokeStyle = 'rgba(188,140,255,0.4)'; ctx.lineWidth = 1; ctx.setLineDash([3,4]);
+                ctx.beginPath(); ctx.moveTo(x2, y1); ctx.lineTo(x2, y2); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y1); ctx.stroke();
+                ctx.setLineDash([]);
+                ctx.fillStyle = '#bc8cff'; ctx.font = "9px 'IBM Plex Mono', monospace";
+                ctx.textAlign = 'left';
+                ctx.fillText('E = ' + E_GPa.toPrecision(3) + ' GPa', x2 + 4, (y1+y2)/2);
+            }
+        }
+    }
+
+    // ============================================================
+    //  MEMBER LOADING SCHEMATIC
+    // ============================================================
+    function drawMemberCanvas() {
+        if (!R) return;
+        const { ctx, W, H } = setupCanvas('memberCanvas', 160);
+        const ML = 60, MR = 60, MT = 24, MB = 28;
+        const cx  = W / 2;
+        const mY  = H / 2 + 4;  // member centreline Y
+
+        const bx0 = ML, bx1 = W - MR;
+        const bW  = bx1 - bx0;
+        const bH  = 28; // member cross-section height in drawing
+
+        const F    = R.F    || (R.sigma && R.A ? R.sigma * R.A : null);
+        const A    = R.A    || null;
+        const L0   = R.L0   || null;
+        const dL   = R.dL   || null;
+        const sigma = R.sigma || null;
+
+        ctx.fillStyle = '#0d1117';
+        ctx.fillRect(0, 0, W, H);
+
+        // Faint vertical grid
+        ctx.strokeStyle = 'rgba(255,255,255,0.025)'; ctx.lineWidth = 1;
+        for (let i = 0; i <= 8; i++) {
+            const gx = bx0 + i * bW / 8;
+            ctx.beginPath(); ctx.moveTo(gx, MT); ctx.lineTo(gx, H - MB); ctx.stroke();
+        }
+
+        // --- Member body ---
+        const memberTop = mY - bH/2, memberBot = mY + bH/2;
+
+        // Fill (stress-coloured: blue = low, amber = near yield, orange = over)
+        let bodyColor = '#58a6ff';
+        if (R.fos !== undefined) {
+            bodyColor = R.fos >= 2 ? '#58a6ff' : R.fos >= 1.25 ? '#e3b341' : '#f0883e';
+        }
+        ctx.fillStyle = bodyColor + '18';
+        ctx.fillRect(bx0, memberTop, bW, bH);
+
+        // Border
+        ctx.strokeStyle = bodyColor;
+        ctx.lineWidth = 1.8; ctx.setLineDash([]);
+        ctx.strokeRect(bx0, memberTop, bW, bH);
+
+        // Hatch ends (wall-like)
+        ctx.strokeStyle = '#30363d'; ctx.lineWidth = 1;
+        const hatchW = 10;
+        for (let y = memberTop - 5; y < memberBot + 10; y += 6) {
+            ctx.beginPath(); ctx.moveTo(bx0 - hatchW, y); ctx.lineTo(bx0, y + hatchW); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(bx1, y); ctx.lineTo(bx1 + hatchW, y + hatchW); ctx.stroke();
+        }
+        ctx.strokeStyle = '#484f58'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(bx0, memberTop - 6); ctx.lineTo(bx0, memberBot + 6); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(bx1, memberTop - 6); ctx.lineTo(bx1, memberBot + 6); ctx.stroke();
+
+        // --- Force arrows ---
+        const arrowGap = 14;
+        const arrowLen = 38;
+
+        if (F !== null && F !== undefined) {
+            const tension = F >= 0; // positive = tension
+            const col = bodyColor;
+
+            if (tension) {
+                // Left arrow pointing left (reaction), right arrow pointing right (load)
+                drawArrow(ctx, bx0 - arrowGap, mY, bx0 - arrowGap - arrowLen, mY, col, 2.2);
+                drawArrow(ctx, bx1 + arrowGap, mY, bx1 + arrowGap + arrowLen, mY, col, 2.2);
+            } else {
+                // Compression — arrows pointing inward
+                drawArrow(ctx, bx0 - arrowGap - arrowLen, mY, bx0 - arrowGap, mY, col, 2.2);
+                drawArrow(ctx, bx1 + arrowGap + arrowLen, mY, bx1 + arrowGap, mY, col, 2.2);
+            }
+
+            // Force label
+            ctx.font = "bold 11px 'IBM Plex Mono', monospace";
+            ctx.fillStyle = col; ctx.textAlign = 'center';
+            const fLabel = Math.abs(F) >= 1e6 ? (F/1e6).toPrecision(3)+' MN'
+                         : Math.abs(F) >= 1e3 ? (F/1e3).toPrecision(3)+' kN'
+                         : F.toPrecision(3)+' N';
+            ctx.fillText('F = ' + fLabel, W * 0.14, mY - bH/2 - 7);
+            ctx.fillText('F = ' + fLabel, W * 0.86, mY - bH/2 - 7);
+        }
+
+        // --- Dimension line (L₀) ---
+        const dimY = memberBot + 16;
+        ctx.strokeStyle = '#30363d'; ctx.lineWidth = 1; ctx.setLineDash([3,4]);
+        ctx.beginPath(); ctx.moveTo(bx0, memberBot+2); ctx.lineTo(bx0, dimY+4); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(bx1, memberBot+2); ctx.lineTo(bx1, dimY+4); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.strokeStyle = '#484f58'; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(bx0, dimY); ctx.lineTo(bx1, dimY); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(bx0, dimY-4); ctx.lineTo(bx0, dimY+4); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(bx1, dimY-4); ctx.lineTo(bx1, dimY+4); ctx.stroke();
+        ctx.fillStyle = '#484f58'; ctx.font = "10px 'IBM Plex Mono', monospace"; ctx.textAlign = 'center';
+        const lenLabel = L0 ? 'L₀ = ' + L0.toFixed(1) + ' mm' : 'L₀';
+        ctx.fillText(lenLabel, cx, dimY - 4);
+
+        // --- Annotations: σ, ε, ΔL ---
+        ctx.font = "10px 'IBM Plex Mono', monospace";
+        const annY = MT + 4;
+
+        // σ centred on member
+        if (sigma !== null && sigma !== undefined) {
+            ctx.fillStyle = '#f0883e'; ctx.textAlign = 'center';
+            ctx.fillText('σ = ' + sigma.toPrecision(4) + ' MPa', cx, annY + 12);
+        }
+
+        // ΔL annotation (elongation indicator)
+        if (dL !== null && dL !== undefined) {
+            ctx.fillStyle = '#3fb950'; ctx.textAlign = 'center';
+            ctx.fillText('ΔL = ' + dL.toPrecision(4) + ' mm', cx, annY + 26);
+        }
+
+        // A label
+        if (A !== null && A !== undefined) {
+            ctx.fillStyle = '#8b949e'; ctx.textAlign = 'right';
+            ctx.font = "9px 'IBM Plex Mono', monospace";
+            ctx.fillText('A = ' + A.toPrecision(4) + ' mm²', W - 6, H - 4);
+        }
+    }
+
+    // ============================================================
+    //  ARROW HELPER (matches beam tool)
+    // ============================================================
+    function drawArrow(ctx, x1, y1, x2, y2, color, lw) {
+        const dx = x2-x1, dy = y2-y1;
+        const len = Math.sqrt(dx*dx + dy*dy);
+        if (len === 0) return;
+        const ux = dx/len, uy = dy/len, hl = 9, ha = 0.42;
+        ctx.strokeStyle = color; ctx.fillStyle = color;
+        ctx.lineWidth = lw; ctx.setLineDash([]);
+        ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x2, y2);
+        ctx.lineTo(x2 - hl*(ux*Math.cos(ha) - uy*Math.sin(ha)), y2 - hl*(uy*Math.cos(ha) + ux*Math.sin(ha)));
+        ctx.lineTo(x2 - hl*(ux*Math.cos(-ha) - uy*Math.sin(-ha)), y2 - hl*(uy*Math.cos(-ha) + ux*Math.sin(-ha)));
+        ctx.closePath(); ctx.fill();
+    }
+
+    // ============================================================
+    //  INIT
+    // ============================================================
+    window.addEventListener('load', () => {
+        onMaterialChange();
+        setSolveMode('all');
+    });
+    </script>
+</body>
+</html>

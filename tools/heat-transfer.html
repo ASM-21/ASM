@@ -1,0 +1,2703 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<title>Heat Transfer Calculator - Andrew Morrissey</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<link rel="stylesheet" href="../assets/css/main.css" />
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+	<script async src="https://www.googletagmanager.com/gtag/js?id=GTM-N34CKH5Q"></script>
+	<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','GTM-N34CKH5Q');</script>
+	<style>
+	/* ===================================================
+	   CALCULATOR THEME – engineering terminal on dark bg
+	   =================================================== */
+	:root {
+		--c-bg:       #0d1117;
+		--c-surface:  #161b27;
+		--c-border:   #21293a;
+		--c-border2:  #2d3748;
+		--c-acc:      #4CAF50;
+		--c-acc-dim:  #2d6a30;
+		--c-acc-glow: rgba(76,175,80,0.18);
+		--c-cyan:     #38bdf8;
+		--c-amber:    #f59e0b;
+		--c-red:      #f87171;
+		--c-blue:     #60a5fa;
+		--c-text:     #e2e8f0;
+		--c-label:    #94a3b8;
+		--c-muted:    #4a5568;
+		--c-mono:     'Courier New', Courier, monospace;
+	}
+
+	/* wrapper */
+	.htc {
+		background: var(--c-bg);
+		border: 1px solid var(--c-border);
+		border-radius: 10px;
+		overflow: hidden;
+		max-width: 860px;
+		margin-top: 22px;
+		box-shadow: 0 24px 60px rgba(0,0,0,.55);
+		font-family: 'Source Sans Pro', sans-serif;
+	}
+
+	/* top bar */
+	.htc-bar {
+		background: var(--c-surface);
+		border-bottom: 1px solid var(--c-border);
+		padding: 13px 20px;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 12px;
+	}
+	.htc-bar-title {
+		color: var(--c-text);
+		font-size: 0.82em;
+		font-weight: 700;
+		letter-spacing: .12em;
+		text-transform: uppercase;
+		display: flex;
+		align-items: center;
+		gap: 9px;
+	}
+	.htc-bar-title::before {
+		content:'';
+		width:8px; height:8px;
+		background: var(--c-acc);
+		border-radius:50%;
+		box-shadow: 0 0 10px var(--c-acc);
+		flex-shrink:0;
+	}
+
+	/* unit toggle */
+	.unit-toggle { display:flex; border:1px solid var(--c-border); border-radius:6px; overflow:hidden; }
+	.unit-toggle button {
+		padding:5px 14px; border:none; background:transparent;
+		color:var(--c-muted); cursor:pointer; font-size:.75em;
+		font-weight:700; letter-spacing:.07em; transition:.2s;
+	}
+	.unit-toggle button.active { background:var(--c-acc); color:#000; }
+
+	/* tabs */
+	.htc-tabs {
+		display:flex; background:var(--c-bg);
+		border-bottom:1px solid var(--c-border);
+		overflow-x:auto; scrollbar-width:none;
+	}
+	.htc-tabs::-webkit-scrollbar { display:none; }
+	.htc-tab {
+		padding:11px 18px; border:none; border-bottom:2px solid transparent;
+		background:transparent; color:var(--c-muted); cursor:pointer;
+		font-size:.75em; font-weight:700; letter-spacing:.07em;
+		text-transform:uppercase; white-space:nowrap;
+		display:flex; align-items:center; gap:6px; transition:.2s;
+	}
+	.htc-tab:hover { color:var(--c-text); }
+	.htc-tab.active { color:var(--c-acc); border-bottom-color:var(--c-acc); }
+
+	/* body grid */
+	.htc-body {
+		display:grid;
+		grid-template-columns: 1fr 260px;
+		min-height:400px;
+	}
+	@media(max-width:680px){ .htc-body{ grid-template-columns:1fr; } }
+
+	/* inputs panel */
+	.htc-inputs { padding:22px 22px 12px; border-right:1px solid var(--c-border); }
+
+	/* schematic panel */
+	.htc-sch {
+		padding:14px; background:var(--c-surface);
+		display:flex; flex-direction:column; align-items:center; gap:10px;
+	}
+	.htc-sch-title {
+		font-size:.65em; text-transform:uppercase; letter-spacing:.12em;
+		color:var(--c-muted); width:100%; text-align:center;
+	}
+	.htc-sch svg { width:100%; max-width:230px; }
+
+	/* section divider label */
+	.sec-lbl {
+		font-size:.67em; text-transform:uppercase; letter-spacing:.1em;
+		color:var(--c-muted); padding-bottom:7px;
+		border-bottom:1px solid var(--c-border); margin-bottom:12px;
+	}
+
+	/* preset chips */
+	.chips { display:flex; flex-wrap:wrap; gap:4px; margin-bottom:14px; }
+	.chip {
+		font-size:.7em; padding:3px 9px;
+		background:var(--c-surface); border:1px solid var(--c-border);
+		border-radius:20px; color:var(--c-label); cursor:pointer; transition:.2s;
+	}
+	.chip:hover { border-color:var(--c-acc); color:var(--c-acc); }
+
+	/* input groups */
+	.ig { margin-bottom:13px; }
+	.ig label {
+		display:block; font-size:.7em; text-transform:uppercase;
+		letter-spacing:.08em; color:var(--c-label); margin-bottom:4px; font-weight:700;
+	}
+	.ig-row { display:flex; gap:7px; align-items:center; }
+	.ig input[type=number], .ig select {
+		flex:1; background:var(--c-bg); border:1px solid var(--c-border);
+		border-radius:5px; color:var(--c-text); padding:8px 10px;
+		font-size:.92em; font-family:var(--c-mono); transition:border-color .2s; width:100%;
+		box-sizing:border-box;
+	}
+	.ig input:focus, .ig select:focus { outline:none; border-color:var(--c-acc); }
+	.ig-unit {
+		font-size:.68em; color:var(--c-muted); white-space:nowrap;
+		min-width:55px; text-align:right; font-family:var(--c-mono);
+	}
+	.g2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+
+	/* calc button */
+	.calc-btn {
+		display:block; width:100%; padding:11px;
+		background:var(--c-acc); color:#000; border:none; border-radius:6px;
+		font-size:.82em; font-weight:800; letter-spacing:.1em;
+		text-transform:uppercase; cursor:pointer; transition:.2s; margin-top:16px;
+	}
+	.calc-btn:hover {
+		background:#6bcf6e;
+		box-shadow: 0 0 22px var(--c-acc-glow);
+	}
+
+	/* error */
+	.htc-err {
+		display:none; color:var(--c-red); font-size:.75em; margin-top:7px;
+		padding:7px 10px; background:rgba(248,113,113,.08);
+		border:1px solid rgba(248,113,113,.25); border-radius:5px;
+	}
+
+	/* results area */
+	.htc-res {
+		background:var(--c-surface); border-top:1px solid var(--c-border);
+		padding:18px 22px; display:none;
+	}
+	.htc-res.show { display:block; }
+
+	.res-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; margin-bottom:14px; }
+	.res-card {
+		background:var(--c-bg); border:1px solid var(--c-border);
+		border-radius:7px; padding:13px;
+	}
+	.res-lbl { font-size:.65em; text-transform:uppercase; letter-spacing:.09em; color:var(--c-muted); margin-bottom:3px; }
+	.res-val { font-family:var(--c-mono); font-size:1.45em; font-weight:700; color:var(--c-acc); line-height:1.1; }
+	.res-unit { font-family:var(--c-mono); font-size:.72em; color:var(--c-label); }
+	.res-sub { font-family:var(--c-mono); font-size:.72em; color:var(--c-muted); margin-top:3px; }
+	.res-card.cyan .res-val { color:var(--c-cyan); }
+	.res-card.amber .res-val { color:var(--c-amber); }
+	.res-card.warn-border { border-color: var(--c-amber); }
+
+	/* equation box */
+	.eq-box {
+		background:var(--c-bg); border:1px solid var(--c-border);
+		border-radius:7px; padding:11px 14px; margin-top:11px;
+		font-family:var(--c-mono); font-size:.82em; color:var(--c-label);
+	}
+	.eq-main { color:var(--c-text); font-size:1.05em; margin-bottom:3px; }
+
+	/* biot warning */
+	.biot-warn {
+		display:none; margin-top:11px; padding:9px 13px;
+		background:rgba(245,158,11,.08); border:1px solid rgba(245,158,11,.3);
+		border-radius:6px; font-size:.78em; color:var(--c-amber);
+	}
+	.biot-warn.show { display:block; }
+
+	/* ---- composite specific ---- */
+	.layer-hdr {
+		display:grid; grid-template-columns:1fr 74px 74px 34px;
+		gap:6px; padding:0 2px 7px;
+		font-size:.62em; text-transform:uppercase; letter-spacing:.08em; color:var(--c-muted);
+	}
+	.layer-row {
+		display:grid; grid-template-columns:1fr 74px 74px 34px;
+		gap:6px; align-items:center; padding:6px 2px;
+		border-bottom:1px solid var(--c-border);
+	}
+	.layer-row select, .layer-row input {
+		background:var(--c-bg); border:1px solid var(--c-border);
+		border-radius:4px; color:var(--c-text); padding:5px 7px;
+		font-size:.78em; font-family:var(--c-mono); width:100%; box-sizing:border-box;
+	}
+	.layer-row select:focus, .layer-row input:focus { outline:none; border-color:var(--c-acc); }
+	.layer-del {
+		background:transparent; border:1px solid var(--c-border);
+		border-radius:4px; color:var(--c-muted); cursor:pointer;
+		padding:5px; font-size:.8em; transition:.2s; width:34px; height:30px;
+		display:flex; align-items:center; justify-content:center;
+	}
+	.layer-del:hover { border-color:var(--c-red); color:var(--c-red); }
+	.add-layer {
+		width:100%; background:transparent; border:1px dashed var(--c-border);
+		border-radius:5px; color:var(--c-muted); cursor:pointer; padding:7px;
+		font-size:.72em; letter-spacing:.07em; text-transform:uppercase; transition:.2s;
+	}
+	.add-layer:hover { border-color:var(--c-acc); color:var(--c-acc); }
+	.iface-table {
+		width:100%; border-collapse:collapse; font-family:var(--c-mono); font-size:.78em;
+		margin-bottom:14px;
+	}
+	.iface-table th {
+		text-align:left; padding:6px 8px; color:var(--c-label); font-weight:600;
+		border-bottom:1px solid var(--c-border);
+	}
+	.iface-table td { padding:5px 8px; border-bottom:1px solid rgba(33,41,58,.5); }
+
+	/* tab panels */
+	.tab-panel { display:none; }
+	.tab-panel.active { display:block; }
+
+	/* copy button */
+	.copy-btn {
+		display:inline-flex; align-items:center; gap:6px;
+		padding:6px 14px; background:transparent;
+		border:1px solid var(--c-border); border-radius:5px;
+		color:var(--c-muted); cursor:pointer; font-size:.72em;
+		letter-spacing:.07em; text-transform:uppercase;
+		transition:.2s; margin-top:10px;
+	}
+	.copy-btn:hover { border-color:var(--c-acc); color:var(--c-acc); }
+	.copy-btn.copied { border-color:var(--c-acc); color:var(--c-acc); }
+
+	/* inline validation */
+	.ig input.valid   { border-color: var(--c-acc) !important; }
+	.ig input.invalid { border-color: var(--c-red) !important; }
+	.ig-err { font-size:.65em; color:var(--c-red); margin-top:3px; display:none; }
+	.ig input.invalid ~ .ig-err { display:block; }
+	.back-btn {
+		display:inline-block; margin-top:22px; padding:10px 20px;
+		background:#4CAF50; color:#fff; text-decoration:none;
+		border-radius:5px; transition:background .3s; font-size:.9em;
+	}
+	.back-btn:hover { background:#45a049; }
+
+	/* worked example cards */
+	.ex-card {
+		background:#0d1117; border:1px solid #21293a; border-radius:8px;
+		padding:14px 16px; cursor:pointer; transition:.2s;
+	}
+	.ex-card:hover { border-color:#4CAF50; box-shadow:0 0 16px rgba(76,175,80,.12); }
+	.ex-title { font-size:.82em; font-weight:700; color:#e2e8f0; margin-bottom:5px; }
+	.ex-desc  { font-size:.73em; color:#94a3b8; line-height:1.5; margin-bottom:7px; }
+	.ex-params { font-family:'Courier New',monospace; font-size:.65em; color:#4a5568; }
+	</style>
+</head>
+<body class="is-preload">
+
+<!-- ===== SIDEBAR (unchanged from original) ===== -->
+<div id="header">
+	<div class="top">
+		<div id="logo">
+			<span class="image avatar48"><img src="../images/Avatar_1.jpg" alt="" /></span>
+			<h1 id="title">Andrew Morrissey</h1>
+			<p>Mechanical Engineer</p>
+		</div>
+		<nav id="nav">
+			<ul>
+				<li><a href="../index.html#top"><span class="icon solid fa-home">Intro</span></a></li>
+				<li><a href="../index.html#portfolio"><span class="icon solid fa-th">Portfolio</span></a></li>
+				<li><a href="../index.html#tools"><span class="icon solid fa-wrench">Tools</span></a></li>
+				<li><a href="../index.html#blog"><span class="icon solid fa-pen-nib">Blog</span></a></li>
+				<li><a href="../index.html#about"><span class="icon solid fa-user">About Me</span></a></li>
+				<li><a href="../index.html#contact"><span class="icon solid fa-envelope">Contact</span></a></li>
+			</ul>
+		</nav>
+	</div>
+	<div class="bottom">
+		<ul class="icons">
+			<li><a href="https://www.linkedin.com/in/asmorrissey" class="icon brands fa-linkedin" target="_blank"><span class="label">LinkedIn</span></a></li>
+			<li><a href="mailto:asmspartan21@gmail.com" class="icon solid fa-envelope"><span class="label">Email</span></a></li>
+			<li><a href="https://github.com/ASM-21" class="icon brands fa-github" target="_blank"><span class="label">Github</span></a></li>
+		</ul>
+	</div>
+</div>
+
+<!-- ===== MAIN CONTENT ===== -->
+<div id="main">
+<section id="calculator" class="two">
+<div class="container">
+
+	<header><h2>Heat Transfer Calculator</h2></header>
+	<p style="color:#888;font-size:.9em;margin-bottom:.5em;">
+		Five calculation modes covering the core mechanisms of heat transfer. Toggle SI ↔ Imperial throughout.
+	</p>
+
+	<div class="htc">
+
+		<!-- top bar -->
+		<div class="htc-bar">
+			<div class="htc-bar-title">
+				<i class="fas fa-temperature-high" style="color:var(--c-acc)"></i>
+				Heat Transfer
+			</div>
+			<div class="unit-toggle">
+				<button id="btn-si"  onclick="setUnits('si')"       class="active">SI</button>
+				<button id="btn-imp" onclick="setUnits('imperial')">Imperial</button>
+			</div>
+		</div>
+
+		<!-- tabs -->
+		<div class="htc-tabs">
+			<button class="htc-tab active" onclick="switchTab('fw')">
+				<i class="fas fa-layer-group"></i> Flat Wall
+			</button>
+			<button class="htc-tab" onclick="switchTab('cyl')">
+				<i class="fas fa-circle-notch"></i> Cylindrical
+			</button>
+			<button class="htc-tab" onclick="switchTab('conv')">
+				<i class="fas fa-wind"></i> Convection
+			</button>
+			<button class="htc-tab" onclick="switchTab('rad')">
+				<i class="fas fa-sun"></i> Radiation
+			</button>
+			<button class="htc-tab" onclick="switchTab('comp')">
+				<i class="fas fa-align-justify"></i> Composite Wall
+			</button>
+			<button class="htc-tab" onclick="switchTab('fin')">
+				<i class="fas fa-project-diagram"></i> Fin Efficiency
+			</button>
+			<button class="htc-tab" onclick="switchTab('hx')">
+				<i class="fas fa-exchange-alt"></i> Heat Exchanger
+			</button>
+			<button class="htc-tab" onclick="switchTab('trans')">
+				<i class="fas fa-clock"></i> Transient
+			</button>
+		</div>
+
+		<!-- ============================================================
+		     PANEL 1 – FLAT WALL
+		     ============================================================ -->
+		<div id="panel-fw" class="tab-panel active">
+			<div class="htc-body">
+				<div class="htc-inputs">
+					<div class="sec-lbl">Material presets (k)</div>
+					<div class="chips">
+						<button class="chip" onclick="preset_k('fw-k',0.025)">Air</button>
+						<button class="chip" onclick="preset_k('fw-k',0.040)">Fiberglass</button>
+						<button class="chip" onclick="preset_k('fw-k',0.045)">Foam</button>
+						<button class="chip" onclick="preset_k('fw-k',0.160)">Wood</button>
+						<button class="chip" onclick="preset_k('fw-k',0.17)">Gypsum</button>
+						<button class="chip" onclick="preset_k('fw-k',0.8)">Concrete</button>
+						<button class="chip" onclick="preset_k('fw-k',1.5)">Brick</button>
+						<button class="chip" onclick="preset_k('fw-k',15)">Stainless</button>
+						<button class="chip" onclick="preset_k('fw-k',50)">Carbon Steel</button>
+						<button class="chip" onclick="preset_k('fw-k',205)">Aluminum</button>
+						<button class="chip" onclick="preset_k('fw-k',385)">Copper</button>
+					</div>
+					<div class="sec-lbl">Inputs</div>
+					<div class="ig">
+						<label>Thermal Conductivity, k</label>
+						<div class="ig-row">
+							<input type="number" id="fw-k" placeholder="50" step="any" min="0.001">
+							<span class="ig-unit" id="fw-k-u">W/m·K</span>
+						</div>
+					</div>
+					<div class="g2">
+						<div class="ig">
+							<label>Thickness, t</label>
+							<div class="ig-row">
+								<input type="number" id="fw-t" placeholder="0.1" step="any" min="0.001">
+								<span class="ig-unit" id="fw-t-u">m</span>
+							</div>
+						</div>
+						<div class="ig">
+							<label>Area, A</label>
+							<div class="ig-row">
+								<input type="number" id="fw-A" placeholder="1" step="any" min="0.001">
+								<span class="ig-unit" id="fw-A-u">m²</span>
+							</div>
+						</div>
+					</div>
+					<div class="ig">
+						<label>Temperature Difference, ΔT</label>
+						<div class="ig-row">
+							<input type="number" id="fw-dT" placeholder="30" step="any">
+							<span class="ig-unit" id="fw-dT-u">K</span>
+						</div>
+					</div>
+					<button class="calc-btn" onclick="calcFW()">Calculate</button>
+					<div class="htc-err" id="fw-err">Please enter valid positive values for k, t, A, and ΔT.</div>
+				</div>
+				<div class="htc-sch">
+					<div class="htc-sch-title">Schematic</div>
+					<svg viewBox="0 0 220 200" xmlns="http://www.w3.org/2000/svg">
+						<defs>
+							<marker id="arw" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+								<path d="M0,0 L6,3 L0,6 Z" fill="#f59e0b"/>
+							</marker>
+						</defs>
+						<!-- hot side -->
+						<rect x="0" y="25" width="44" height="150" fill="#3b0000" rx="4" opacity=".8"/>
+						<rect x="0" y="25" width="44" height="150" fill="none" stroke="#f87171" stroke-width="1.2" rx="4"/>
+						<text x="22" y="96" text-anchor="middle" fill="#f87171" font-size="12" font-family="monospace" font-weight="bold">T₁</text>
+						<text x="22" y="112" text-anchor="middle" fill="#fca5a5" font-size="8" font-family="monospace">HOT</text>
+						<!-- wall -->
+						<rect x="49" y="25" width="122" height="150" fill="#0d2a12" rx="2" opacity=".7"/>
+						<rect x="49" y="25" width="122" height="150" fill="none" stroke="#4CAF50" stroke-width="1.5" rx="2"/>
+						<text x="110" y="90" text-anchor="middle" fill="#4CAF50" font-size="10" font-family="monospace">WALL</text>
+						<text x="110" y="106" text-anchor="middle" fill="#86efac" font-size="9" font-family="monospace" id="fw-sch-k">k = —</text>
+						<text x="110" y="120" text-anchor="middle" fill="#4CAF50" font-size="9" font-family="monospace" id="fw-sch-t">t = —</text>
+						<!-- cold side -->
+						<rect x="176" y="25" width="44" height="150" fill="#001a3b" rx="4" opacity=".8"/>
+						<rect x="176" y="25" width="44" height="150" fill="none" stroke="#60a5fa" stroke-width="1.2" rx="4"/>
+						<text x="198" y="96" text-anchor="middle" fill="#60a5fa" font-size="12" font-family="monospace" font-weight="bold">T₂</text>
+						<text x="198" y="112" text-anchor="middle" fill="#93c5fd" font-size="8" font-family="monospace">COLD</text>
+						<!-- heat arrows -->
+						<line x1="6" y1="75"  x2="46" y2="75"  stroke="#f59e0b" stroke-width="1.5" marker-end="url(#arw)" opacity=".8"/>
+						<line x1="6" y1="100" x2="46" y2="100" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#arw)" opacity=".8"/>
+						<line x1="6" y1="125" x2="46" y2="125" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#arw)" opacity=".8"/>
+						<text x="2" y="71" fill="#f59e0b" font-size="7" font-family="monospace">Q̇</text>
+						<!-- dimension -->
+						<line x1="49" y1="186" x2="171" y2="186" stroke="#4a5568" stroke-width="1"/>
+						<line x1="49" y1="182" x2="49" y2="190" stroke="#4a5568" stroke-width="1"/>
+						<line x1="171" y1="182" x2="171" y2="190" stroke="#4a5568" stroke-width="1"/>
+						<text x="110" y="198" text-anchor="middle" fill="#4a5568" font-size="7.5" font-family="monospace">thickness t</text>
+					</svg>
+					<div style="font-size:.65em;color:var(--c-muted);text-align:center;line-height:1.5;padding:0 4px;">
+						Steady-state conduction through a flat homogeneous wall. Valid for planar geometry with uniform material properties.
+					</div>
+				</div>
+			</div>
+			<div class="htc-res" id="fw-res">
+				<div class="res-grid">
+					<div class="res-card">
+						<div class="res-lbl">Heat Transfer Rate</div>
+						<div class="res-val" id="fw-Q">—</div>
+						<div class="res-unit" id="fw-Q-u">W</div>
+						<div class="res-sub" id="fw-Q-alt"></div>
+					</div>
+					<div class="res-card cyan">
+						<div class="res-lbl">Thermal Resistance</div>
+						<div class="res-val" id="fw-R">—</div>
+						<div class="res-unit" id="fw-R-u">K/W</div>
+					</div>
+					<div class="res-card">
+						<div class="res-lbl">Heat Flux  q″</div>
+						<div class="res-val" id="fw-flux">—</div>
+						<div class="res-unit" id="fw-flux-u">W/m²</div>
+					</div>
+				</div>
+				<div class="eq-box">
+					<div class="eq-main">Q̇ = k · A · ΔT / t &nbsp;|&nbsp; R = t / (k·A)</div>
+					<div id="fw-eq-sub" style="color:var(--c-muted)"></div>
+				</div>
+				<button class="copy-btn" onclick="copyResults('fw')"><i class="fas fa-copy"></i> Copy Results</button>
+			</div>
+		</div>
+
+		<!-- ============================================================
+		     PANEL 2 – CYLINDRICAL
+		     ============================================================ -->
+		<div id="panel-cyl" class="tab-panel">
+			<div class="htc-body">
+				<div class="htc-inputs">
+					<div class="sec-lbl">Material presets (k)</div>
+					<div class="chips">
+						<button class="chip" onclick="preset_k('cyl-k',0.04)">Pipe insulation</button>
+						<button class="chip" onclick="preset_k('cyl-k',0.16)">Rubber</button>
+						<button class="chip" onclick="preset_k('cyl-k',15)">Stainless</button>
+						<button class="chip" onclick="preset_k('cyl-k',50)">Carbon Steel</button>
+						<button class="chip" onclick="preset_k('cyl-k',205)">Aluminum</button>
+						<button class="chip" onclick="preset_k('cyl-k',385)">Copper</button>
+					</div>
+					<div class="sec-lbl">Inputs</div>
+					<div class="ig">
+						<label>Thermal Conductivity, k</label>
+						<div class="ig-row">
+							<input type="number" id="cyl-k" placeholder="50" step="any" min="0.001">
+							<span class="ig-unit" id="cyl-k-u">W/m·K</span>
+						</div>
+					</div>
+					<div class="g2">
+						<div class="ig">
+							<label>Inner Radius, r₁</label>
+							<div class="ig-row">
+								<input type="number" id="cyl-r1" placeholder="0.05" step="any" min="0.001">
+								<span class="ig-unit" id="cyl-r1-u">m</span>
+							</div>
+						</div>
+						<div class="ig">
+							<label>Outer Radius, r₂</label>
+							<div class="ig-row">
+								<input type="number" id="cyl-r2" placeholder="0.07" step="any" min="0.001">
+								<span class="ig-unit" id="cyl-r2-u">m</span>
+							</div>
+						</div>
+					</div>
+					<div class="g2">
+						<div class="ig">
+							<label>Pipe Length, L</label>
+							<div class="ig-row">
+								<input type="number" id="cyl-L" placeholder="1" step="any" min="0.001">
+								<span class="ig-unit" id="cyl-L-u">m</span>
+							</div>
+						</div>
+						<div class="ig">
+							<label>Temp. Difference, ΔT</label>
+							<div class="ig-row">
+								<input type="number" id="cyl-dT" placeholder="30" step="any">
+								<span class="ig-unit" id="cyl-dT-u">K</span>
+							</div>
+						</div>
+					</div>
+					<button class="calc-btn" onclick="calcCYL()">Calculate</button>
+					<div class="htc-err" id="cyl-err">Check inputs: r₂ must be greater than r₁, all values positive.</div>
+				</div>
+				<div class="htc-sch">
+					<div class="htc-sch-title">Cross-Section</div>
+					<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+						<defs>
+							<marker id="arw2" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto">
+								<path d="M0,0 L5,2.5 L0,5 Z" fill="#f59e0b"/>
+							</marker>
+						</defs>
+						<!-- outer annulus fill -->
+						<circle cx="100" cy="100" r="78" fill="#0d2a12" opacity=".7"/>
+						<!-- annulus border -->
+						<circle cx="100" cy="100" r="78" fill="none" stroke="#4CAF50" stroke-width="1.5"/>
+						<circle cx="100" cy="100" r="50" fill="none" stroke="#4CAF50" stroke-width="1.5"/>
+						<!-- inner fluid -->
+						<circle cx="100" cy="100" r="49" fill="#001a3b" opacity=".8"/>
+						<!-- labels -->
+						<text x="100" y="96" text-anchor="middle" fill="#60a5fa" font-size="11" font-family="monospace" font-weight="bold">T₁</text>
+						<text x="100" y="111" text-anchor="middle" fill="#93c5fd" font-size="8" font-family="monospace">inner</text>
+						<text x="100" y="24" text-anchor="middle" fill="#f87171" font-size="10" font-family="monospace" font-weight="bold">T₂</text>
+						<text x="100" y="36" text-anchor="middle" fill="#fca5a5" font-size="8" font-family="monospace">outer</text>
+						<!-- radii lines -->
+						<line x1="100" y1="100" x2="100" y2="50" stroke="#4a5568" stroke-width="1" stroke-dasharray="3,2"/>
+						<text x="86" y="77" fill="#4a5568" font-size="8.5" font-family="monospace">r₁</text>
+						<line x1="100" y1="100" x2="178" y2="100" stroke="#4a5568" stroke-width="1" stroke-dasharray="3,2"/>
+						<text x="137" y="95" fill="#4a5568" font-size="8.5" font-family="monospace">r₂</text>
+						<!-- heat arrows radially outward -->
+						<line x1="100" y1="50" x2="100" y2="22" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#arw2)"/>
+						<line x1="135" y1="65" x2="157" y2="43" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#arw2)"/>
+						<line x1="150" y1="100" x2="178" y2="100" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#arw2)"/>
+						<line x1="135" y1="135" x2="157" y2="157" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#arw2)"/>
+						<line x1="100" y1="150" x2="100" y2="178" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#arw2)"/>
+					</svg>
+					<div style="font-size:.65em;color:var(--c-muted);text-align:center;line-height:1.5;padding:0 4px;">
+						Radial conduction in a hollow cylinder (pipes, pressure vessels). Uses the logarithmic mean area naturally embedded in the ln(r₂/r₁) term.
+					</div>
+				</div>
+			</div>
+			<div class="htc-res" id="cyl-res">
+				<div class="res-grid">
+					<div class="res-card">
+						<div class="res-lbl">Heat Transfer Rate</div>
+						<div class="res-val" id="cyl-Q">—</div>
+						<div class="res-unit" id="cyl-Q-u">W</div>
+						<div class="res-sub" id="cyl-Q-alt"></div>
+					</div>
+					<div class="res-card cyan">
+						<div class="res-lbl">Thermal Resistance</div>
+						<div class="res-val" id="cyl-R">—</div>
+						<div class="res-unit" id="cyl-R-u">K/W</div>
+					</div>
+					<div class="res-card">
+						<div class="res-lbl">Flux (outer surface)</div>
+						<div class="res-val" id="cyl-flux">—</div>
+						<div class="res-unit" id="cyl-flux-u">W/m²</div>
+					</div>
+				</div>
+				<div class="eq-box">
+					<div class="eq-main">Q̇ = 2πkL·ΔT / ln(r₂/r₁) &nbsp;|&nbsp; R = ln(r₂/r₁) / (2πkL)</div>
+					<div id="cyl-eq-sub" style="color:var(--c-muted)"></div>
+				</div>
+				<button class="copy-btn" onclick="copyResults('cyl')"><i class="fas fa-copy"></i> Copy Results</button>
+			</div>
+		</div>
+
+		<!-- ============================================================
+		     PANEL 3 – CONVECTION
+		     ============================================================ -->
+		<div id="panel-conv" class="tab-panel">
+			<div class="htc-body">
+				<div class="htc-inputs">
+					<div class="sec-lbl">Convection coefficient presets (h)</div>
+					<div class="chips">
+						<button class="chip" onclick="preset_h(2)">Free conv. air (2)</button>
+						<button class="chip" onclick="preset_h(10)">Free conv. air (10)</button>
+						<button class="chip" onclick="preset_h(25)">Forced conv. air (25)</button>
+						<button class="chip" onclick="preset_h(100)">Forced conv. air (100)</button>
+						<button class="chip" onclick="preset_h(500)">Forced conv. water (500)</button>
+						<button class="chip" onclick="preset_h(5000)">Boiling water (5k)</button>
+						<button class="chip" onclick="preset_h(10000)">Condensing steam (10k)</button>
+					</div>
+					<div class="sec-lbl">Inputs</div>
+					<div class="ig">
+						<label>Convection Coefficient, h</label>
+						<div class="ig-row">
+							<input type="number" id="conv-h" placeholder="25" step="any" min="0.001">
+							<span class="ig-unit" id="conv-h-u">W/m²·K</span>
+						</div>
+					</div>
+					<div class="g2">
+						<div class="ig">
+							<label>Surface Area, A</label>
+							<div class="ig-row">
+								<input type="number" id="conv-A" placeholder="1" step="any" min="0.001">
+								<span class="ig-unit" id="conv-A-u">m²</span>
+							</div>
+						</div>
+						<div class="ig">
+							<label>Temp. Difference, ΔT</label>
+							<div class="ig-row">
+								<input type="number" id="conv-dT" placeholder="30" step="any">
+								<span class="ig-unit" id="conv-dT-u">K</span>
+							</div>
+						</div>
+					</div>
+					<div class="sec-lbl" style="margin-top:4px;">Biot Number Check <span style="font-size:.8em;font-style:italic;text-transform:none;letter-spacing:0;">(optional)</span></div>
+					<div class="g2">
+						<div class="ig">
+							<label>Char. length, L_c</label>
+							<div class="ig-row">
+								<input type="number" id="conv-Lc" placeholder="0.01" step="any" min="0.0001">
+								<span class="ig-unit" id="conv-Lc-u">m</span>
+							</div>
+						</div>
+						<div class="ig">
+							<label>Solid conduct., k_s</label>
+							<div class="ig-row">
+								<input type="number" id="conv-ks" placeholder="50" step="any" min="0.001">
+								<span class="ig-unit">W/m·K</span>
+							</div>
+						</div>
+					</div>
+					<button class="calc-btn" onclick="calcCONV()">Calculate</button>
+					<div class="htc-err" id="conv-err">Please enter valid positive values for h, A, and ΔT.</div>
+				</div>
+				<div class="htc-sch">
+					<div class="htc-sch-title">Convection</div>
+					<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+						<!-- solid surface -->
+						<rect x="12" y="28" width="58" height="144" fill="#0d2a12" opacity=".8" rx="4"/>
+						<rect x="12" y="28" width="58" height="144" fill="none" stroke="#4CAF50" stroke-width="1.5" rx="4"/>
+						<text x="41" y="95" text-anchor="middle" fill="#4CAF50" font-size="9" font-family="monospace">solid</text>
+						<text x="41" y="108" text-anchor="middle" fill="#86efac" font-size="11" font-family="monospace" font-weight="bold">Ts</text>
+						<!-- fluid region -->
+						<rect x="70" y="28" width="118" height="144" fill="#001a3b" opacity=".5" rx="4"/>
+						<text x="126" y="88" text-anchor="middle" fill="#60a5fa" font-size="9" font-family="monospace">fluid</text>
+						<text x="126" y="103" text-anchor="middle" fill="#93c5fd" font-size="11" font-family="monospace" font-weight="bold">T∞</text>
+						<!-- wavy convection lines -->
+						<path d="M73,58  Q85,52  97,58  Q109,64 121,58 Q133,52 145,58" fill="none" stroke="#f59e0b" stroke-width="1.5" opacity=".9"/>
+						<path d="M73,78  Q85,72  97,78  Q109,84 121,78 Q133,72 145,78 Q157,72 169,78" fill="none" stroke="#f59e0b" stroke-width="1.5" opacity=".9"/>
+						<path d="M73,98  Q85,92  97,98  Q109,104 121,98 Q133,92 145,98" fill="none" stroke="#f59e0b" stroke-width="1.5" opacity=".9"/>
+						<path d="M73,118 Q85,112 97,118 Q109,124 121,118 Q133,112 145,118 Q157,112 169,118" fill="none" stroke="#f59e0b" stroke-width="1.5" opacity=".9"/>
+						<path d="M73,138 Q85,132 97,138 Q109,144 121,138 Q133,132 145,138" fill="none" stroke="#f59e0b" stroke-width="1.5" opacity=".9"/>
+						<!-- h label at interface -->
+						<line x1="70" y1="15" x2="70" y2="27" stroke="#4a5568" stroke-width="1"/>
+						<text x="70" y="11" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="monospace">h</text>
+						<text x="126" y="155" text-anchor="middle" fill="#f59e0b" font-size="8" font-family="monospace">Q̇ = h·A·ΔT</text>
+					</svg>
+					<div style="font-size:.65em;color:var(--c-muted);text-align:center;line-height:1.5;padding:0 4px;">
+						Newton's law of cooling. Bi = hL/k &lt; 0.1 is required for the lumped-capacitance method to be valid.
+					</div>
+				</div>
+			</div>
+			<div class="htc-res" id="conv-res">
+				<div class="res-grid">
+					<div class="res-card">
+						<div class="res-lbl">Heat Transfer Rate</div>
+						<div class="res-val" id="conv-Q">—</div>
+						<div class="res-unit" id="conv-Q-u">W</div>
+						<div class="res-sub" id="conv-Q-alt"></div>
+					</div>
+					<div class="res-card cyan">
+						<div class="res-lbl">Thermal Resistance</div>
+						<div class="res-val" id="conv-R">—</div>
+						<div class="res-unit" id="conv-R-u">K/W</div>
+					</div>
+					<div class="res-card" id="conv-bi-card" style="display:none">
+						<div class="res-lbl">Biot Number</div>
+						<div class="res-val" id="conv-Bi">—</div>
+						<div class="res-unit">dimensionless</div>
+						<div class="res-sub" id="conv-bi-interp"></div>
+					</div>
+				</div>
+				<div class="biot-warn" id="conv-bi-warn">
+					<i class="fas fa-exclamation-triangle"></i>
+					<strong>Bi &gt; 0.1</strong> — Lumped-capacitance method is <strong>NOT valid</strong>. Significant temperature gradients exist within the solid; use distributed models.
+				</div>
+				<div class="eq-box">
+					<div class="eq-main">Q̇ = h · A · ΔT &nbsp;|&nbsp; R = 1 / (h·A) &nbsp;|&nbsp; Bi = h·Lc / k</div>
+					<div id="conv-eq-sub" style="color:var(--c-muted)"></div>
+				</div>
+				<button class="copy-btn" onclick="copyResults('conv')"><i class="fas fa-copy"></i> Copy Results</button>
+			</div>
+		</div>
+
+		<!-- ============================================================
+		     PANEL 4 – RADIATION
+		     ============================================================ -->
+		<div id="panel-rad" class="tab-panel">
+			<div class="htc-body">
+				<div class="htc-inputs">
+					<div class="sec-lbl">Emissivity presets (ε)</div>
+					<div class="chips">
+						<button class="chip" onclick="setV('rad-eps',0.03)">Polished Ag (0.03)</button>
+						<button class="chip" onclick="setV('rad-eps',0.05)">Polished Al (0.05)</button>
+						<button class="chip" onclick="setV('rad-eps',0.10)">Polished steel (0.10)</button>
+						<button class="chip" onclick="setV('rad-eps',0.25)">Oxidized Al (0.25)</button>
+						<button class="chip" onclick="setV('rad-eps',0.70)">Oxidized steel (0.70)</button>
+						<button class="chip" onclick="setV('rad-eps',0.90)">Painted (0.90)</button>
+						<button class="chip" onclick="setV('rad-eps',0.95)">Black paint (0.95)</button>
+						<button class="chip" onclick="setV('rad-eps',0.98)">Human skin (0.98)</button>
+					</div>
+					<div class="sec-lbl">Inputs</div>
+					<div class="g2">
+						<div class="ig">
+							<label>Emissivity, ε (0–1)</label>
+							<div class="ig-row">
+								<input type="number" id="rad-eps" placeholder="0.9" step="0.01" min="0" max="1">
+							</div>
+						</div>
+						<div class="ig">
+							<label>Surface Area, A</label>
+							<div class="ig-row">
+								<input type="number" id="rad-A" placeholder="1" step="any" min="0.001">
+								<span class="ig-unit" id="rad-A-u">m²</span>
+							</div>
+						</div>
+					</div>
+					<div class="g2">
+						<div class="ig">
+							<label>Surface Temp, T₁</label>
+							<div class="ig-row">
+								<input type="number" id="rad-T1" placeholder="500" step="any" min="0.001">
+								<span class="ig-unit" id="rad-T1-u">K</span>
+							</div>
+						</div>
+						<div class="ig">
+							<label>Surroundings, T₂</label>
+							<div class="ig-row">
+								<input type="number" id="rad-T2" placeholder="300" step="any" min="0.001">
+								<span class="ig-unit" id="rad-T2-u">K</span>
+							</div>
+						</div>
+					</div>
+					<p style="font-size:.7em;color:var(--c-muted);margin-top:2px;font-style:italic;">
+						Temperatures must be absolute (K or °R). σ = 5.670 × 10⁻⁸ W/m²·K⁴
+					</p>
+					<button class="calc-btn" onclick="calcRAD()">Calculate</button>
+					<div class="htc-err" id="rad-err">ε must be 0–1, all temperatures positive, A positive.</div>
+				</div>
+				<div class="htc-sch">
+					<div class="htc-sch-title">Radiation</div>
+					<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+						<defs>
+							<marker id="arw3" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto">
+								<path d="M0,0 L5,2.5 L0,5 Z" fill="#fbbf24"/>
+							</marker>
+						</defs>
+						<!-- surface 1 -->
+						<rect x="8" y="36" width="52" height="128" fill="#3b0000" opacity=".8" rx="4"/>
+						<rect x="8" y="36" width="52" height="128" fill="none" stroke="#f87171" stroke-width="1.5" rx="4"/>
+						<text x="34" y="92" text-anchor="middle" fill="#f87171" font-size="11" font-family="monospace" font-weight="bold">T₁</text>
+						<text x="34" y="107" text-anchor="middle" fill="#fca5a5" font-size="9" font-family="monospace">ε</text>
+						<!-- surface 2 -->
+						<rect x="140" y="36" width="52" height="128" fill="#001a3b" opacity=".8" rx="4"/>
+						<rect x="140" y="36" width="52" height="128" fill="none" stroke="#60a5fa" stroke-width="1.5" rx="4"/>
+						<text x="166" y="92" text-anchor="middle" fill="#60a5fa" font-size="11" font-family="monospace" font-weight="bold">T₂</text>
+						<text x="166" y="107" text-anchor="middle" fill="#93c5fd" font-size="9" font-family="monospace">surr.</text>
+						<!-- radiation wavy arrows -->
+						<path d="M62,60  Q80,54  100,60 Q120,66 138,60" fill="none" stroke="#fbbf24" stroke-width="1.5" marker-end="url(#arw3)"/>
+						<path d="M62,80  Q80,74  100,80 Q120,86 138,80" fill="none" stroke="#fbbf24" stroke-width="1.5" marker-end="url(#arw3)"/>
+						<path d="M62,100 Q80,94  100,100 Q120,106 138,100" fill="none" stroke="#fbbf24" stroke-width="1.5" marker-end="url(#arw3)"/>
+						<path d="M62,120 Q80,114 100,120 Q120,126 138,120" fill="none" stroke="#fbbf24" stroke-width="1.5" marker-end="url(#arw3)"/>
+						<path d="M62,140 Q80,134 100,140 Q120,146 138,140" fill="none" stroke="#fbbf24" stroke-width="1.5" marker-end="url(#arw3)"/>
+						<text x="100" y="22" text-anchor="middle" fill="#fbbf24" font-size="7.5" font-family="monospace">Stefan-Boltzmann</text>
+						<text x="100" y="180" text-anchor="middle" fill="#fbbf24" font-size="7" font-family="monospace">Q̇ = εσA(T₁⁴ − T₂⁴)</text>
+					</svg>
+					<div style="font-size:.65em;color:var(--c-muted);text-align:center;line-height:1.5;padding:0 4px;">
+						Gray-body radiation to large isothermal surroundings. Sign: positive means net emission, negative means net absorption.
+					</div>
+				</div>
+			</div>
+			<div class="htc-res" id="rad-res">
+				<div class="res-grid">
+					<div class="res-card">
+						<div class="res-lbl">Net Heat Rate</div>
+						<div class="res-val" id="rad-Q">—</div>
+						<div class="res-unit" id="rad-Q-u">W</div>
+						<div class="res-sub" id="rad-Q-dir"></div>
+					</div>
+					<div class="res-card cyan">
+						<div class="res-lbl">Radiation Heat Flux</div>
+						<div class="res-val" id="rad-flux">—</div>
+						<div class="res-unit" id="rad-flux-u">W/m²</div>
+					</div>
+					<div class="res-card">
+						<div class="res-lbl">Linearized Resistance</div>
+						<div class="res-val" id="rad-R">—</div>
+						<div class="res-unit" id="rad-R-u">K/W</div>
+						<div class="res-sub" id="rad-hr">h_rad —</div>
+					</div>
+				</div>
+				<div class="eq-box">
+					<div class="eq-main">Q̇ = ε · σ · A · (T₁⁴ − T₂⁴) &nbsp;|&nbsp; R_rad = ΔT / |Q̇|</div>
+					<div id="rad-eq-sub" style="color:var(--c-muted)"></div>
+				</div>
+				<button class="copy-btn" onclick="copyResults('rad')"><i class="fas fa-copy"></i> Copy Results</button>
+			</div>
+		</div>
+
+		<!-- ============================================================
+		     PANEL 5 – COMPOSITE WALL
+		     ============================================================ -->
+		<div id="panel-comp" class="tab-panel">
+			<div class="htc-body">
+				<div class="htc-inputs" style="overflow-y:auto;">
+					<div class="sec-lbl">Boundary Condition Mode</div>
+					<div class="unit-toggle" style="margin-bottom:12px;width:fit-content;">
+						<button id="comp-iso-btn" class="active" onclick="switchCompBC('iso')">Isothermal</button>
+						<button id="comp-conv-btn" onclick="switchCompBC('conv')">Convective</button>
+					</div>
+					<!-- Isothermal BCs -->
+					<div id="comp-bc-iso">
+						<div class="g2">
+							<div class="ig"><label>T_hot (inner surface)</label>
+								<div class="ig-row"><input type="number" id="comp-Th" placeholder="100" step="any"><span class="ig-unit" id="comp-Th-u">°C</span></div>
+							</div>
+							<div class="ig"><label>T_cold (outer surface)</label>
+								<div class="ig-row"><input type="number" id="comp-Tc" placeholder="20" step="any"><span class="ig-unit" id="comp-Tc-u">°C</span></div>
+							</div>
+						</div>
+					</div>
+					<!-- Convective BCs -->
+					<div id="comp-bc-conv" style="display:none;">
+						<div class="g2">
+							<div class="ig"><label>T_fluid,inner</label>
+								<div class="ig-row"><input type="number" id="comp-Tfi" placeholder="120" step="any"><span class="ig-unit" id="comp-Tfi-u">°C</span></div>
+							</div>
+							<div class="ig"><label>h_inner</label>
+								<div class="ig-row"><input type="number" id="comp-hi" placeholder="500" step="any" min="0.001"><span class="ig-unit" id="comp-hi-u">W/m²·K</span></div>
+							</div>
+						</div>
+						<div class="g2">
+							<div class="ig"><label>T_fluid,outer</label>
+								<div class="ig-row"><input type="number" id="comp-Tfo" placeholder="10" step="any"><span class="ig-unit" id="comp-Tfo-u">°C</span></div>
+							</div>
+							<div class="ig"><label>h_outer</label>
+								<div class="ig-row"><input type="number" id="comp-ho" placeholder="25" step="any" min="0.001"><span class="ig-unit" id="comp-ho-u">W/m²·K</span></div>
+							</div>
+						</div>
+					</div>
+					<div class="ig" style="margin-top:4px;">
+						<label>Cross-sectional Area, A</label>
+						<div class="ig-row"><input type="number" id="comp-A" placeholder="1" step="any" min="0.001"><span class="ig-unit" id="comp-A-u">m²</span></div>
+					</div>
+					<!-- Contact resistance toggle -->
+					<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;margin-top:2px;">
+						<input type="checkbox" id="comp-cr-toggle" onchange="toggleContactR()" style="accent-color:var(--c-acc);cursor:pointer;">
+						<label for="comp-cr-toggle" style="font-size:.72em;color:var(--c-label);cursor:pointer;text-transform:uppercase;letter-spacing:.07em;">Enable contact resistance between layers</label>
+					</div>
+					<div class="sec-lbl">Wall Layers</div>
+					<div class="layer-hdr" id="comp-layer-hdr">
+						<div>Material / k</div>
+						<div id="comp-k-hdr">k (W/m·K)</div>
+						<div id="comp-t-hdr">t (m)</div>
+						<div></div>
+					</div>
+					<div id="comp-layer-list"></div>
+					<button class="add-layer" onclick="addLayer()" style="margin-top:8px;">+ Add Layer</button>
+					<button class="calc-btn" onclick="calcCOMP()">Calculate</button>
+					<div class="htc-err" id="comp-err">Check inputs: T_hot &gt; T_cold, all layer k and t values must be positive.</div>
+				</div>
+				<div class="htc-sch" style="justify-content:flex-start;">
+					<div class="htc-sch-title">Wall Stack Preview</div>
+					<svg id="comp-svg" viewBox="0 0 230 200" xmlns="http://www.w3.org/2000/svg" style="max-width:230px;width:100%;">
+						<text x="115" y="105" text-anchor="middle" fill="#4a5568" font-size="10" font-family="monospace">Add layers to preview</text>
+					</svg>
+				</div>
+			</div>
+			<div class="htc-res" id="comp-res">
+				<div class="res-grid">
+					<div class="res-card">
+						<div class="res-lbl">Total Heat Rate</div>
+						<div class="res-val" id="comp-Q">—</div>
+						<div class="res-unit" id="comp-Q-u">W</div>
+						<div class="res-sub" id="comp-Q-alt"></div>
+					</div>
+					<div class="res-card cyan">
+						<div class="res-lbl">Total Resistance</div>
+						<div class="res-val" id="comp-R">—</div>
+						<div class="res-unit" id="comp-R-u">K/W</div>
+					</div>
+					<div class="res-card">
+						<div class="res-lbl">Overall Heat Flux</div>
+						<div class="res-val" id="comp-flux">—</div>
+						<div class="res-unit" id="comp-flux-u">W/m²</div>
+					</div>
+					<div class="res-card amber">
+						<div class="res-lbl">U-value</div>
+						<div class="res-val" id="comp-U">—</div>
+						<div class="res-unit" id="comp-U-u">W/m²·K</div>
+					</div>
+				</div>
+				<div id="comp-iface-wrap" style="overflow-x:auto;margin-bottom:14px;"></div>
+				<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+					<div style="font-size:.65em;text-transform:uppercase;letter-spacing:.09em;color:var(--c-muted);">Temperature Profile</div>
+					<div class="unit-toggle">
+						<button id="comp-xaxis-r-btn" class="active" onclick="switchCompXAxis('resist')">Resistance</button>
+						<button id="comp-xaxis-p-btn" onclick="switchCompXAxis('position')">Position (mm)</button>
+					</div>
+				</div>
+				<canvas id="comp-canvas" style="width:100%;border-radius:6px;border:1px solid var(--c-border);display:block;" height="150"></canvas>
+			</div>
+		</div>
+
+		<!-- ============================================================
+		     PANEL 6 – FIN EFFICIENCY
+		     ============================================================ -->
+		<div id="panel-fin" class="tab-panel">
+			<div class="htc-body">
+				<div class="htc-inputs">
+					<div class="sec-lbl">Fin Geometry</div>
+					<div class="ig">
+						<label>Fin Type</label>
+						<div class="ig-row">
+							<select id="fin-type" onchange="updateFinGeom()">
+								<option value="rect">Straight Rectangular</option>
+								<option value="pin">Pin (Cylindrical)</option>
+								<option value="annular">Annular</option>
+							</select>
+						</div>
+					</div>
+					<div id="fin-geom-rect">
+						<div class="g2">
+							<div class="ig">
+								<label>Fin Length, L</label>
+								<div class="ig-row">
+									<input type="number" id="fin-L" placeholder="0.05" step="any" min="0.001">
+									<span class="ig-unit" id="fin-L-u">m</span>
+								</div>
+							</div>
+							<div class="ig">
+								<label>Half-thickness, t</label>
+								<div class="ig-row">
+									<input type="number" id="fin-t" placeholder="0.002" step="any" min="0.0001">
+									<span class="ig-unit" id="fin-t-u">m</span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div id="fin-geom-pin" style="display:none">
+						<div class="g2">
+							<div class="ig">
+								<label>Pin Length, L</label>
+								<div class="ig-row">
+									<input type="number" id="fin-Lp" placeholder="0.05" step="any" min="0.001">
+									<span class="ig-unit" id="fin-Lp-u">m</span>
+								</div>
+							</div>
+							<div class="ig">
+								<label>Pin Diameter, D</label>
+								<div class="ig-row">
+									<input type="number" id="fin-D" placeholder="0.005" step="any" min="0.0001">
+									<span class="ig-unit" id="fin-D-u">m</span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div id="fin-geom-annular" style="display:none">
+						<div class="g2">
+							<div class="ig">
+								<label>Inner Radius, r₁</label>
+								<div class="ig-row">
+									<input type="number" id="fin-r1" placeholder="0.01" step="any" min="0.001">
+									<span class="ig-unit" id="fin-r1-u">m</span>
+								</div>
+							</div>
+							<div class="ig">
+								<label>Outer Radius, r₂</label>
+								<div class="ig-row">
+									<input type="number" id="fin-r2" placeholder="0.04" step="any" min="0.001">
+									<span class="ig-unit" id="fin-r2-u">m</span>
+								</div>
+							</div>
+						</div>
+						<div class="ig">
+							<label>Fin Thickness, t</label>
+							<div class="ig-row">
+								<input type="number" id="fin-ta" placeholder="0.002" step="any" min="0.0001">
+								<span class="ig-unit" id="fin-ta-u">m</span>
+							</div>
+						</div>
+					</div>
+					<div class="sec-lbl">Thermal Properties</div>
+					<div class="chips">
+						<button class="chip" onclick="preset_k('fin-k',15)">Stainless</button>
+						<button class="chip" onclick="preset_k('fin-k',50)">Carbon Steel</button>
+						<button class="chip" onclick="preset_k('fin-k',205)">Aluminum</button>
+						<button class="chip" onclick="preset_k('fin-k',385)">Copper</button>
+					</div>
+					<div class="g2">
+						<div class="ig">
+							<label>Conductivity, k</label>
+							<div class="ig-row">
+								<input type="number" id="fin-k" placeholder="205" step="any" min="0.001">
+								<span class="ig-unit" id="fin-k-u">W/m·K</span>
+							</div>
+						</div>
+						<div class="ig">
+							<label>Conv. coeff., h</label>
+							<div class="ig-row">
+								<input type="number" id="fin-h" placeholder="25" step="any" min="0.001">
+								<span class="ig-unit" id="fin-h-u">W/m²·K</span>
+							</div>
+						</div>
+					</div>
+					<div class="ig">
+						<label>Base–Fluid Temp. Difference, θ_b</label>
+						<div class="ig-row">
+							<input type="number" id="fin-dT" placeholder="50" step="any" min="0.001">
+							<span class="ig-unit" id="fin-dT-u">K</span>
+						</div>
+					</div>
+					<button class="calc-btn" onclick="calcFIN()">Calculate</button>
+					<div class="htc-err" id="fin-err">Check inputs — all values must be positive; for annular r₂ &gt; r₁.</div>
+				</div>
+				<div class="htc-sch">
+					<div class="htc-sch-title">Fin Schematic</div>
+					<svg id="fin-svg" viewBox="0 0 220 210" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:230px;">
+						<!-- default: straight rectangular -->
+						<defs>
+							<marker id="farw" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto">
+								<path d="M0,0 L5,2.5 L0,5 Z" fill="#f59e0b"/>
+							</marker>
+						</defs>
+						<!-- base -->
+						<rect x="8" y="20" width="30" height="170" fill="#0d2a12" stroke="#4CAF50" stroke-width="1.5" rx="3"/>
+						<text x="23" y="112" text-anchor="middle" fill="#4CAF50" font-size="8" font-family="monospace">BASE</text>
+						<text x="23" y="124" text-anchor="middle" fill="#86efac" font-size="9" font-family="monospace" font-weight="bold">Tb</text>
+						<!-- fin body -->
+						<rect x="38" y="90" width="130" height="30" fill="#1e3a8a" opacity=".7" stroke="#60a5fa" stroke-width="1.5" rx="3"/>
+						<text x="103" y="109" text-anchor="middle" fill="#93c5fd" font-size="9" font-family="monospace">k, fin</text>
+						<!-- tip -->
+						<rect x="168" y="90" width="20" height="30" fill="#134e4a" opacity=".7" stroke="#38bdf8" stroke-width="1" rx="2"/>
+						<text x="178" y="109" text-anchor="middle" fill="#38bdf8" font-size="7" font-family="monospace">tip</text>
+						<!-- heat arrows leaving fin surface -->
+						<line x1="83" y1="90" x2="83" y2="72" stroke="#f59e0b" stroke-width="1.2" marker-end="url(#farw)"/>
+						<line x1="123" y1="90" x2="123" y2="72" stroke="#f59e0b" stroke-width="1.2" marker-end="url(#farw)"/>
+						<line x1="83" y1="120" x2="83" y2="138" stroke="#f59e0b" stroke-width="1.2" marker-end="url(#farw)"/>
+						<line x1="123" y1="120" x2="123" y2="138" stroke="#f59e0b" stroke-width="1.2" marker-end="url(#farw)"/>
+						<!-- dimension arrows -->
+						<line x1="38" y1="162" x2="168" y2="162" stroke="#4a5568" stroke-width="1"/>
+						<line x1="38" y1="158" x2="38" y2="166" stroke="#4a5568" stroke-width="1"/>
+						<line x1="168" y1="158" x2="168" y2="166" stroke="#4a5568" stroke-width="1"/>
+						<text x="103" y="174" text-anchor="middle" fill="#4a5568" font-size="7.5" font-family="monospace">Length L</text>
+						<line x1="196" y1="90" x2="196" y2="120" stroke="#4a5568" stroke-width="1"/>
+						<line x1="192" y1="90" x2="200" y2="90" stroke="#4a5568" stroke-width="1"/>
+						<line x1="192" y1="120" x2="200" y2="120" stroke="#4a5568" stroke-width="1"/>
+						<text x="210" y="109" text-anchor="middle" fill="#4a5568" font-size="7" font-family="monospace">2t</text>
+						<!-- h label -->
+						<text x="83" y="66" text-anchor="middle" fill="#f59e0b" font-size="8" font-family="monospace">h, T∞</text>
+					</svg>
+					<div style="font-size:.65em;color:var(--c-muted);text-align:center;line-height:1.5;padding:0 4px;">
+						Efficiency η = Q_fin / Q_ideal. Ideal assumes entire fin is at base temperature. Effectiveness ε_f = Q_fin / Q_no_fin.
+					</div>
+				</div>
+			</div>
+			<div class="htc-res" id="fin-res">
+				<div class="res-grid">
+					<div class="res-card">
+						<div class="res-lbl">Fin Efficiency, η</div>
+						<div class="res-val" id="fin-eta">—</div>
+						<div class="res-unit">%</div>
+						<div class="res-sub" id="fin-mL">mL = —</div>
+					</div>
+					<div class="res-card cyan">
+						<div class="res-lbl">Fin Heat Transfer</div>
+						<div class="res-val" id="fin-Qfin">—</div>
+						<div class="res-unit" id="fin-Qfin-u">W</div>
+					</div>
+					<div class="res-card">
+						<div class="res-lbl">Q_ideal (η=1)</div>
+						<div class="res-val" id="fin-Qideal">—</div>
+						<div class="res-unit" id="fin-Qideal-u">W</div>
+					</div>
+					<div class="res-card amber">
+						<div class="res-lbl">Fin Effectiveness, ε_f</div>
+						<div class="res-val" id="fin-eff">—</div>
+						<div class="res-unit">dimensionless</div>
+						<div class="res-sub" id="fin-eff-note"></div>
+					</div>
+				</div>
+				<div class="eq-box">
+					<div class="eq-main" id="fin-eq-main">η = tanh(mL) / mL &nbsp;|&nbsp; m = √(hP / kA_c)</div>
+					<div id="fin-eq-sub" style="color:var(--c-muted)"></div>
+				</div>
+			</div>
+		</div>
+
+		<!-- PANEL 7 – HEAT EXCHANGER -->
+		<div id="panel-hx" class="tab-panel">
+			<div class="htc-body">
+				<div class="htc-inputs">
+					<div class="sec-lbl">Mode</div>
+					<div class="unit-toggle" style="margin-bottom:14px;width:fit-content;">
+						<button id="hx-lmtd-btn" class="active" onclick="switchHXMode('lmtd')">LMTD</button>
+						<button id="hx-ntu-btn" onclick="switchHXMode('ntu')">NTU-ε</button>
+					</div>
+					<div id="hx-lmtd-inputs">
+						<div class="sec-lbl">Flow Arrangement</div>
+						<div class="ig"><label>Configuration</label>
+							<div class="ig-row"><select id="hx-flow">
+								<option value="counter">Counter-flow</option>
+								<option value="parallel">Parallel-flow</option>
+								<option value="shell1">Shell-and-tube (1 shell, 2 tube passes)</option>
+							</select></div>
+						</div>
+						<div class="sec-lbl">Hot Fluid</div>
+						<div class="g2">
+							<div class="ig"><label>T_h,in</label><div class="ig-row"><input type="number" id="hx-Thi" placeholder="120" step="any"><span class="ig-unit" id="hx-Thi-u">°C</span></div></div>
+							<div class="ig"><label>T_h,out</label><div class="ig-row"><input type="number" id="hx-Tho" placeholder="60" step="any"><span class="ig-unit" id="hx-Tho-u">°C</span></div></div>
+						</div>
+						<div class="sec-lbl">Cold Fluid</div>
+						<div class="g2">
+							<div class="ig"><label>T_c,in</label><div class="ig-row"><input type="number" id="hx-Tci" placeholder="20" step="any"><span class="ig-unit" id="hx-Tci-u">°C</span></div></div>
+							<div class="ig"><label>T_c,out</label><div class="ig-row"><input type="number" id="hx-Tco" placeholder="80" step="any"><span class="ig-unit" id="hx-Tco-u">°C</span></div></div>
+						</div>
+						<div class="sec-lbl">Design Parameters</div>
+						<div class="g2">
+							<div class="ig"><label>Overall U</label><div class="ig-row"><input type="number" id="hx-U" placeholder="500" step="any" min="0.001"><span class="ig-unit" id="hx-U-u">W/m²·K</span></div></div>
+							<div class="ig"><label>Area A (optional)</label><div class="ig-row"><input type="number" id="hx-A" placeholder="" step="any" min="0.001"><span class="ig-unit" id="hx-A-u">m²</span></div></div>
+						</div>
+					</div>
+					<div id="hx-ntu-inputs" style="display:none">
+						<div class="sec-lbl">Flow Arrangement</div>
+						<div class="ig"><label>Configuration</label>
+							<div class="ig-row"><select id="hx-ntu-flow">
+								<option value="counter">Counter-flow</option>
+								<option value="parallel">Parallel-flow</option>
+								<option value="shell1">Shell-and-tube (1-2)</option>
+								<option value="cross">Cross-flow (both unmixed)</option>
+							</select></div>
+						</div>
+						<div class="sec-lbl">Inlet Temperatures</div>
+						<div class="g2">
+							<div class="ig"><label>T_h,in</label><div class="ig-row"><input type="number" id="hx-ntu-Thi" placeholder="120" step="any"><span class="ig-unit" id="hx-ntu-Thi-u">°C</span></div></div>
+							<div class="ig"><label>T_c,in</label><div class="ig-row"><input type="number" id="hx-ntu-Tci" placeholder="20" step="any"><span class="ig-unit" id="hx-ntu-Tci-u">°C</span></div></div>
+						</div>
+						<div class="sec-lbl">Capacity Rates</div>
+						<div class="g2">
+							<div class="ig"><label>C_h (ṁc_p hot)</label><div class="ig-row"><input type="number" id="hx-Ch" placeholder="2000" step="any" min="0.001"><span class="ig-unit" id="hx-Ch-u">W/K</span></div></div>
+							<div class="ig"><label>C_c (ṁc_p cold)</label><div class="ig-row"><input type="number" id="hx-Cc" placeholder="1000" step="any" min="0.001"><span class="ig-unit" id="hx-Cc-u">W/K</span></div></div>
+						</div>
+						<div class="ig"><label>NTU = UA / C_min</label><div class="ig-row"><input type="number" id="hx-NTU" placeholder="2" step="any" min="0.001"></div></div>
+					</div>
+					<button class="calc-btn" onclick="calcHX()">Calculate</button>
+					<div class="htc-err" id="hx-err">Check inputs — verify temperatures are thermodynamically consistent.</div>
+				</div>
+				<div class="htc-sch">
+					<div class="htc-sch-title">Flow Schematic</div>
+					<svg id="hx-svg" viewBox="0 0 220 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:230px;">
+						<defs>
+							<marker id="hxarw-r" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#f87171"/></marker>
+							<marker id="hxarw-bl" markerWidth="6" markerHeight="6" refX="1" refY="3" orient="auto"><path d="M6,0 L0,3 L6,6 Z" fill="#60a5fa"/></marker>
+						</defs>
+						<rect x="30" y="55" width="160" height="90" rx="8" fill="#161b27" stroke="#21293a" stroke-width="1.5"/>
+						<line x1="10" y1="82" x2="185" y2="82" stroke="#f87171" stroke-width="2" marker-end="url(#hxarw-r)"/>
+						<text x="12" y="76" fill="#f87171" font-size="8" font-family="monospace">Th,in</text>
+						<text x="175" y="76" fill="#f87171" font-size="8" font-family="monospace">Th,out</text>
+						<line x1="210" y1="118" x2="35" y2="118" stroke="#60a5fa" stroke-width="2" marker-end="url(#hxarw-bl)"/>
+						<text x="175" y="134" fill="#60a5fa" font-size="8" font-family="monospace">Tc,in</text>
+						<text x="12" y="134" fill="#60a5fa" font-size="8" font-family="monospace">Tc,out</text>
+						<text x="110" y="104" text-anchor="middle" fill="#4a5568" font-size="9" font-family="monospace" id="hx-sch-label">counter-flow</text>
+						<text x="110" y="175" text-anchor="middle" fill="#4a5568" font-size="8" font-family="monospace">Q̇ = U·A·F·LMTD</text>
+					</svg>
+					<div style="font-size:.65em;color:var(--c-muted);text-align:center;line-height:1.5;padding:0 4px;">LMTD: requires all 4 temps. NTU-ε: predicts outlet temps from UA and inlet conditions — useful for rating existing HXs.</div>
+				</div>
+			</div>
+			<div class="htc-res" id="hx-res">
+				<div class="res-grid">
+					<div class="res-card"><div class="res-lbl">Heat Transfer Rate</div><div class="res-val" id="hx-Q">—</div><div class="res-unit" id="hx-Q-u">W</div><div class="res-sub" id="hx-Q-alt"></div></div>
+					<div class="res-card cyan"><div class="res-lbl">LMTD·F</div><div class="res-val" id="hx-LMTD">—</div><div class="res-unit" id="hx-LMTD-u">K</div></div>
+					<div class="res-card"><div class="res-lbl" id="hx-UA-lbl">Required Area A</div><div class="res-val" id="hx-UA">—</div><div class="res-unit" id="hx-UA-u">m²</div></div>
+					<div class="res-card amber"><div class="res-lbl">Effectiveness ε</div><div class="res-val" id="hx-eff">—</div><div class="res-unit">dimensionless</div><div class="res-sub" id="hx-eff-sub"></div></div>
+				</div>
+				<div id="hx-ntu-outlets" style="display:none;margin-bottom:14px;">
+					<div class="res-grid">
+						<div class="res-card"><div class="res-lbl">T_h,out (predicted)</div><div class="res-val" id="hx-Tho-out">—</div><div class="res-unit" id="hx-Tho-out-u">°C</div></div>
+						<div class="res-card"><div class="res-lbl">T_c,out (predicted)</div><div class="res-val" id="hx-Tco-out">—</div><div class="res-unit" id="hx-Tco-out-u">°C</div></div>
+					</div>
+				</div>
+				<div class="eq-box">
+					<div class="eq-main" id="hx-eq-main">LMTD = (ΔT₁−ΔT₂)/ln(ΔT₁/ΔT₂) &nbsp;|&nbsp; Q̇ = U·A·F·LMTD</div>
+					<div id="hx-eq-sub" style="color:var(--c-muted)"></div>
+				</div>
+			</div>
+		</div>
+
+		<!-- PANEL 8 – TRANSIENT -->
+		<div id="panel-trans" class="tab-panel">
+			<div class="htc-body">
+				<div class="htc-inputs">
+					<div class="sec-lbl">Material Presets</div>
+					<div class="chips">
+						<button class="chip" onclick="transPreset(7800,500,50)">Carbon Steel</button>
+						<button class="chip" onclick="transPreset(2700,900,205)">Aluminum</button>
+						<button class="chip" onclick="transPreset(8900,385,385)">Copper</button>
+						<button class="chip" onclick="transPreset(8500,380,120)">Brass</button>
+					</div>
+					<div class="sec-lbl">Material Properties</div>
+					<div class="g2">
+						<div class="ig"><label>Density, ρ</label><div class="ig-row"><input type="number" id="tr-rho" placeholder="7800" step="any" min="0.001"><span class="ig-unit" id="tr-rho-u">kg/m³</span></div></div>
+						<div class="ig"><label>Specific heat, c_p</label><div class="ig-row"><input type="number" id="tr-cp" placeholder="500" step="any" min="0.001"><span class="ig-unit" id="tr-cp-u">J/kg·K</span></div></div>
+					</div>
+					<div class="ig"><label>Conductivity, k</label><div class="ig-row"><input type="number" id="tr-k" placeholder="50" step="any" min="0.001"><span class="ig-unit" id="tr-k-u">W/m·K</span></div></div>
+					<div class="sec-lbl">Geometry</div>
+					<div class="g2">
+						<div class="ig"><label>Shape</label><div class="ig-row"><select id="tr-geom" onchange="updateTransGeom()"><option value="slab">Flat plate (half-thickness L)</option><option value="cyl">Long cylinder (radius r)</option><option value="sphere">Sphere (radius r)</option></select></div></div>
+						<div class="ig"><label id="tr-dim-lbl">L or r</label><div class="ig-row"><input type="number" id="tr-dim" placeholder="0.01" step="any" min="0.0001"><span class="ig-unit" id="tr-dim-u">m</span></div></div>
+					</div>
+					<div class="sec-lbl">Conditions</div>
+					<div class="g2">
+						<div class="ig"><label>Conv. coeff., h</label><div class="ig-row"><input type="number" id="tr-h" placeholder="25" step="any" min="0.001"><span class="ig-unit" id="tr-h-u">W/m²·K</span></div></div>
+						<div class="ig"><label>Fluid temp, T_∞</label><div class="ig-row"><input type="number" id="tr-Tinf" placeholder="25" step="any"><span class="ig-unit" id="tr-Tinf-u">°C</span></div></div>
+					</div>
+					<div class="ig"><label>Initial temp, T_i</label><div class="ig-row"><input type="number" id="tr-Ti" placeholder="300" step="any"><span class="ig-unit" id="tr-Ti-u">°C</span></div></div>
+					<div class="sec-lbl">Solve For</div>
+					<div class="unit-toggle" style="margin-bottom:12px;width:fit-content;">
+						<button id="tr-mode-t-btn" class="active" onclick="switchTransMode('time')">Find T(t)</button>
+						<button id="tr-mode-T-btn" onclick="switchTransMode('temp')">Find t(T)</button>
+					</div>
+					<div id="tr-input-time"><div class="ig"><label>Time, t</label><div class="ig-row"><input type="number" id="tr-t" placeholder="60" step="any" min="0.001"><span class="ig-unit">s</span></div></div></div>
+					<div id="tr-input-temp" style="display:none"><div class="ig"><label>Target Temp, T_target</label><div class="ig-row"><input type="number" id="tr-Ttarget" placeholder="100" step="any"><span class="ig-unit" id="tr-Ttarget-u">°C</span></div></div></div>
+					<button class="calc-btn" onclick="calcTRANS()">Calculate</button>
+					<div class="htc-err" id="tr-err">Check inputs — all values positive; T_i must differ from T_∞.</div>
+				</div>
+				<div class="htc-sch">
+					<div class="htc-sch-title">Schematic</div>
+					<svg viewBox="0 0 220 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:230px;">
+						<defs><marker id="tarw" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5 Z" fill="#f59e0b"/></marker></defs>
+						<rect x="70" y="30" width="80" height="120" rx="6" fill="#1e3a8a" opacity=".7" stroke="#60a5fa" stroke-width="1.5"/>
+						<text x="110" y="88" text-anchor="middle" fill="#93c5fd" font-size="10" font-family="monospace">ρ, c_p, k</text>
+						<text x="110" y="104" text-anchor="middle" fill="#60a5fa" font-size="13" font-family="monospace" font-weight="bold">T(t)</text>
+						<rect x="10" y="30" width="55" height="120" rx="4" fill="#001020" opacity=".5"/>
+						<text x="37" y="92" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="monospace">T_∞, h</text>
+						<rect x="155" y="30" width="55" height="120" rx="4" fill="#001020" opacity=".5"/>
+						<text x="182" y="92" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="monospace">T_∞, h</text>
+						<line x1="63" y1="80" x2="72" y2="80" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#tarw)"/>
+						<line x1="63" y1="100" x2="72" y2="100" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#tarw)"/>
+						<line x1="63" y1="120" x2="72" y2="120" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#tarw)"/>
+						<line x1="157" y1="80" x2="148" y2="80" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#tarw)"/>
+						<line x1="157" y1="100" x2="148" y2="100" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#tarw)"/>
+						<line x1="157" y1="120" x2="148" y2="120" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#tarw)"/>
+						<text x="110" y="172" text-anchor="middle" fill="#4a5568" font-size="7.5" font-family="monospace">θ/θᵢ = exp(−t/τ), τ = ρc_pV/hA_s</text>
+					</svg>
+					<div style="font-size:.65em;color:var(--c-muted);text-align:center;line-height:1.5;padding:0 4px;">Valid only when Bi = hL_c/k &lt; 0.1. Assumes uniform temperature throughout the solid at each instant.</div>
+				</div>
+			</div>
+			<div class="htc-res" id="trans-res">
+				<div class="res-grid">
+					<div class="res-card"><div class="res-lbl" id="tr-ans-lbl">Temperature T(t)</div><div class="res-val" id="tr-ans">—</div><div class="res-unit" id="tr-ans-u">°C</div></div>
+					<div class="res-card cyan"><div class="res-lbl">Time Constant, τ</div><div class="res-val" id="tr-tau">—</div><div class="res-unit">s</div><div class="res-sub" id="tr-tau-sub"></div></div>
+					<div class="res-card" id="tr-bi-card"><div class="res-lbl">Biot Number</div><div class="res-val" id="tr-Bi">—</div><div class="res-unit">dimensionless</div><div class="res-sub" id="tr-Bi-sub"></div></div>
+					<div class="res-card"><div class="res-lbl">θ/θᵢ (temp ratio)</div><div class="res-val" id="tr-ratio">—</div><div class="res-unit">dimensionless</div></div>
+				</div>
+				<div class="biot-warn" id="tr-bi-warn">
+					<i class="fas fa-exclamation-triangle"></i>
+					<strong>Bi &gt; 0.1</strong> — Lumped capacitance is <strong>NOT valid</strong>. Use Heisler charts or series solutions.
+				</div>
+				<div style="font-size:.65em;text-transform:uppercase;letter-spacing:.09em;color:var(--c-muted);margin:12px 0 6px;">T(t) Decay Curve</div>
+				<canvas id="tr-canvas" style="width:100%;border-radius:6px;border:1px solid var(--c-border);display:block;" height="150"></canvas>
+				<div class="eq-box" style="margin-top:11px;">
+					<div class="eq-main">θ/θᵢ = (T−T_∞)/(Tᵢ−T_∞) = exp(−t/τ) &nbsp;|&nbsp; τ = ρc_pV/(hA_s)</div>
+					<div id="tr-eq-sub" style="color:var(--c-muted)"></div>
+				</div>
+			</div>
+		</div>
+
+	</div><!-- /htc -->
+
+	<a href="../index.html#tools" class="back-btn">← Back to Tools</a>
+
+	<!-- ===== WORKED EXAMPLES ===== -->
+	<div style="margin-top:48px;">
+		<h3 style="font-size:1.1em;letter-spacing:.06em;color:#ccc;border-bottom:1px solid #21293a;padding-bottom:10px;margin-bottom:4px;">Worked Examples</h3>
+		<p style="font-size:.82em;color:#4a5568;margin-bottom:22px;">Click any scenario to load inputs and auto-calculate. All examples use SI units.</p>
+
+		<!-- Flat Wall -->
+		<div style="margin-bottom:28px;">
+			<div style="font-size:.68em;text-transform:uppercase;letter-spacing:.12em;color:#4CAF50;margin-bottom:10px;">Flat Wall Conduction</div>
+			<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;">
+				<div class="ex-card" onclick="loadExample('fw_insulated_wall')">
+					<div class="ex-title">Residential Stud Wall</div>
+					<div class="ex-desc">Fiberglass batt insulation, 140 mm thick, 10 m² section, 21°C inside / −5°C outside</div>
+					<div class="ex-params">k=0.04 · t=0.14 m · A=10 m² · ΔT=26 K</div>
+				</div>
+				<div class="ex-card" onclick="loadExample('fw_furnace')">
+					<div class="ex-title">Furnace Refractory Wall</div>
+					<div class="ex-desc">Firebrick lining, 300 mm thick, 5 m² wall panel, 1200°C interior / 80°C exterior</div>
+					<div class="ex-params">k=1.5 · t=0.3 m · A=5 m² · ΔT=1120 K</div>
+				</div>
+				<div class="ex-card" onclick="loadExample('fw_aircraft_panel')">
+					<div class="ex-title">Aluminum Aircraft Panel</div>
+					<div class="ex-desc">Thin aluminum skin, 3 mm thick, 2 m² panel, 80°C cabin / −50°C exterior</div>
+					<div class="ex-params">k=205 · t=0.003 m · A=2 m² · ΔT=130 K</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Cylindrical -->
+		<div style="margin-bottom:28px;">
+			<div style="font-size:.68em;text-transform:uppercase;letter-spacing:.12em;color:#38bdf8;margin-bottom:10px;">Cylindrical Conduction</div>
+			<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;">
+				<div class="ex-card" onclick="loadExample('cyl_steam_pipe')">
+					<div class="ex-title">Insulated Steam Pipe</div>
+					<div class="ex-desc">Mineral wool insulation around a 100 mm steam pipe, 3 m long, 180°C steam / 30°C ambient</div>
+					<div class="ex-params">r₁=0.05 m · r₂=0.10 m · L=3 m · ΔT=150 K</div>
+				</div>
+				<div class="ex-card" onclick="loadExample('cyl_copper_tube')">
+					<div class="ex-title">Refrigerant Copper Tube</div>
+					<div class="ex-desc">Copper refrigerant line, 12 mm OD / 10 mm ID, 2 m run, ΔT = 20 K</div>
+					<div class="ex-params">r₁=0.005 m · r₂=0.006 m · L=2 m · ΔT=20 K</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Convection -->
+		<div style="margin-bottom:28px;">
+			<div style="font-size:.68em;text-transform:uppercase;letter-spacing:.12em;color:#f59e0b;margin-bottom:10px;">Convection</div>
+			<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;">
+				<div class="ex-card" onclick="loadExample('conv_cpu')">
+					<div class="ex-title">CPU Heat Sink</div>
+					<div class="ex-desc">Forced air cooling over 80 cm² heat sink surface, h=45 W/m²·K, junction ΔT=55°C</div>
+					<div class="ex-params">h=45 · A=0.008 m² · ΔT=55 K</div>
+				</div>
+				<div class="ex-card" onclick="loadExample('conv_hot_plate')">
+					<div class="ex-title">Hot Plate in Still Air</div>
+					<div class="ex-desc">Horizontal plate, 0.25 m², natural convection, h=8 W/m²·K, plate at 60°C above ambient</div>
+					<div class="ex-params">h=8 · A=0.25 m² · ΔT=60 K</div>
+				</div>
+				<div class="ex-card" onclick="loadExample('conv_car_radiator')">
+					<div class="ex-title">Car Radiator Core</div>
+					<div class="ex-desc">Forced convection over 0.4 m² core, h=120 W/m²·K, coolant 85°C, air 25°C</div>
+					<div class="ex-params">h=120 · A=0.4 m² · ΔT=60 K</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Radiation -->
+		<div style="margin-bottom:28px;">
+			<div style="font-size:.68em;text-transform:uppercase;letter-spacing:.12em;color:#f87171;margin-bottom:10px;">Radiation</div>
+			<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;">
+				<div class="ex-card" onclick="loadExample('rad_painted_pipe')">
+					<div class="ex-title">Painted Pipe to Room</div>
+					<div class="ex-desc">Black-painted hot water pipe, 0.5 m² surface, 80°C surface to 20°C surroundings</div>
+					<div class="ex-params">ε=0.95 · A=0.5 m² · T₁=353 K · T₂=293 K</div>
+				</div>
+				<div class="ex-card" onclick="loadExample('rad_polished_al')">
+					<div class="ex-title">Polished Aluminum Surface</div>
+					<div class="ex-desc">Polished aluminum panel, 1 m², 200°C surface, 25°C surroundings — low emissivity</div>
+					<div class="ex-params">ε=0.05 · A=1 m² · T₁=473 K · T₂=298 K</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Composite -->
+		<div style="margin-bottom:28px;">
+			<div style="font-size:.68em;text-transform:uppercase;letter-spacing:.12em;color:#a78bfa;margin-bottom:10px;">Composite Wall</div>
+			<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;">
+				<div class="ex-card" onclick="loadExample('comp_house_wall')">
+					<div class="ex-title">House Exterior Wall</div>
+					<div class="ex-desc">Gypsum board + fiberglass batt + OSB sheathing. Classic residential construction assembly</div>
+					<div class="ex-params">3 layers · T: 21°C → −10°C · A=1 m²</div>
+				</div>
+				<div class="ex-card" onclick="loadExample('comp_boiler_wall')">
+					<div class="ex-title">Boiler Pressure Wall</div>
+					<div class="ex-desc">Carbon steel shell + mineral wool insulation + thin stainless cladding</div>
+					<div class="ex-params">3 layers · T: 300°C → 30°C · A=1 m²</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- HX -->
+		<div style="margin-bottom:28px;">
+			<div style="font-size:.68em;text-transform:uppercase;letter-spacing:.12em;color:#4CAF50;margin-bottom:10px;">Heat Exchanger</div>
+			<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;">
+				<div class="ex-card" onclick="loadExample('hx_counter_water')">
+					<div class="ex-title">Counter-flow Water/Water</div>
+					<div class="ex-desc">Hot water cooled from 90°C→50°C, cold water heated 20°C→60°C, U=1200 W/m²·K</div>
+					<div class="ex-params">LMTD mode · counter-flow · U=1200</div>
+				</div>
+				<div class="ex-card" onclick="loadExample('hx_ntu_aircoil')">
+					<div class="ex-title">Air Coil Rating (NTU)</div>
+					<div class="ex-desc">Rate an existing air coil: C_h=3000, C_c=1500 W/K, NTU=2.5, counter-flow</div>
+					<div class="ex-params">NTU-ε mode · counter-flow · Cr=0.5</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Transient -->
+		<div style="margin-bottom:28px;">
+			<div style="font-size:.68em;text-transform:uppercase;letter-spacing:.12em;color:#38bdf8;margin-bottom:10px;">Transient / Lumped Capacitance</div>
+			<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;">
+				<div class="ex-card" onclick="loadExample('trans_steel_ball')">
+					<div class="ex-title">Steel Ball Quenching</div>
+					<div class="ex-desc">25 mm diameter steel ball, heated to 800°C, quenched in oil bath at 40°C with h=300 W/m²·K. How long to reach 100°C?</div>
+					<div class="ex-params">sphere · r=0.0125 m · h=300 · find t(T)</div>
+				</div>
+				<div class="ex-card" onclick="loadExample('trans_al_plate')">
+					<div class="ex-title">Aluminum Plate Cooling</div>
+					<div class="ex-desc">10 mm thick aluminum plate, initially at 150°C, exposed to forced air at 25°C, h=50 W/m²·K. Temperature after 2 minutes?</div>
+					<div class="ex-params">flat plate · L=0.005 m · h=50 · find T(t)</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Fin -->
+		<div style="margin-bottom:10px;">
+			<div style="font-size:.68em;text-transform:uppercase;letter-spacing:.12em;color:#f59e0b;margin-bottom:10px;">Fin Efficiency</div>
+			<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;">
+				<div class="ex-card" onclick="loadExample('fin_al_rect')">
+					<div class="ex-title">Aluminum Heat Sink Fin</div>
+					<div class="ex-desc">Straight rectangular aluminum fin, 50 mm long, 2 mm thick, h=35 W/m²·K, base ΔT=60°C</div>
+					<div class="ex-params">rect · L=0.05 · t=0.002 · k=205 · h=35</div>
+				</div>
+				<div class="ex-card" onclick="loadExample('fin_annular_pipe')">
+					<div class="ex-title">Annular Fin on Steam Pipe</div>
+					<div class="ex-desc">Annular steel fins on a pipe, r₁=25 mm, r₂=55 mm, t=3 mm, h=80 W/m²·K, ΔT=100°C</div>
+					<div class="ex-params">annular · r₁=0.025 · r₂=0.055 · k=50</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</div>
+</section>
+</div>
+
+<!-- ===== FOOTER ===== -->
+<div id="footer">
+	<ul class="copyright">
+		<li>&copy; Andrew Morrissey. All rights reserved.</li>
+		<li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+	</ul>
+</div>
+
+<!-- Site scripts -->
+<script src="../assets/js/jquery.min.js"></script>
+<script src="../assets/js/jquery.scrolly.min.js"></script>
+<script src="../assets/js/jquery.scrollex.min.js"></script>
+<script src="../assets/js/browser.min.js"></script>
+<script src="../assets/js/breakpoints.min.js"></script>
+<script src="../assets/js/util.js"></script>
+<script src="../assets/js/main.js"></script>
+
+<!-- ===================================================
+     CALCULATOR LOGIC
+     =================================================== -->
+<script>
+'use strict';
+
+// ── UNIT SYSTEM ──────────────────────────────────────
+let SYS = 'si'; // 'si' | 'imperial'
+
+// Convert SI value → display units
+const TO_D = {
+	k:    { si: 1,       imp: 0.57818  },  // W/m·K      → BTU/(hr·ft·°F)
+	A:    { si: 1,       imp: 10.7639  },  // m²         → ft²
+	L:    { si: 1,       imp: 3.28084  },  // m          → ft
+	dT:   { si: 1,       imp: 1.8      },  // K          → °F  (differences)
+	Q:    { si: 1,       imp: 3.41214  },  // W          → BTU/hr
+	R:    { si: 1,       imp: 0.52750  },  // K/W        → hr·°F/BTU
+	flux: { si: 1,       imp: 0.31699  },  // W/m²       → BTU/(hr·ft²)
+	h:    { si: 1,       imp: 0.17612  },  // W/m²·K     → BTU/(hr·ft²·°F)
+};
+
+// Convert display input → SI
+const FROM_D = {
+	k:  { si: 1, imp: 1.73073  },
+	A:  { si: 1, imp: 0.09290  },
+	L:  { si: 1, imp: 0.30480  },
+	dT: { si: 1, imp: 1/1.8    },
+	h:  { si: 1, imp: 5.67826  },
+};
+
+function toSI(val, type) {
+	return val * FROM_D[type][SYS];
+}
+function toDisp(val, type) {
+	return val * TO_D[type][SYS];
+}
+function fmtN(v, sig=4) {
+	if (!isFinite(v)) return '∞';
+	const a = Math.abs(v);
+	if (a === 0) return '0';
+	if (a < 0.001 || a >= 1e6) return v.toExponential(sig-1);
+	return parseFloat(v.toPrecision(sig)).toString();
+}
+function gv(id) { return parseFloat(document.getElementById(id).value); }
+function sv(id, v) { document.getElementById(id).textContent = v; }
+function hideRes(id) { document.getElementById(id).classList.remove('show'); }
+function showRes(id) { document.getElementById(id).classList.add('show'); }
+function showErr(id) { document.getElementById(id).style.display = 'block'; }
+function hideErr(id) { document.getElementById(id).style.display = 'none'; }
+
+// ── UNIT LABELS ───────────────────────────────────────
+const ULBL = {
+	si: {
+		k:'W/m·K', A:'m²', t:'m', L:'m', r:'m',
+		dT:'K', T:'°C', Tab:'K', h:'W/m²·K',
+		Q:'W', R:'K/W', flux:'W/m²',
+	},
+	imperial: {
+		k:'BTU/(hr·ft·°F)', A:'ft²', t:'ft', L:'ft', r:'ft',
+		dT:'°F', T:'°F', Tab:'°R', h:'BTU/(hr·ft²·°F)',
+		Q:'BTU/hr', R:'hr·°F/BTU', flux:'BTU/(hr·ft²)',
+	}
+};
+function u(type) { return ULBL[SYS][type]; }
+
+function updateLabels() {
+	const ids = [
+		['fw-k-u','k'],['fw-t-u','t'],['fw-A-u','A'],['fw-dT-u','dT'],
+		['cyl-k-u','k'],['cyl-r1-u','r'],['cyl-r2-u','r'],['cyl-L-u','L'],['cyl-dT-u','dT'],
+		['conv-h-u','h'],['conv-A-u','A'],['conv-dT-u','dT'],['conv-Lc-u','t'],
+		['rad-A-u','A'],['rad-T1-u','Tab'],['rad-T2-u','Tab'],
+		['comp-Th-u','T'],['comp-Tc-u','T'],['comp-A-u','A'],
+		['comp-Tfi-u','T'],['comp-Tfo-u','T'],['comp-hi-u','h'],['comp-ho-u','h'],
+	];
+	ids.forEach(([id, type]) => { const el = document.getElementById(id); if(el) el.textContent = u(type); });
+	// fin labels
+	['fin-L-u','fin-Lp-u','fin-r1-u','fin-r2-u','fin-t-u','fin-ta-u','fin-D-u'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent=u('t'); });
+	const fku=document.getElementById('fin-k-u'); if(fku) fku.textContent=u('k');
+	const fhu=document.getElementById('fin-h-u'); if(fhu) fhu.textContent=u('h');
+	const fdtu=document.getElementById('fin-dT-u'); if(fdtu) fdtu.textContent=u('dT');
+	const fQu=document.getElementById('fin-Qfin-u'); if(fQu) fQu.textContent=u('Q');
+	const fQiu=document.getElementById('fin-Qideal-u'); if(fQiu) fQiu.textContent=u('Q');
+	sv('comp-k-hdr', 'k (' + u('k') + ')');
+	sv('comp-t-hdr', 't (' + u('t') + ')');
+	// result units
+	['fw','cyl','conv'].forEach(p => {
+		const qu = document.getElementById(p+'-Q-u');  if(qu) qu.textContent = u('Q');
+		const ru = document.getElementById(p+'-R-u');  if(ru) ru.textContent = u('R');
+		const fu = document.getElementById(p+'-flux-u'); if(fu) fu.textContent = u('flux');
+	});
+	['comp'].forEach(p => {
+		const qu = document.getElementById(p+'-Q-u');  if(qu) qu.textContent = u('Q');
+		const ru = document.getElementById(p+'-R-u');  if(ru) ru.textContent = u('R');
+		const fu = document.getElementById(p+'-flux-u'); if(fu) fu.textContent = u('flux');
+		const uu = document.getElementById(p+'-U-u');  if(uu) uu.textContent = u('h');
+	});
+	const rqu = document.getElementById('rad-Q-u');   if(rqu) rqu.textContent = u('Q');
+	const rfu = document.getElementById('rad-flux-u'); if(rfu) rfu.textContent = u('flux');
+	const rru = document.getElementById('rad-R-u');   if(rru) rru.textContent = u('R');
+}
+
+function setUnits(sys) {
+	SYS = sys;
+	document.getElementById('btn-si').classList.toggle('active', sys==='si');
+	document.getElementById('btn-imp').classList.toggle('active', sys==='imperial');
+	updateLabels();
+	document.querySelectorAll('.htc-res').forEach(el => el.classList.remove('show'));
+}
+
+// ── TAB SWITCHING ─────────────────────────────────────
+const TAB_ORDER = ['fw','cyl','conv','rad','comp','fin','hx','trans'];
+function switchTab(name) {
+	document.querySelectorAll('.htc-tab').forEach((el,i) => {
+		el.classList.toggle('active', TAB_ORDER[i] === name);
+	});
+	document.querySelectorAll('.tab-panel').forEach(el => el.classList.remove('active'));
+	document.getElementById('panel-'+name).classList.add('active');
+}
+
+// ── PRESET HELPERS ────────────────────────────────────
+function preset_k(id, kSI) {
+	const v = SYS === 'imperial' ? kSI * TO_D.k.imp : kSI;
+	document.getElementById(id).value = parseFloat(v.toPrecision(4));
+}
+function preset_h(hSI) {
+	const v = SYS === 'imperial' ? hSI * TO_D.h.imp : hSI;
+	document.getElementById('conv-h').value = parseFloat(v.toPrecision(4));
+}
+function setV(id, v) { document.getElementById(id).value = v; }
+
+// ── DISPLAY Q helper ──────────────────────────────────
+function dispQ(Q_W) {
+	const Qd = toDisp(Q_W, 'Q');
+	const unit = u('Q');
+	let alt;
+	if (SYS === 'si') {
+		alt = fmtN(Q_W/1000, 3) + ' kW';
+	} else {
+		alt = fmtN(Qd/12000, 3) + ' ton refrig.';
+	}
+	return { val: fmtN(Math.abs(Qd)), unit, alt };
+}
+
+// ── FLAT WALL ─────────────────────────────────────────
+function calcFW() {
+	hideErr('fw-err');
+	const k  = toSI(gv('fw-k'),  'k');
+	const t  = toSI(gv('fw-t'),  'L');
+	const A  = toSI(gv('fw-A'),  'A');
+	const dT = toSI(gv('fw-dT'), 'dT');
+	if ([k,t,A,dT].some(isNaN) || k<=0 || t<=0 || A<=0) { showErr('fw-err'); return; }
+
+	const Q    = k*A*dT/t;
+	const R    = t/(k*A);
+	const flux = Q/A;
+
+	const Qd = dispQ(Q);
+	sv('fw-Q', Qd.val);   sv('fw-Q-u', Qd.unit);  sv('fw-Q-alt', Qd.alt);
+	sv('fw-R', fmtN(toDisp(R,'R')));  sv('fw-R-u', u('R'));
+	sv('fw-flux', fmtN(toDisp(flux,'flux')));  sv('fw-flux-u', u('flux'));
+	sv('fw-eq-sub', `= ${gv('fw-k')} × ${gv('fw-A')} × ${gv('fw-dT')} / ${gv('fw-t')} = ${Qd.val} ${Qd.unit}`);
+
+	// update schematic labels
+	document.getElementById('fw-sch-k').textContent = 'k = ' + gv('fw-k') + ' ' + u('k');
+	document.getElementById('fw-sch-t').textContent = 't = ' + gv('fw-t') + ' ' + u('t');
+	showRes('fw-res');
+}
+
+// ── CYLINDRICAL ───────────────────────────────────────
+function calcCYL() {
+	hideErr('cyl-err');
+	const k  = toSI(gv('cyl-k'),  'k');
+	const r1 = toSI(gv('cyl-r1'), 'L');
+	const r2 = toSI(gv('cyl-r2'), 'L');
+	const L  = toSI(gv('cyl-L'),  'L');
+	const dT = toSI(gv('cyl-dT'), 'dT');
+	if ([k,r1,r2,L,dT].some(isNaN) || k<=0 || r1<=0 || r2<=r1 || L<=0) { showErr('cyl-err'); return; }
+
+	const Q    = 2*Math.PI*k*L*dT / Math.log(r2/r1);
+	const R    = Math.log(r2/r1) / (2*Math.PI*k*L);
+	const Aout = 2*Math.PI*r2*L;
+	const flux = Q/Aout;
+
+	const Qd = dispQ(Q);
+	sv('cyl-Q', Qd.val);   sv('cyl-Q-u', Qd.unit);  sv('cyl-Q-alt', Qd.alt);
+	sv('cyl-R', fmtN(toDisp(R,'R')));  sv('cyl-R-u', u('R'));
+	sv('cyl-flux', fmtN(toDisp(flux,'flux')));  sv('cyl-flux-u', u('flux'));
+	sv('cyl-eq-sub', `= 2π × ${gv('cyl-k')} × ${gv('cyl-L')} × ${gv('cyl-dT')} / ln(${gv('cyl-r2')}/${gv('cyl-r1')}) = ${Qd.val} ${Qd.unit}`);
+	showRes('cyl-res');
+}
+
+// ── CONVECTION ────────────────────────────────────────
+function calcCONV() {
+	hideErr('conv-err');
+	const h  = toSI(gv('conv-h'),  'h');
+	const A  = toSI(gv('conv-A'),  'A');
+	const dT = toSI(gv('conv-dT'), 'dT');
+	if ([h,A,dT].some(isNaN) || h<=0 || A<=0) { showErr('conv-err'); return; }
+
+	const Q = h*A*dT;
+	const R = 1/(h*A);
+
+	const Qd = dispQ(Q);
+	sv('conv-Q', Qd.val);  sv('conv-Q-u', Qd.unit);  sv('conv-Q-alt', Qd.alt);
+	sv('conv-R', fmtN(toDisp(R,'R')));  sv('conv-R-u', u('R'));
+
+	// Biot number – dimensionless, computed in whatever unit system user entered
+	const h_raw  = gv('conv-h');
+	const Lc_raw = gv('conv-Lc');
+	const ks_raw = gv('conv-ks');
+	const bioCard = document.getElementById('conv-bi-card');
+	const bioWarn = document.getElementById('conv-bi-warn');
+	if (!isNaN(h_raw) && !isNaN(Lc_raw) && !isNaN(ks_raw) && h_raw>0 && Lc_raw>0 && ks_raw>0) {
+		const Bi = h_raw * Lc_raw / ks_raw;
+		sv('conv-Bi', fmtN(Bi,3));
+		sv('conv-bi-interp', Bi < 0.1 ? '✓ Lumped capacitance valid' : '✗ Use distributed model');
+		bioCard.style.display = 'block';
+		bioCard.className = 'res-card ' + (Bi >= 0.1 ? 'warn-border' : 'cyan');
+		bioWarn.classList.toggle('show', Bi >= 0.1);
+	} else {
+		bioCard.style.display = 'none';
+		bioWarn.classList.remove('show');
+	}
+
+	sv('conv-eq-sub', `= ${gv('conv-h')} × ${gv('conv-A')} × ${gv('conv-dT')} = ${Qd.val} ${Qd.unit}`);
+	showRes('conv-res');
+}
+
+// ── RADIATION ─────────────────────────────────────────
+const SIGMA = 5.670374419e-8;  // W/(m²·K⁴)
+const SIGMA_IMP = 0.1714e-8;   // BTU/(hr·ft²·°R⁴)
+
+function calcRAD() {
+	hideErr('rad-err');
+	const eps = gv('rad-eps');
+	const A_raw = gv('rad-A');
+	const T1_raw = gv('rad-T1');
+	const T2_raw = gv('rad-T2');
+	if ([eps,A_raw,T1_raw,T2_raw].some(isNaN) || eps<0 || eps>1 || A_raw<=0 || T1_raw<=0 || T2_raw<=0) {
+		showErr('rad-err'); return;
+	}
+
+	let Q_W, flux_W, T1_K, T2_K, A_SI;
+	if (SYS === 'si') {
+		T1_K = T1_raw; T2_K = T2_raw; A_SI = A_raw;
+		Q_W   = eps * SIGMA * A_SI * (Math.pow(T1_K,4) - Math.pow(T2_K,4));
+		flux_W = Q_W / A_SI;
+	} else {
+		// Inputs: T in Rankine, A in ft²
+		T1_K = T1_raw / 1.8;  T2_K = T2_raw / 1.8;  A_SI = A_raw * 0.09290;
+		const Q_btu = eps * SIGMA_IMP * A_raw * (Math.pow(T1_raw,4) - Math.pow(T2_raw,4));
+		Q_W = Q_btu / TO_D.Q.imp;  // convert BTU/hr → W for internal use
+		flux_W = Q_W / A_SI;
+	}
+
+	const dT_K = Math.abs(T1_K - T2_K);
+	const R_KW = dT_K / Math.abs(Q_W);
+	// linearized radiation h_r = Q / (A·ΔT)
+	const hr_SI = Math.abs(Q_W) / (A_SI * dT_K);
+
+	const Qd = dispQ(Q_W);
+	sv('rad-Q', fmtN(Math.abs(toDisp(Q_W,'Q'))));
+	sv('rad-Q-u', u('Q'));
+	sv('rad-Q-dir', Q_W >= 0 ? '(surface emits)' : '(surface absorbs)');
+	sv('rad-flux', fmtN(Math.abs(toDisp(flux_W,'flux'))));  sv('rad-flux-u', u('flux'));
+	sv('rad-R', fmtN(toDisp(R_KW,'R')));  sv('rad-R-u', u('R'));
+	sv('rad-hr', 'h_rad = ' + fmtN(toDisp(hr_SI,'h')) + ' ' + u('h'));
+	sv('rad-eq-sub', `= ${eps} × σ × ${A_raw} × (${T1_raw}⁴ − ${T2_raw}⁴)`);
+	showRes('rad-res');
+}
+
+// ── COMPOSITE WALL ────────────────────────────────────
+const LAYER_COLORS = [
+	'#166534','#1e3a8a','#78350f','#6b21a8',
+	'#9f1239','#134e4a','#7c2d12','#1e3a5f'
+];
+const MAT_PRESETS = [
+	{name:'Custom', kSI:null},
+	{name:'Air',            kSI:0.025},
+	{name:'Foam',           kSI:0.040},
+	{name:'Fiberglass',     kSI:0.040},
+	{name:'Mineral wool',   kSI:0.038},
+	{name:'Wood',           kSI:0.160},
+	{name:'Gypsum board',   kSI:0.170},
+	{name:'Plywood',        kSI:0.130},
+	{name:'Brick',          kSI:1.500},
+	{name:'Concrete',       kSI:0.800},
+	{name:'Limestone',      kSI:1.300},
+	{name:'Glass',          kSI:1.050},
+	{name:'Stainless steel',kSI:15.0 },
+	{name:'Carbon steel',   kSI:50.0 },
+	{name:'Aluminum',       kSI:205.0},
+	{name:'Copper',         kSI:385.0},
+];
+
+let layers = [];
+let layerNextId = 1;
+
+function addLayer() {
+	layers.push({ id: layerNextId++, k:'', t:'' });
+	renderLayers();
+	updateCompSVG();
+}
+
+function removeLayer(id) {
+	layers = layers.filter(l => l.id !== id);
+	renderLayers();
+	updateCompSVG();
+}
+
+let COMP_BC = 'iso';
+let COMP_XAXIS = 'resist';
+let CONTACT_R_ON = false;
+
+function switchCompBC(m) {
+	COMP_BC = m;
+	document.getElementById('comp-iso-btn').classList.toggle('active', m==='iso');
+	document.getElementById('comp-conv-btn').classList.toggle('active', m==='conv');
+	document.getElementById('comp-bc-iso').style.display  = m==='iso'  ? '' : 'none';
+	document.getElementById('comp-bc-conv').style.display = m==='conv' ? '' : 'none';
+}
+function switchCompXAxis(m) {
+	COMP_XAXIS = m;
+	document.getElementById('comp-xaxis-r-btn').classList.toggle('active', m==='resist');
+	document.getElementById('comp-xaxis-p-btn').classList.toggle('active', m==='position');
+}
+function toggleContactR() {
+	CONTACT_R_ON = document.getElementById('comp-cr-toggle').checked;
+	renderLayers();
+}
+
+function renderLayers() {
+	const wrap = document.getElementById('comp-layer-list');
+	if (layers.length === 0) {
+		wrap.innerHTML = '<div style="font-size:.75em;color:var(--c-muted);padding:10px 2px;">No layers yet — click Add Layer.</div>';
+		return;
+	}
+	wrap.innerHTML = '';
+	layers.forEach((layer, idx) => {
+		const color = LAYER_COLORS[idx % LAYER_COLORS.length];
+		// Layer row
+		const div = document.createElement('div');
+		div.className = 'layer-row';
+		div.dataset.lid = layer.id;
+		const selOpts = MAT_PRESETS.map(m =>
+			`<option value="${m.kSI === null ? '' : m.kSI}">${m.name}</option>`
+		).join('');
+		div.innerHTML = `
+			<select style="border-left:3px solid ${color};" onchange="layerMat(${layer.id},this.value,this)">
+				${selOpts}
+			</select>
+			<input type="number" placeholder="k" step="any" min="0.001"
+				value="${layer.k}" data-role="k" oninput="layerSetK(${layer.id},this.value)">
+			<input type="number" placeholder="t" step="any" min="0.001"
+				value="${layer.t}" data-role="t" oninput="layerSetT(${layer.id},this.value)">
+			<button class="layer-del" onclick="removeLayer(${layer.id})"><i class="fas fa-times"></i></button>`;
+		wrap.appendChild(div);
+		// Contact resistance row between layers
+		if (CONTACT_R_ON && idx < layers.length - 1) {
+			const cr = document.createElement('div');
+			cr.style.cssText = 'display:flex;align-items:center;gap:6px;padding:4px 2px;border-bottom:1px solid var(--c-border);';
+			cr.innerHTML = `
+				<span style="font-size:.65em;color:var(--c-muted);white-space:nowrap;flex:1;">R″_c (m²·K/W) between layer ${idx+1}→${idx+2}</span>
+				<input type="number" id="cr-${layer.id}" placeholder="0.0001" step="any" min="0"
+					style="width:90px;background:var(--c-bg);border:1px solid var(--c-border);border-radius:4px;color:var(--c-text);padding:4px 6px;font-size:.78em;font-family:var(--c-mono);">`;
+			wrap.appendChild(cr);
+		}
+	});
+}
+
+function layerMat(id, kValSI, sel) {
+	const layer = layers.find(l => l.id === id);
+	if (!layer || kValSI === '') return;
+	const kSI = parseFloat(kValSI);
+	const kDisp = SYS === 'imperial' ? kSI * TO_D.k.imp : kSI;
+	layer.k = parseFloat(kDisp.toPrecision(4));
+	// Update the k input in the same row
+	const row = sel.closest('.layer-row');
+	if (row) row.querySelector('[data-role="k"]').value = layer.k;
+	updateCompSVG();
+}
+
+function layerSetK(id, v) {
+	const l = layers.find(l=>l.id===id); if(l) l.k = v; updateCompSVG();
+}
+function layerSetT(id, v) {
+	const l = layers.find(l=>l.id===id); if(l) l.t = v; updateCompSVG();
+}
+
+function updateCompSVG() {
+	const svg = document.getElementById('comp-svg');
+	if (layers.length === 0) {
+		svg.innerHTML = '<text x="115" y="105" text-anchor="middle" fill="#4a5568" font-size="10" font-family="monospace">Add layers to preview</text>';
+		svg.setAttribute('viewBox','0 0 230 200');
+		return;
+	}
+	const ts = layers.map(l => parseFloat(l.t) || 1);
+	const totalT = ts.reduce((a,b)=>a+b,0);
+	const WX=30, WY=20, WW=170, WH=130;
+	let svgHTML='', x=WX;
+	// defs for arrows
+	svgHTML += `<defs><marker id="csarw" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5 Z" fill="#f59e0b"/></marker></defs>`;
+	layers.forEach((layer, idx) => {
+		const w = (ts[idx]/totalT)*WW;
+		const c = LAYER_COLORS[idx % LAYER_COLORS.length];
+		svgHTML += `<rect x="${x}" y="${WY}" width="${w}" height="${WH}" fill="${c}" opacity=".65"/>`;
+		svgHTML += `<rect x="${x}" y="${WY}" width="${w}" height="${WH}" fill="none" stroke="#4CAF50" stroke-width=".7"/>`;
+		if (w > 16) {
+			svgHTML += `<text x="${x+w/2}" y="${WY+WH/2}" text-anchor="middle" fill="#fff" font-size="9" font-family="monospace" opacity=".9">${idx+1}</text>`;
+		}
+		x += w;
+	});
+	svgHTML += `<text x="${WX-4}" y="${WY+WH/2+4}" text-anchor="end" fill="#f87171" font-size="10" font-family="monospace" font-weight="bold">T₁</text>`;
+	svgHTML += `<text x="${WX+WW+4}" y="${WY+WH/2+4}" text-anchor="start" fill="#60a5fa" font-size="10" font-family="monospace" font-weight="bold">T₂</text>`;
+	svgHTML += `<line x1="${WX+5}" y1="${WY+WH/2}" x2="${WX+WW-5}" y2="${WY+WH/2}" stroke="#f59e0b" stroke-width="1.4" marker-end="url(#csarw)" opacity=".8"/>`;
+	svgHTML += `<text x="${WX+WW/2}" y="${WY+WH/2-10}" text-anchor="middle" fill="#f59e0b" font-size="8" font-family="monospace">Q̇</text>`;
+	// legend
+	const legY = WY+WH+14;
+	layers.forEach((layer, idx) => {
+		const c = LAYER_COLORS[idx%LAYER_COLORS.length];
+		const matName = (() => {
+			const kv = String(parseFloat(layer.k));
+			const kSI = SYS==='imperial' ? parseFloat(layer.k)*FROM_D.k.imp : parseFloat(layer.k);
+			const match = MAT_PRESETS.find(m => m.kSI !== null && Math.abs(m.kSI - kSI) < 0.001);
+			return match ? match.name : 'Layer '+(idx+1);
+		})();
+		svgHTML += `<rect x="${WX}" y="${legY+idx*13}" width="9" height="9" fill="${c}" rx="2"/>`;
+		svgHTML += `<text x="${WX+13}" y="${legY+idx*13+8}" fill="#94a3b8" font-size="7.5" font-family="monospace">${matName.substring(0,24)}</text>`;
+	});
+	svg.innerHTML = svgHTML;
+	const totalH = legY + layers.length*13 + 6;
+	svg.setAttribute('viewBox', `0 0 230 ${totalH}`);
+}
+
+function calcCOMP() {
+	hideErr('comp-err');
+	if (layers.length < 1) { showErr('comp-err'); return; }
+	const A_SI = toSI(gv('comp-A'), 'A');
+	if (isNaN(A_SI) || A_SI <= 0) { showErr('comp-err'); return; }
+
+	const dT_factor = SYS === 'imperial' ? 1/1.8 : 1;
+
+	// Get layer properties in SI
+	const layerSI = layers.map(l => {
+		let k = parseFloat(l.k), t = parseFloat(l.t);
+		if (isNaN(k)||isNaN(t)||k<=0||t<=0) return null;
+		if (SYS === 'imperial') { k *= FROM_D.k.imp; t *= FROM_D.L.imp; }
+		return { k, t };
+	});
+	if (layerSI.some(l => l === null)) { showErr('comp-err'); return; }
+
+	// Build resistance array — may include convective and contact terms
+	let allR = [];       // resistance values (K/W)
+	let allLabels = [];  // labels for table
+	let allThick = [];   // physical thickness in SI (0 for conv/contact)
+	let allColors = [];  // colors for chart
+
+	// Inner convective resistance
+	let T_hot_disp, T_cold_disp;
+	if (COMP_BC === 'conv') {
+		const Tfi = gv('comp-Tfi'), hi_d = gv('comp-hi');
+		const Tfo = gv('comp-Tfo'), ho_d = gv('comp-ho');
+		if ([Tfi,hi_d,Tfo,ho_d].some(isNaN)||hi_d<=0||ho_d<=0||Tfi<=Tfo) { showErr('comp-err'); return; }
+		const hi_SI = toSI(hi_d,'h'), ho_SI = toSI(ho_d,'h');
+		allR.push(1/(hi_SI*A_SI));       allLabels.push('Conv. inner (1/h_i·A)');
+		allThick.push(0);                allColors.push('#f87171');
+		T_hot_disp = Tfi; T_cold_disp = Tfo;
+	} else {
+		const Thot = gv('comp-Th'), Tcold = gv('comp-Tc');
+		if (isNaN(Thot)||isNaN(Tcold)||Thot<=Tcold) { showErr('comp-err'); return; }
+		T_hot_disp = Thot; T_cold_disp = Tcold;
+	}
+
+	// Wall layers + optional contact resistance
+	layerSI.forEach((layer, idx) => {
+		allR.push(layer.t / (layer.k * A_SI));
+		allLabels.push(`Layer ${idx+1} (k=${parseFloat(layers[idx].k)}, t=${parseFloat(layers[idx].t)})`);
+		allThick.push(layer.t);
+		allColors.push(LAYER_COLORS[idx % LAYER_COLORS.length]);
+		// Contact resistance after this layer (not after last)
+		if (CONTACT_R_ON && idx < layers.length - 1) {
+			const crEl = document.getElementById('cr-' + layers[idx].id);
+			const Rpp = crEl ? parseFloat(crEl.value) : 0;
+			if (!isNaN(Rpp) && Rpp > 0) {
+				const R_contact = Rpp / A_SI;
+				allR.push(R_contact);
+				allLabels.push(`Contact R″ (${Rpp} m²·K/W)`);
+				allThick.push(0);
+				allColors.push('#f59e0b');
+			}
+		}
+	});
+
+	// Outer convective resistance
+	if (COMP_BC === 'conv') {
+		const ho_d = gv('comp-ho');
+		const ho_SI = toSI(ho_d,'h');
+		allR.push(1/(ho_SI*A_SI));
+		allLabels.push('Conv. outer (1/h_o·A)');
+		allThick.push(0);
+		allColors.push('#60a5fa');
+	}
+
+	const Rtot = allR.reduce((a,b) => a+b, 0);
+	const dT_SI = (T_hot_disp - T_cold_disp) * dT_factor;
+	const Q = dT_SI / Rtot;
+	const flux = Q / A_SI;
+	const U_val = 1 / (Rtot * A_SI); // W/m²·K
+
+	// Interface temperatures
+	const dT_drop_per_K = SYS === 'imperial' ? 1.8 : 1;
+	const Tiface = [T_hot_disp];
+	allR.forEach(r => {
+		Tiface.push(parseFloat((Tiface[Tiface.length-1] - Q*r*dT_drop_per_K).toFixed(3)));
+	});
+
+	const Qd = dispQ(Q);
+	sv('comp-Q', Qd.val);  sv('comp-Q-u', Qd.unit);  sv('comp-Q-alt', Qd.alt);
+	sv('comp-R', fmtN(toDisp(Rtot,'R')));  sv('comp-R-u', u('R'));
+	sv('comp-flux', fmtN(toDisp(flux,'flux')));  sv('comp-flux-u', u('flux'));
+	sv('comp-U', fmtN(toDisp(U_val,'h'),3));  sv('comp-U-u', u('h'));
+
+	// Interface table
+	let tblHTML = `<table class="iface-table"><thead><tr>
+		<th>Resistance element</th><th>Temp (${u('T')})</th>
+		<th>R (${u('R')})</th><th>% of R_total</th>
+	</tr></thead><tbody>`;
+	Tiface.forEach((T, i) => {
+		const isHot  = i === 0;
+		const isCold = i === Tiface.length - 1;
+		const label  = isHot ? 'Hot side'
+		             : isCold ? 'Cold side'
+		             : allLabels[i-1];
+		const col    = isHot ? '#f87171' : isCold ? '#60a5fa' : '#e2e8f0';
+		const Ri_disp = i < allR.length ? fmtN(toDisp(allR[i-1],'R')) : '—';
+		const pct     = i < allR.length ? (allR[i-1]/Rtot*100).toFixed(1)+'%' : '—';
+		tblHTML += `<tr>
+			<td style="color:${col}">${label}</td>
+			<td style="color:${col};text-align:right">${fmtN(T)}</td>
+			<td style="text-align:right;color:var(--c-label)">${i>0?Ri_disp:'—'}</td>
+			<td style="text-align:right;color:var(--c-muted)">${i>0?pct:'—'}</td>
+		</tr>`;
+	});
+	tblHTML += '</tbody></table>';
+	document.getElementById('comp-iface-wrap').innerHTML = tblHTML;
+
+	drawTempProfile(Tiface, allR, Rtot, allThick, allColors);
+	showRes('comp-res');
+}
+
+function drawTempProfile(Tiface, allR, Rtot, allThick, allColors) {
+	const canvas = document.getElementById('comp-canvas');
+	const W = canvas.offsetWidth > 0 ? canvas.offsetWidth : 600;
+	canvas.width = W * (window.devicePixelRatio||1);
+	canvas.height = 150 * (window.devicePixelRatio||1);
+	canvas.style.width = W + 'px';
+	canvas.style.height = '150px';
+	const ctx = canvas.getContext('2d');
+	const dpr = window.devicePixelRatio || 1;
+	ctx.scale(dpr, dpr);
+	const cW = W, cH = 150;
+	ctx.fillStyle = '#0d1117'; ctx.fillRect(0,0,cW,cH);
+	const pad = {l:46,r:14,t:14,b:28};
+	const iW = cW-pad.l-pad.r, iH = cH-pad.t-pad.b;
+
+	const Tmin = Math.min(...Tiface)-3, Tmax = Math.max(...Tiface)+3;
+	const Tr = Tmax - Tmin;
+	const yOf = T => pad.t + (1-(T-Tmin)/Tr)*iH;
+
+	// Build x positions based on mode
+	const usePos = COMP_XAXIS === 'position';
+	const totalThick_SI = allThick.reduce((a,b)=>a+b, 0);
+	// cumulative x values (0..1 normalized)
+	let cumX = [0];
+	if (usePos) {
+		// zero-thickness elements (conv, contact) get a small visual gap
+		const vizThick = allThick.map(t => t > 0 ? t : totalThick_SI * 0.02);
+		const vizTotal = vizThick.reduce((a,b)=>a+b,0);
+		vizThick.forEach(t => cumX.push(cumX[cumX.length-1] + t/vizTotal));
+	} else {
+		allR.forEach(r => cumX.push(cumX[cumX.length-1] + r/Rtot));
+	}
+	const xOf = v => pad.l + v * iW;
+
+	// grid lines
+	ctx.strokeStyle = '#161b27'; ctx.lineWidth = 1;
+	for(let i=0;i<=4;i++){
+		const y=pad.t+(i/4)*iH;
+		ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(pad.l+iW,y); ctx.stroke();
+	}
+
+	// fill bands per resistance element
+	allR.forEach((_,idx) => {
+		const x1=xOf(cumX[idx]), x2=xOf(cumX[idx+1]);
+		const col = (allColors && allColors[idx]) ? allColors[idx] : LAYER_COLORS[idx%LAYER_COLORS.length];
+		ctx.fillStyle = col + '33';
+		ctx.fillRect(x1,pad.t,x2-x1,iH);
+		if(idx>0){
+			ctx.strokeStyle='#21293a'; ctx.lineWidth=.5;
+			ctx.beginPath(); ctx.moveTo(x1,pad.t); ctx.lineTo(x1,pad.t+iH); ctx.stroke();
+		}
+	});
+
+	// temp line
+	ctx.beginPath();
+	ctx.strokeStyle='#4CAF50'; ctx.lineWidth=2.5;
+	ctx.shadowColor='#4CAF50'; ctx.shadowBlur=10;
+	Tiface.forEach((T,i) => {
+		const x=xOf(cumX[i]), y=yOf(T);
+		i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+	});
+	ctx.stroke(); ctx.shadowBlur=0;
+
+	// dots
+	Tiface.forEach((T,i) => {
+		ctx.beginPath(); ctx.arc(xOf(cumX[i]),yOf(T),4,0,2*Math.PI);
+		ctx.fillStyle = i===0?'#f87171':i===Tiface.length-1?'#60a5fa':'#4CAF50';
+		ctx.fill();
+	});
+
+	// y axis labels
+	ctx.fillStyle='#4a5568'; ctx.font='9px "Courier New",monospace'; ctx.textAlign='right';
+	for(let i=0;i<=4;i++){
+		const T=Tmin+(1-i/4)*Tr;
+		ctx.fillText(T.toFixed(0), pad.l-4, pad.t+(i/4)*iH+4);
+	}
+	// x axis label
+	ctx.fillStyle='#4a5568'; ctx.textAlign='center'; ctx.font='8px "Courier New",monospace';
+	const xLabel = usePos
+		? `← position (0 to ${(totalThick_SI*1000).toFixed(1)} mm) →`
+		: '← cumulative thermal resistance →';
+	ctx.fillText(xLabel, pad.l+iW/2, cH-4);
+	// y axis label
+	ctx.save(); ctx.translate(10, pad.t+iH/2);
+	ctx.rotate(-Math.PI/2); ctx.fillText('Temp (' + u('T') + ')', 0, 0);
+	ctx.restore();
+}
+
+// ── HEAT EXCHANGER ────────────────────────────────────
+let HX_MODE = 'lmtd';
+function switchHXMode(m) {
+	HX_MODE = m;
+	document.getElementById('hx-lmtd-btn').classList.toggle('active', m==='lmtd');
+	document.getElementById('hx-ntu-btn').classList.toggle('active', m==='ntu');
+	document.getElementById('hx-lmtd-inputs').style.display = m==='lmtd' ? '' : 'none';
+	document.getElementById('hx-ntu-inputs').style.display  = m==='ntu'  ? '' : 'none';
+	document.getElementById('hx-ntu-outlets').style.display = m==='ntu'  ? '' : 'none';
+	hideRes('hx-res');
+}
+
+// F-correction factor for shell-and-tube 1-2 (approximate)
+function hxF_shell12(R, P) {
+	if(Math.abs(R-1)<1e-6) {
+		const sqr = Math.sqrt(2);
+		return sqr*P / ((1-P)*Math.log((2-P*(2-sqr))/(2-P*(2+sqr))));
+	}
+	const sqR2 = Math.sqrt(R*R+1);
+	const num  = sqR2*Math.log((1-P)/(1-P*R));
+	const den  = (R-1)*Math.log((2-P*(R+1-sqR2))/(2-P*(R+1+sqR2)));
+	return num/den;
+}
+
+// NTU → ε for each configuration
+function ntuToEps(NTU, Cr, flow) {
+	if(flow==='counter') {
+		if(Math.abs(Cr-1)<1e-6) return NTU/(1+NTU);
+		return (1-Math.exp(-NTU*(1-Cr)))/(1-Cr*Math.exp(-NTU*(1-Cr)));
+	} else if(flow==='parallel') {
+		return (1-Math.exp(-NTU*(1+Cr)))/(1+Cr);
+	} else if(flow==='cross') {
+		// Both fluids unmixed approximation
+		return 1-Math.exp((1/Cr)*NTU**0.22*(Math.exp(-Cr*NTU**0.78)-1));
+	} else { // shell1 (1-2)
+		const E = Math.exp(-NTU*Math.sqrt(1+Cr*Cr));
+		return 2/(1+Cr+Math.sqrt(1+Cr*Cr)*(1+E)/(1-E));
+	}
+}
+
+function calcHX() {
+	hideErr('hx-err');
+	document.getElementById('hx-ntu-outlets').style.display='none';
+
+	if(HX_MODE==='lmtd') {
+		const Thi=gv('hx-Thi'), Tho=gv('hx-Tho'), Tci=gv('hx-Tci'), Tco=gv('hx-Tco');
+		const U=toSI(gv('hx-U'),'h'), A_in=gv('hx-A');
+		if([Thi,Tho,Tci,Tco,U].some(isNaN)||Thi<=Tho||Tco<=Tci||Thi<=Tci){ showErr('hx-err'); return; }
+		// Convert temps to K differences (values are °C or °F, differences work same way)
+		const dT_factor = SYS==='imperial'?1/1.8:1;
+
+		const flow = document.getElementById('hx-flow').value;
+		let dT1, dT2;
+		if(flow==='parallel'){
+			dT1=(Thi-Tci)*dT_factor; dT2=(Tho-Tco)*dT_factor;
+		} else {
+			dT1=(Thi-Tco)*dT_factor; dT2=(Tho-Tci)*dT_factor;
+		}
+		if(dT1<=0||dT2<=0){showErr('hx-err');return;}
+		const LMTD = Math.abs(dT1-dT2)<1e-6 ? dT1 : (dT1-dT2)/Math.log(dT1/dT2);
+
+		// F correction for shell-and-tube
+		let F=1;
+		if(flow==='shell1'){
+			const dThi_K=(Thi-Tho)*dT_factor, dTci_K=(Tco-Tci)*dT_factor;
+			const R=dThi_K/dTci_K;
+			const P=dTci_K/((Thi-Tci)*dT_factor);
+			F=hxF_shell12(R,P);
+		}
+
+		// Q from energy balance (use hot side)
+		// We don't have flow rates, so Q = U*A*F*LMTD if A given,
+		// else derive required A from given U
+		const LMTD_eff=LMTD*F;
+
+		// effectiveness: need Cmin — approximate from temp changes
+		const dTh=(Thi-Tho)*dT_factor, dTc=(Tco-Tci)*dT_factor;
+		// Q_max = Cmin*(Thi-Tci)*dT_factor — but we don't have C; show R=dTh/dTc as proxy
+		const R_cap=dTh/dTc; // =Ch/Cc if no phase change
+
+		let Q_W, A_disp, UA_val;
+		if(!isNaN(A_in)&&A_in>0) {
+			const A_SI=toSI(A_in,'A');
+			Q_W=U*A_SI*LMTD_eff;
+			UA_val=fmtN(Q_W/LMTD_eff); // UA
+			sv('hx-UA-lbl','UA (W/K)'); sv('hx-UA-u','W/K');
+		} else {
+			// Required A for given U: A = Q/(U*F*LMTD) — but Q unknown without C
+			// Use LMTD*F and U to express as UA, show req. A = "provide A to get Q"
+			UA_val='—'; sv('hx-UA-lbl','Req. Area A'); sv('hx-UA-u', u('A'));
+			Q_W=NaN;
+		}
+
+		const Qd=isNaN(Q_W)?{val:'—',unit:u('Q'),alt:''}:dispQ(Q_W);
+		sv('hx-Q', Qd.val); sv('hx-Q-u', Qd.unit); sv('hx-Q-alt', Qd.alt);
+		sv('hx-LMTD', fmtN(SYS==='imperial'?LMTD_eff*1.8:LMTD_eff));
+		sv('hx-LMTD-u', SYS==='imperial'?'°F':'K');
+		sv('hx-UA', UA_val);
+		// ε not calculable without capacitance rates in LMTD mode
+		sv('hx-eff', fmtN(1/(1+R_cap),3));
+		sv('hx-eff-sub','≈ Cc/(Cc+Ch) proxy — supply C_h/C_c for exact ε');
+		sv('hx-eq-sub', `LMTD=${fmtN(SYS==='imperial'?LMTD*1.8:LMTD)} K, F=${fmtN(F,4)}, LMTD·F=${fmtN(LMTD_eff)} K`);
+		document.getElementById('hx-eq-main').textContent = flow==='shell1'
+			? 'LMTD=(ΔT₁−ΔT₂)/ln(ΔT₁/ΔT₂) | Q̇=U·A·F·LMTD (F<1 for shell-and-tube)'
+			: 'LMTD=(ΔT₁−ΔT₂)/ln(ΔT₁/ΔT₂) | Q̇=U·A·LMTD';
+		document.getElementById('hx-sch-label').textContent=flow==='parallel'?'parallel-flow':flow==='shell1'?'shell-and-tube 1-2':'counter-flow';
+
+	} else { // NTU-ε mode
+		const Thi=gv('hx-ntu-Thi'), Tci=gv('hx-ntu-Tci');
+		const Ch=gv('hx-Ch'), Cc=gv('hx-Cc'), NTU=gv('hx-NTU');
+		const dT_factor=SYS==='imperial'?1/1.8:1;
+		if([Thi,Tci,Ch,Cc,NTU].some(isNaN)||Ch<=0||Cc<=0||NTU<=0||Thi<=Tci){showErr('hx-err');return;}
+
+		const Ch_SI=SYS==='imperial'?Ch*1.896:Ch;
+		const Cc_SI=SYS==='imperial'?Cc*1.896:Cc;
+		const Cmin=Math.min(Ch_SI,Cc_SI), Cmax=Math.max(Ch_SI,Cc_SI);
+		const Cr=Cmin/Cmax;
+		const flow=document.getElementById('hx-ntu-flow').value;
+		const eps=ntuToEps(NTU,Cr,flow);
+		const dT_in=(Thi-Tci)*dT_factor; // in K
+		const Q_W=eps*Cmin*dT_in;
+		const Tho_out = Thi - (Q_W/Ch_SI)/dT_factor;
+		const Tco_out = Tci + (Q_W/Cc_SI)/dT_factor;
+
+		const Qd=dispQ(Q_W);
+		sv('hx-Q',Qd.val); sv('hx-Q-u',Qd.unit); sv('hx-Q-alt',Qd.alt);
+		// LMTD from outlet temps
+		let dT1k,dT2k;
+		if(flow==='parallel'){dT1k=(Thi-Tci)*dT_factor;dT2k=(Tho_out-Tco_out)*dT_factor;}
+		else{dT1k=(Thi-Tco_out)*dT_factor;dT2k=(Tho_out-Tci)*dT_factor;}
+		const LMTD_k=dT1k>0&&dT2k>0?Math.abs(dT1k-dT2k)<1e-6?dT1k:(dT1k-dT2k)/Math.log(dT1k/dT2k):NaN;
+		sv('hx-LMTD', isNaN(LMTD_k)?'—':fmtN(SYS==='imperial'?LMTD_k*1.8:LMTD_k));
+		sv('hx-LMTD-u', SYS==='imperial'?'°F':'K');
+		sv('hx-UA-lbl','UA (W/K)'); sv('hx-UA', fmtN(NTU*Cmin)); sv('hx-UA-u','W/K');
+		sv('hx-eff', fmtN(eps,3));
+		sv('hx-eff-sub', eps>=0.9?'Very high ε — consider diminishing returns':eps>=0.6?'Good effectiveness':'Low ε — large HX needed');
+		sv('hx-Tho-out', fmtN(Tho_out,4)); sv('hx-Tho-out-u', u('T'));
+		sv('hx-Tco-out', fmtN(Tco_out,4)); sv('hx-Tco-out-u', u('T'));
+		document.getElementById('hx-ntu-outlets').style.display='block';
+		sv('hx-eq-sub',`ε=${fmtN(eps,3)}, Cr=${fmtN(Cr,3)}, Q=${Qd.val} ${Qd.unit}`);
+		document.getElementById('hx-eq-main').textContent='ε=f(NTU,Cr,config) | Q̇=ε·C_min·(T_h,in−T_c,in)';
+	}
+	showRes('hx-res');
+}
+
+// ── TRANSIENT (LUMPED CAPACITANCE) ────────────────────
+let TRANS_MODE = 'time';
+function switchTransMode(m) {
+	TRANS_MODE=m;
+	document.getElementById('tr-mode-t-btn').classList.toggle('active',m==='time');
+	document.getElementById('tr-mode-T-btn').classList.toggle('active',m==='temp');
+	document.getElementById('tr-input-time').style.display=m==='time'?'':'none';
+	document.getElementById('tr-input-temp').style.display=m==='temp'?'':'none';
+}
+function updateTransGeom() {
+	const g=document.getElementById('tr-geom').value;
+	document.getElementById('tr-dim-lbl').textContent=g==='slab'?'Half-thickness L':'Radius r';
+}
+function transPreset(rho,cp,k) {
+	document.getElementById('tr-rho').value=SYS==='imperial'?(rho*0.06243).toFixed(2):rho;
+	document.getElementById('tr-cp').value=SYS==='imperial'?(cp*0.000239006).toFixed(4):cp;
+	document.getElementById('tr-k').value=SYS==='imperial'?parseFloat((k*0.57818).toPrecision(4)):k;
+}
+function calcTRANS() {
+	hideErr('tr-err');
+	// All inputs in display units
+	let rho_SI=gv('tr-rho'), cp_SI=gv('tr-cp'), k_SI=gv('tr-k');
+	const dim_d=gv('tr-dim'), h_d=gv('tr-h');
+	const Ti_d=gv('tr-Ti'), Tinf_d=gv('tr-Tinf');
+	if([rho_SI,cp_SI,k_SI,dim_d,h_d,Ti_d,Tinf_d].some(isNaN)||rho_SI<=0||cp_SI<=0||k_SI<=0||dim_d<=0||h_d<=0){showErr('tr-err');return;}
+	if(Math.abs(Ti_d-Tinf_d)<1e-6){showErr('tr-err');return;}
+
+	// Convert to SI
+	if(SYS==='imperial'){
+		rho_SI=rho_SI/0.06243;
+		cp_SI=cp_SI/0.000239006;
+		k_SI=k_SI/0.57818;
+	}
+	const dim_SI=toSI(dim_d,'L');
+	const h_SI=toSI(h_d,'h');
+	// Temperatures: Ti-Tinf difference, same in K regardless of offset
+	const dT_factor=SYS==='imperial'?1/1.8:1;
+	const dTi=(Ti_d-Tinf_d)*dT_factor; // in K, initial excess
+
+	const geom=document.getElementById('tr-geom').value;
+	// V/A_s ratio = Lc (characteristic length)
+	let Lc_SI;
+	if(geom==='slab')   Lc_SI=dim_SI;           // half-thickness = L
+	else if(geom==='cyl') Lc_SI=dim_SI/2;        // r/2
+	else                  Lc_SI=dim_SI/3;         // r/3 for sphere
+
+	const Bi=h_SI*Lc_SI/k_SI;
+	// time constant: τ = ρ*cp*Lc/h  (since V/As = Lc for all geometries by definition)
+	const tau=rho_SI*cp_SI*Lc_SI/h_SI;
+
+	let t_s, T_ans_disp, ratio;
+	if(TRANS_MODE==='time'){
+		const t_in=gv('tr-t');
+		if(isNaN(t_in)||t_in<=0){showErr('tr-err');return;}
+		t_s=t_in; // always in seconds
+		ratio=Math.exp(-t_s/tau);
+		const T_K=Tinf_d+ratio*dTi/dT_factor; // back in display units
+		T_ans_disp=T_K;
+		sv('tr-ans-lbl','Temperature T(t)'); sv('tr-ans',fmtN(T_ans_disp,4)); sv('tr-ans-u',u('T'));
+	} else {
+		const Ttgt=gv('tr-Ttarget');
+		if(isNaN(Ttgt)){showErr('tr-err');return;}
+		const dTtgt=(Ttgt-Tinf_d)*dT_factor;
+		ratio=dTtgt/dTi;
+		if(ratio<=0||ratio>=1){showErr('tr-err');document.getElementById('tr-err').textContent='Target temp must be between T_∞ and T_i.';return;}
+		t_s=-tau*Math.log(ratio);
+		sv('tr-ans-lbl','Time to reach T_target'); sv('tr-ans',fmtN(t_s,4)); sv('tr-ans-u','s');
+	}
+
+	sv('tr-tau', fmtN(tau,4));
+	sv('tr-tau-sub', `≈ ${(tau/60).toFixed(1)} min`);
+	sv('tr-Bi', fmtN(Bi,3));
+	sv('tr-Bi-sub', Bi<0.1?'✓ Valid':'✗ Not valid (Bi>0.1)');
+	sv('tr-ratio', fmtN(ratio,4));
+	document.getElementById('tr-bi-card').className='res-card'+(Bi>=0.1?' warn-border':'');
+	document.getElementById('tr-bi-warn').classList.toggle('show',Bi>=0.1);
+	sv('tr-eq-sub',`Bi=${fmtN(Bi,3)}, τ=${fmtN(tau,4)} s, θ/θᵢ=${fmtN(ratio,4)}`);
+
+	drawTransientCurve(tau, dTi, dT_factor, Tinf_d, t_s, TRANS_MODE==='time'?t_s:t_s*3);
+	showRes('trans-res');
+}
+
+function drawTransientCurve(tau, dTi_K, dT_factor, Tinf_d, t_mark, t_max_in) {
+	const canvas=document.getElementById('tr-canvas');
+	const W=canvas.offsetWidth>0?canvas.offsetWidth:600;
+	canvas.width=W*(window.devicePixelRatio||1);
+	canvas.height=150*(window.devicePixelRatio||1);
+	canvas.style.width=W+'px'; canvas.style.height='150px';
+	const ctx=canvas.getContext('2d');
+	const dpr=window.devicePixelRatio||1;
+	ctx.scale(dpr,dpr);
+	const cW=W,cH=150;
+	ctx.fillStyle='#0d1117'; ctx.fillRect(0,0,cW,cH);
+	const pad={l:46,r:14,t:14,b:28};
+	const iW=cW-pad.l-pad.r, iH=cH-pad.t-pad.b;
+	const t_max=Math.max(t_max_in,tau*4);
+	const T_max_d=Tinf_d+dTi_K/dT_factor, T_min_d=Tinf_d;
+	const Tr=T_max_d-T_min_d;
+	const xOf=t=>pad.l+(t/t_max)*iW;
+	const yOf=T=>pad.t+(1-(T-T_min_d)/Tr)*iH;
+	// grid
+	ctx.strokeStyle='#161b27'; ctx.lineWidth=1;
+	for(let i=0;i<=4;i++){const y=pad.t+(i/4)*iH;ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(pad.l+iW,y);ctx.stroke();}
+	// asymptote line
+	ctx.strokeStyle='#21293a'; ctx.lineWidth=1; ctx.setLineDash([4,4]);
+	ctx.beginPath();ctx.moveTo(pad.l,yOf(T_min_d));ctx.lineTo(pad.l+iW,yOf(T_min_d));ctx.stroke();
+	ctx.setLineDash([]);
+	// curve
+	ctx.beginPath(); ctx.strokeStyle='#4CAF50'; ctx.lineWidth=2.5;
+	ctx.shadowColor='#4CAF50'; ctx.shadowBlur=8;
+	const steps=200;
+	for(let i=0;i<=steps;i++){
+		const t=(i/steps)*t_max;
+		const T=T_min_d+(dTi_K/dT_factor)*Math.exp(-t/tau);
+		i===0?ctx.moveTo(xOf(t),yOf(T)):ctx.lineTo(xOf(t),yOf(T));
+	}
+	ctx.stroke(); ctx.shadowBlur=0;
+	// mark point
+	const T_mark=T_min_d+(dTi_K/dT_factor)*Math.exp(-t_mark/tau);
+	ctx.beginPath(); ctx.arc(xOf(t_mark),yOf(T_mark),5,0,2*Math.PI);
+	ctx.fillStyle='#f59e0b'; ctx.fill();
+	// y labels
+	ctx.fillStyle='#4a5568'; ctx.font='9px "Courier New",monospace'; ctx.textAlign='right';
+	for(let i=0;i<=4;i++){const T=T_min_d+(1-i/4)*Tr;ctx.fillText(T.toFixed(0),pad.l-4,pad.t+(i/4)*iH+4);}
+	ctx.textAlign='center'; ctx.font='8px "Courier New",monospace';
+	ctx.fillText('time (s)',pad.l+iW/2,cH-4);
+	ctx.save(); ctx.translate(10,pad.t+iH/2); ctx.rotate(-Math.PI/2);
+	ctx.fillText('Temp ('+u('T')+')',0,0); ctx.restore();
+}
+
+// ── FIN EFFICIENCY ────────────────────────────────────
+// Bessel function approximations (Abramowitz & Stegun)
+function I0(x) {
+	const t = x/3.75, t2=t*t;
+	if(x<3.75) return 1+3.5156229*t2+3.0899424*t2*t2+1.2067492*Math.pow(t2,3)+0.2659732*Math.pow(t2,4)+0.0360768*Math.pow(t2,5)+0.0045813*Math.pow(t2,6);
+	const u=3.75/x; return Math.exp(x)/Math.sqrt(x)*(0.39894228+0.01328592*u+0.00225319*u*u-0.00157565*Math.pow(u,3)+0.00916281*Math.pow(u,4)-0.02057706*Math.pow(u,5)+0.02635537*Math.pow(u,6)-0.01647633*Math.pow(u,7)+0.00392377*Math.pow(u,8));
+}
+function I1(x) {
+	const t=x/3.75,t2=t*t;
+	if(x<3.75) return x*(0.5+0.87890594*t2+0.51498869*t2*t2+0.15084934*Math.pow(t2,3)+0.02658733*Math.pow(t2,4)+0.00301532*Math.pow(t2,5)+0.00032411*Math.pow(t2,6));
+	const u=3.75/x; return Math.exp(x)/Math.sqrt(x)*(0.39894228-0.03988024*u-0.00362018*u*u+0.00163801*Math.pow(u,3)-0.01031555*Math.pow(u,4)+0.02282967*Math.pow(u,5)-0.02895312*Math.pow(u,6)+0.01787654*Math.pow(u,7)-0.00420059*Math.pow(u,8));
+}
+function K0(x) {
+	if(x<=2){ const t=x*x/4; return -Math.log(x/2)*I0(x)+(-0.57721566+0.42278420*t+0.23069756*t*t+0.03488590*Math.pow(t,3)+0.00262698*Math.pow(t,4)+0.00010750*Math.pow(t,5)+0.0000074*Math.pow(t,6)); }
+	const u=2/x; return Math.exp(-x)/Math.sqrt(x)*(1.25331414-0.07832358*u+0.02189568*u*u-0.01062446*Math.pow(u,3)+0.00587872*Math.pow(u,4)-0.00251540*Math.pow(u,5)+0.00053208*Math.pow(u,6));
+}
+function K1(x) {
+	if(x<=2){ const t=x*x/4; return Math.log(x/2)*I1(x)+(1/x)*(1+0.15443144*t-0.67278579*t*t-0.18156897*Math.pow(t,3)-0.01919402*Math.pow(t,4)-0.00110404*Math.pow(t,5)-0.00004686*Math.pow(t,6)); }
+	const u=2/x; return Math.exp(-x)/Math.sqrt(x)*(1.25331414+0.23498619*u-0.03655620*u*u+0.01504268*Math.pow(u,3)-0.00780353*Math.pow(u,4)+0.00325614*Math.pow(u,5)-0.00068245*Math.pow(u,6));
+}
+
+function updateFinGeom() {
+	const type = document.getElementById('fin-type').value;
+	document.getElementById('fin-geom-rect').style.display    = type==='rect'    ? '' : 'none';
+	document.getElementById('fin-geom-pin').style.display     = type==='pin'     ? '' : 'none';
+	document.getElementById('fin-geom-annular').style.display = type==='annular' ? '' : 'none';
+}
+
+function calcFIN() {
+	hideErr('fin-err');
+	const type = document.getElementById('fin-type').value;
+	const k_d  = gv('fin-k');
+	const h_d  = gv('fin-h');
+	const dT_d = gv('fin-dT');
+	if([k_d,h_d,dT_d].some(isNaN)||k_d<=0||h_d<=0||dT_d<=0){ showErr('fin-err'); return; }
+	// Convert to SI
+	const k  = toSI(k_d, 'k');
+	const h  = toSI(h_d, 'h');
+	const dT = toSI(dT_d,'dT');
+
+	let eta, mL, Q_fin, Q_ideal, A_fin, A_base, eqMain;
+
+	if(type==='rect') {
+		const L_d=gv('fin-L'), t_d=gv('fin-t');
+		if([L_d,t_d].some(isNaN)||L_d<=0||t_d<=0){ showErr('fin-err'); return; }
+		const L=toSI(L_d,'L'), t=toSI(t_d,'L');
+		// Corrected length (insulated tip approximation)
+		const Lc = L + t;
+		const m  = Math.sqrt(2*h/(k*t));
+		mL       = m*Lc;
+		eta      = Math.tanh(mL)/mL;
+		const P  = 2; // per unit width; we use per-unit-width then multiply by W=1
+		A_fin    = 2*Lc;   // per unit width
+		A_base   = 2*t;    // per unit width (base cross-section projected)
+		Q_ideal  = h*A_fin*dT;
+		Q_fin    = eta*Q_ideal;
+		A_base   = 2*t;
+		eqMain   = 'η = tanh(mLc)/mLc, m = √(2h/kt), Lc = L+t (insulated-tip corrected)';
+		sv('fin-eq-main', eqMain);
+
+	} else if(type==='pin') {
+		const L_d=gv('fin-Lp'), D_d=gv('fin-D');
+		if([L_d,D_d].some(isNaN)||L_d<=0||D_d<=0){ showErr('fin-err'); return; }
+		const L=toSI(L_d,'L'), D=toSI(D_d,'L');
+		const r=D/2;
+		const Lc=L+r;
+		const m=Math.sqrt(4*h/(k*D));
+		mL=m*Lc;
+		eta=Math.tanh(mL)/mL;
+		A_fin  = Math.PI*D*Lc;
+		A_base = Math.PI*r*r;
+		Q_ideal= h*A_fin*dT;
+		Q_fin  = eta*Q_ideal;
+		sv('fin-eq-main','η = tanh(mLc)/mLc, m = √(4h/kD), Lc = L+D/2');
+
+	} else { // annular
+		const r1_d=gv('fin-r1'), r2_d=gv('fin-r2'), t_d=gv('fin-ta');
+		if([r1_d,r2_d,t_d].some(isNaN)||r1_d<=0||r2_d<=r1_d||t_d<=0){ showErr('fin-err'); return; }
+		const r1=toSI(r1_d,'L'), r2=toSI(r2_d,'L'), t=toSI(t_d,'L');
+		const r2c=r2+t/2;
+		const m=Math.sqrt(2*h/(k*t));
+		const mr1=m*r1, mr2c=m*r2c;
+		// Annular fin efficiency using Bessel functions
+		const num = 2*r1/m * (K1(mr1)*I1(mr2c) - I1(mr1)*K1(mr2c));
+		const den = (r2c*r2c - r1*r1) * (I0(mr1)*K1(mr2c) + K0(mr1)*I1(mr2c));
+		eta   = num/den;
+		mL    = m*(r2c-r1);
+		A_fin = 2*Math.PI*(r2c*r2c - r1*r1);
+		A_base= 2*Math.PI*r1*t;
+		Q_ideal= h*A_fin*dT;
+		Q_fin  = eta*Q_ideal;
+		sv('fin-eq-main','η uses Bessel: K₁I₁−I₁K₁ / (r₂²−r₁²)(I₀K₁+K₀I₁) form');
+	}
+
+	// Effectiveness: Q_fin vs Q if fin were removed (bare base area)
+	const eps_f = Q_fin / (h*A_base*dT);
+
+	sv('fin-eta',    (eta*100).toFixed(1));
+	sv('fin-mL',     'mL = ' + mL.toFixed(3));
+	sv('fin-Qfin',   fmtN(toDisp(Q_fin,'Q')));   sv('fin-Qfin-u',   u('Q'));
+	sv('fin-Qideal', fmtN(toDisp(Q_ideal,'Q'))); sv('fin-Qideal-u', u('Q'));
+	sv('fin-eff',    fmtN(eps_f,3));
+	sv('fin-eff-note', eps_f>=2 ? '✓ Fin worthwhile (ε≥2)' : '✗ Fin not beneficial (ε<2)');
+	sv('fin-eq-sub', `η=${(eta*100).toFixed(1)}%, mL=${mL.toFixed(3)}, Q_fin=${fmtN(toDisp(Q_fin,'Q'))} ${u('Q')}`);
+	document.getElementById('fin-eff').style.color = eps_f>=2 ? 'var(--c-acc)' : 'var(--c-red)';
+	showRes('fin-res');
+}
+
+// ── WORKED EXAMPLES ──────────────────────────────────
+const EXAMPLES = {
+	// Flat Wall
+	fw_insulated_wall: { tab:'fw', fn: () => {
+		setV('fw-k','0.04'); setV('fw-t','0.14'); setV('fw-A','10'); setV('fw-dT','26'); calcFW();
+	}},
+	fw_furnace: { tab:'fw', fn: () => {
+		setV('fw-k','1.5'); setV('fw-t','0.3'); setV('fw-A','5'); setV('fw-dT','1120'); calcFW();
+	}},
+	fw_aircraft_panel: { tab:'fw', fn: () => {
+		setV('fw-k','205'); setV('fw-t','0.003'); setV('fw-A','2'); setV('fw-dT','130'); calcFW();
+	}},
+	// Cylindrical
+	cyl_steam_pipe: { tab:'cyl', fn: () => {
+		setV('cyl-k','0.038'); setV('cyl-r1','0.05'); setV('cyl-r2','0.10'); setV('cyl-L','3'); setV('cyl-dT','150'); calcCYL();
+	}},
+	cyl_copper_tube: { tab:'cyl', fn: () => {
+		setV('cyl-k','385'); setV('cyl-r1','0.005'); setV('cyl-r2','0.006'); setV('cyl-L','2'); setV('cyl-dT','20'); calcCYL();
+	}},
+	// Convection
+	conv_cpu: { tab:'conv', fn: () => {
+		setV('conv-h','45'); setV('conv-A','0.008'); setV('conv-dT','55');
+		setV('conv-Lc','0.005'); setV('conv-ks','205'); calcCONV();
+	}},
+	conv_hot_plate: { tab:'conv', fn: () => {
+		setV('conv-h','8'); setV('conv-A','0.25'); setV('conv-dT','60');
+		setV('conv-Lc',''); setV('conv-ks',''); calcCONV();
+	}},
+	conv_car_radiator: { tab:'conv', fn: () => {
+		setV('conv-h','120'); setV('conv-A','0.4'); setV('conv-dT','60');
+		setV('conv-Lc','0.003'); setV('conv-ks','205'); calcCONV();
+	}},
+	// Radiation
+	rad_painted_pipe: { tab:'rad', fn: () => {
+		setV('rad-eps','0.95'); setV('rad-A','0.5'); setV('rad-T1','353'); setV('rad-T2','293'); calcRAD();
+	}},
+	rad_polished_al: { tab:'rad', fn: () => {
+		setV('rad-eps','0.05'); setV('rad-A','1'); setV('rad-T1','473'); setV('rad-T2','298'); calcRAD();
+	}},
+	// Composite
+	comp_house_wall: { tab:'comp', fn: () => {
+		// Reset layers
+		layers = []; layerNextId = 1;
+		addLayer(); addLayer(); addLayer();
+		// Gypsum 13mm, Fiberglass 140mm, OSB 12mm
+		layers[0].k='0.17'; layers[0].t='0.013';
+		layers[1].k='0.04'; layers[1].t='0.14';
+		layers[2].k='0.13'; layers[2].t='0.012';
+		renderLayers(); updateCompSVG();
+		setV('comp-Th','21'); setV('comp-Tc','-10'); setV('comp-A','1');
+		if(COMP_BC!=='iso') switchCompBC('iso');
+		calcCOMP();
+	}},
+	comp_boiler_wall: { tab:'comp', fn: () => {
+		layers = []; layerNextId = 1;
+		addLayer(); addLayer(); addLayer();
+		// Carbon steel 15mm, mineral wool 80mm, stainless 2mm
+		layers[0].k='50';   layers[0].t='0.015';
+		layers[1].k='0.038';layers[1].t='0.08';
+		layers[2].k='15';   layers[2].t='0.002';
+		renderLayers(); updateCompSVG();
+		setV('comp-Th','300'); setV('comp-Tc','30'); setV('comp-A','1');
+		if(COMP_BC!=='iso') switchCompBC('iso');
+		calcCOMP();
+	}},
+	// HX
+	hx_counter_water: { tab:'hx', fn: () => {
+		if(HX_MODE!=='lmtd') switchHXMode('lmtd');
+		document.getElementById('hx-flow').value='counter';
+		setV('hx-Thi','90'); setV('hx-Tho','50'); setV('hx-Tci','20'); setV('hx-Tco','60');
+		setV('hx-U','1200'); setV('hx-A','2'); calcHX();
+	}},
+	hx_ntu_aircoil: { tab:'hx', fn: () => {
+		if(HX_MODE!=='ntu') switchHXMode('ntu');
+		document.getElementById('hx-ntu-flow').value='counter';
+		setV('hx-ntu-Thi','90'); setV('hx-ntu-Tci','20');
+		setV('hx-Ch','3000'); setV('hx-Cc','1500'); setV('hx-NTU','2.5'); calcHX();
+	}},
+	// Transient
+	trans_steel_ball: { tab:'trans', fn: () => {
+		transPreset(7800,500,50);
+		document.getElementById('tr-geom').value='sphere'; updateTransGeom();
+		setV('tr-dim','0.0125'); setV('tr-h','300');
+		setV('tr-Ti','800'); setV('tr-Tinf','40');
+		if(TRANS_MODE!=='temp') switchTransMode('temp');
+		setV('tr-Ttarget','100'); calcTRANS();
+	}},
+	trans_al_plate: { tab:'trans', fn: () => {
+		transPreset(2700,900,205);
+		document.getElementById('tr-geom').value='slab'; updateTransGeom();
+		setV('tr-dim','0.005'); setV('tr-h','50');
+		setV('tr-Ti','150'); setV('tr-Tinf','25');
+		if(TRANS_MODE!=='time') switchTransMode('time');
+		setV('tr-t','120'); calcTRANS();
+	}},
+	// Fin
+	fin_al_rect: { tab:'fin', fn: () => {
+		document.getElementById('fin-type').value='rect'; updateFinGeom();
+		setV('fin-L','0.05'); setV('fin-t','0.002');
+		setV('fin-k','205'); setV('fin-h','35'); setV('fin-dT','60'); calcFIN();
+	}},
+	fin_annular_pipe: { tab:'fin', fn: () => {
+		document.getElementById('fin-type').value='annular'; updateFinGeom();
+		setV('fin-r1','0.025'); setV('fin-r2','0.055'); setV('fin-ta','0.003');
+		setV('fin-k','50'); setV('fin-h','80'); setV('fin-dT','100'); calcFIN();
+	}},
+};
+
+function loadExample(key) {
+	const ex = EXAMPLES[key];
+	if (!ex) return;
+	// Switch to SI if not already (examples defined in SI)
+	if (SYS !== 'si') setUnits('si');
+	switchTab(ex.tab);
+	// Small delay to let tab render before calculating
+	setTimeout(() => ex.fn(), 30);
+}
+
+// ── COPY RESULTS ─────────────────────────────────────
+const RES_FIELDS = {
+	fw:   [{id:'fw-Q',lbl:'Heat Rate'},{id:'fw-R',lbl:'Thermal Resistance'},{id:'fw-flux',lbl:'Heat Flux'}],
+	cyl:  [{id:'cyl-Q',lbl:'Heat Rate'},{id:'cyl-R',lbl:'Thermal Resistance'},{id:'cyl-flux',lbl:'Heat Flux (outer)'}],
+	conv: [{id:'conv-Q',lbl:'Heat Rate'},{id:'conv-R',lbl:'Thermal Resistance'},{id:'conv-Bi',lbl:'Biot Number'}],
+	rad:  [{id:'rad-Q',lbl:'Net Heat Rate'},{id:'rad-flux',lbl:'Radiation Flux'},{id:'rad-R',lbl:'Radiation Resistance'},{id:'rad-hr',lbl:'h_rad'}],
+	comp: [{id:'comp-Q',lbl:'Heat Rate'},{id:'comp-R',lbl:'Total Resistance'},{id:'comp-flux',lbl:'Heat Flux'},{id:'comp-U',lbl:'U-value'}],
+	fin:  [{id:'fin-eta',lbl:'Fin Efficiency (%)'},{id:'fin-Qfin',lbl:'Q_fin'},{id:'fin-Qideal',lbl:'Q_ideal'},{id:'fin-eff',lbl:'Fin Effectiveness'}],
+	hx:   [{id:'hx-Q',lbl:'Heat Rate'},{id:'hx-LMTD',lbl:'LMTD·F'},{id:'hx-UA',lbl:'UA or Area'},{id:'hx-eff',lbl:'Effectiveness'}],
+	trans:[{id:'tr-ans',lbl:'Answer (T or t)'},{id:'tr-tau',lbl:'Time Constant τ (s)'},{id:'tr-Bi',lbl:'Biot Number'},{id:'tr-ratio',lbl:'θ/θᵢ'}],
+};
+function copyResults(panel) {
+	const fields = RES_FIELDS[panel];
+	if (!fields) return;
+	const lines = [`Heat Transfer Calculator — ${panel.toUpperCase()} Mode`,''];
+	fields.forEach(f => {
+		const el = document.getElementById(f.id);
+		if (el && el.textContent && el.textContent !== '—') {
+			const uEl = document.getElementById(f.id+'-u') || document.getElementById(f.id.replace('-val','').replace('fin-eta','')+'u');
+			const unit = uEl ? uEl.textContent : '';
+			lines.push(`${f.lbl}: ${el.textContent} ${unit}`.trim());
+		}
+	});
+	navigator.clipboard.writeText(lines.join('\n')).then(() => {
+		const btn = event.currentTarget;
+		btn.classList.add('copied');
+		btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+		setTimeout(() => {
+			btn.classList.remove('copied');
+			btn.innerHTML = '<i class="fas fa-copy"></i> Copy Results';
+		}, 2000);
+	});
+}
+
+// ── INLINE VALIDATION ────────────────────────────────
+function attachValidation() {
+	document.querySelectorAll('.ig input[type=number]').forEach(inp => {
+		inp.addEventListener('blur', () => {
+			const v = parseFloat(inp.value);
+			const allowZero = inp.min === undefined || inp.min === '';
+			const minVal = parseFloat(inp.min);
+			if (inp.value === '') { inp.classList.remove('valid','invalid'); return; }
+			const bad = isNaN(v) || (!allowZero && !isNaN(minVal) && v <= 0) || (!isNaN(minVal) && v < minVal);
+			inp.classList.toggle('valid', !bad);
+			inp.classList.toggle('invalid', bad);
+		});
+		inp.addEventListener('input', () => {
+			if (inp.classList.contains('invalid') || inp.classList.contains('valid')) {
+				const v = parseFloat(inp.value);
+				const minVal = parseFloat(inp.min);
+				const bad = isNaN(v) || (!isNaN(minVal) && v < minVal);
+				inp.classList.toggle('valid', !bad);
+				inp.classList.toggle('invalid', bad);
+			}
+		});
+	});
+}
+
+// ── INIT ──────────────────────────────────────────────
+renderLayers();
+// seed composite with 2 default layers for quick start
+addLayer(); addLayer();
+updateLabels();
+attachValidation();
+</script>
+
+</body>
+</html>

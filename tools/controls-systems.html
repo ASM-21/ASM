@@ -1,0 +1,3301 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <title>Controls & Systems Calculator Hub - Andrew Morrissey</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+  <link rel="stylesheet" href="../assets/css/main.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <script async src="https://www.googletagmanager.com/gtag/js?id=GTM-N34CKH5Q"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','GTM-N34CKH5Q');</script>
+  <style>
+    /* ── Layout ─────────────────────────────────────────────────────── */
+    #hub-wrap {
+      display: flex; max-width: 1060px; margin: 0 auto;
+      background: #fff; border-radius: 12px;
+      box-shadow: 0 4px 24px rgba(0,0,0,.10); overflow: hidden;
+      height: 740px; /* fixed height — both panels scroll independently */
+    }
+    #hub-nav { width: 224px; flex-shrink: 0; background: #1a1a2e; display: flex; flex-direction: column; height: 100%; }
+    #hub-nav-header { padding: 18px 14px 12px; border-bottom: 1px solid #252540; flex-shrink: 0; }
+    #hub-nav-header .t1 { font-size: 14px; font-weight: 800; color: #fff; line-height: 1.2; }
+    #hub-nav-header .t2 { font-size: 14px; font-weight: 800; color: #00b4d8; line-height: 1.2; }
+    #hub-nav-header .sub { font-size: 10px; color: #44446a; margin-top: 4px; }
+    #hub-search-wrap { padding: 9px 12px; border-bottom: 1px solid #252540; flex-shrink: 0; }
+    #hub-search {
+      width: 100%; padding: 6px 10px; background: #22223a; border: 1px solid #333360;
+      border-radius: 6px; color: #ccc; font-size: 12px; outline: none; box-sizing: border-box;
+    }
+    #hub-search::placeholder { color: #44446a; }
+    #hub-search:focus { border-color: #00b4d8; }
+    #hub-nav-list { flex: 1; overflow-y: auto; padding: 6px 0; min-height: 0; scroll-behavior: smooth; }
+    #hub-nav-list::-webkit-scrollbar { width: 4px; }
+    #hub-nav-list::-webkit-scrollbar-track { background: transparent; }
+    #hub-nav-list::-webkit-scrollbar-thumb { background: #333360; border-radius: 2px; }
+    .nav-cat { font-size: 9px; font-weight: 700; color: #44446a; letter-spacing: .12em; text-transform: uppercase; padding: 10px 14px 3px; }
+    .nav-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 7px 14px; cursor: pointer; font-size: 11.5px; color: #8888aa;
+      transition: background .1s, color .1s; border-left: 3px solid transparent;
+    }
+    .nav-item:hover { background: #22223a; color: #ccc; }
+    .nav-item.active { background: #0d1b2a; color: #00b4d8; border-left-color: #00b4d8; font-weight: 600; }
+    .nav-item.hidden { display: none; }
+    .nav-item .ni { width: 13px; text-align: center; font-size: 10px; flex-shrink: 0; }
+    .nav-item .badge {
+      margin-left: auto; font-size: 8px; background: #252540; color: #44446a;
+      border-radius: 3px; padding: 1px 4px; letter-spacing: .04em;
+    }
+    .nav-item.active .badge { background: #0d2233; color: #00b4d8; }
+    #hub-nav-footer { padding: 10px 14px; border-top: 1px solid #252540; font-size: 10px; color: #556; line-height: 1.6; flex-shrink: 0; }
+    #hub-content { flex: 1; padding: 28px 30px; overflow-y: auto; background: #f8fafc; height: 100%; }
+    #hub-content h2 { margin: 0 0 4px; font-size: 20px; color: #1a1a2e; }
+
+    /* ── Field components ───────────────────────────────────────────── */
+    .calc-desc { font-size: 13px; color: #666; margin: 0 0 20px; line-height: 1.6; }
+    .field-group { margin-bottom: 13px; }
+    .field-label { font-size: 11px; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
+    .field-row { display: flex; gap: 6px; }
+    .field-row input[type="number"] {
+      flex: 1; padding: 7px 10px; border: 1px solid #dde; border-radius: 6px;
+      font-size: 13px; color: #222; background: #fff; outline: none; transition: border-color .15s;
+    }
+    .field-row input[type="number"]:focus { border-color: #00b4d8; }
+    .field-row select {
+      width: 72px; flex-shrink: 0; padding: 7px 5px; border: 1px solid #dde;
+      border-radius: 6px; font-size: 12px; background: #fff; color: #333; outline: none; cursor: pointer;
+    }
+    .field-hint { font-size: 11px; color: #aaa; margin-top: 3px; }
+    select.full-select {
+      width: 100%; padding: 7px 10px; border: 1px solid #dde; border-radius: 6px;
+      font-size: 13px; background: #fff; color: #333; outline: none; cursor: pointer;
+    }
+    select.full-select:focus { border-color: #00b4d8; }
+    .slider-row { display: flex; align-items: center; gap: 10px; }
+    .slider-row input[type="range"] { flex: 1; accent-color: #00b4d8; }
+    .mode-toggle { display: flex; gap: 7px; margin-bottom: 14px; flex-wrap: wrap; }
+    .mode-btn {
+      flex: 1; padding: 7px 8px; border-radius: 6px; font-size: 12px; font-weight: 600;
+      cursor: pointer; border: 1.5px solid #222; background: #1a1a1a; color: #ddd; transition: all .13s;
+    }
+    .mode-btn.active { border-color: #00b4d8; background: #00b4d8; color: #fff; }
+
+    /* ── Result box ─────────────────────────────────────────────────── */
+    .result-box {
+      margin-top: 16px; background: #f0f9ff; border: 1.5px solid #00b4d8;
+      border-radius: 8px; padding: 14px 16px;
+    }
+    .result-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .result-title { font-size: 9px; font-weight: 800; color: #00b4d8; letter-spacing: .12em; text-transform: uppercase; }
+    .copy-btn {
+      font-size: 10px; color: #00b4d8; background: none; border: 1px solid #bae6fd;
+      border-radius: 4px; padding: 3px 8px; cursor: pointer; transition: all .12s;
+    }
+    .copy-btn:hover { background: #00b4d8; color: #fff; }
+    .copy-btn.copied { background: #00b4d8; color: #fff; }
+    .result-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 5px; }
+    .result-label { font-size: 13px; color: #334; }
+    .result-value { font-size: 15px; font-weight: 700; color: #0369a1; font-family: monospace; }
+    .result-divider { border: none; border-top: 1px solid #bae6fd; margin: 8px 0; }
+    .result-note { font-size: 12px; color: #445; margin-bottom: 5px; line-height: 1.5; }
+    .formula-line {
+      margin-top: 10px; padding-top: 9px; border-top: 1px solid #bae6fd;
+      font-size: 11px; color: #0369a1; font-family: monospace; line-height: 1.7;
+    }
+    .error-box {
+      margin-top: 14px; background: #fff5f5; border: 1px solid #fca5a5;
+      border-radius: 8px; padding: 10px 14px; color: #b91c1c; font-size: 13px;
+    }
+    .empty-state { margin-top: 16px; font-size: 13px; color: #888; text-align: center; padding: 24px; }
+    .coming-soon {
+      margin-top: 24px; background: #f1f5f9; border: 1.5px dashed #cbd5e1;
+      border-radius: 8px; padding: 28px 20px; text-align: center;
+    }
+    .coming-soon .cs-icon { font-size: 28px; color: #94a3b8; margin-bottom: 8px; }
+    .coming-soon h3 { color: #475569; font-size: 15px; margin: 0 0 6px; }
+    .coming-soon p { color: #64748b; font-size: 12px; margin: 0; }
+
+    /* ── Formula sheet ──────────────────────────────────────────────── */
+    .formula-cat { font-size: 11px; font-weight: 700; color: #00b4d8; text-transform: uppercase; letter-spacing: .08em; margin: 20px 0 8px; }
+    .formula-cat:first-child { margin-top: 0; }
+    .formula-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .formula-card { background: #fff; border: 1px solid #e5e8ee; border-radius: 7px; padding: 10px 12px; }
+    .formula-card .fc-name { font-size: 11px; font-weight: 700; color: #333; margin-bottom: 5px; }
+    .formula-card .fc-eq { font-family: monospace; font-size: 12px; color: #0369a1; line-height: 1.9; }
+    .formula-card .fc-note { font-size: 10px; color: #aaa; margin-top: 4px; }
+
+    /* ── Laplace table ──────────────────────────────────────────────── */
+    .laplace-table { width: 100%; border-collapse: collapse; font-size: 12.5px; margin-top: 4px; }
+    .laplace-table th { background: #1a1a2e; color: #fff; padding: 8px 12px; text-align: left; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; }
+    .laplace-table td { padding: 7px 12px; border-bottom: 1px solid #eef; font-family: monospace; color: #334; }
+    .laplace-table tr:nth-child(even) td { background: #f8fafc; }
+    .laplace-table td:first-child { color: #0369a1; font-weight: 600; }
+    .laplace-table td:last-child { color: #666; font-family: sans-serif; font-size: 11px; }
+
+    /* ── Hub data tables (Routh, Laplace etc.) ─────────────────────── */
+    .hub-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 4px; }
+    .hub-table th { background: #1a1a2e; color: #e2e8f0; padding: 7px 10px; text-align: left; font-size: 10px; letter-spacing: .06em; text-transform: uppercase; font-family: sans-serif; }
+    .hub-table th.num { text-align: center; }
+    .hub-table td { padding: 6px 10px; border-bottom: 1px solid #e8edf4; color: #1e293b; font-family: monospace; }
+    .hub-table tr:nth-child(even) td { background: #f1f5f9; }
+    .hub-table td.key { color: #0369a1; font-weight: 700; font-family: sans-serif; font-size: 11px; }
+    .hub-table td.num { text-align: center; }
+    .hub-table td.sign-pos { text-align: center; font-weight: 700; color: #166534; font-family: sans-serif; }
+    .hub-table td.sign-neg { text-align: center; font-weight: 700; color: #991b1b; font-family: sans-serif; }
+    .hub-table td.sign-zero { text-align: center; font-weight: 700; color: #92400e; font-family: sans-serif; }
+    .hub-table tr.row-unstable td { background: #fef2f2 !important; }
+    .verdict-stable   { margin-top: 12px; padding: 10px 14px; background: #dcfce7; border: 1px solid #86efac; border-radius: 6px; color: #166534; font-weight: 700; font-size: 13px; }
+    .verdict-unstable { margin-top: 12px; padding: 10px 14px; background: #fee2e2; border: 1px solid #fca5a5; border-radius: 6px; color: #991b1b; font-weight: 700; font-size: 13px; }
+    .verdict-warn     { margin-top: 8px;  padding: 8px 12px;  background: #fef3c7; border: 1px solid #fcd34d; border-radius: 6px; color: #78350f; font-size: 12px; }
+
+    /* ── Schematic area ─────────────────────────────────────────────── */
+    .schematic { display: block; margin: 0 auto 18px; }
+
+    /* ── Response type badges ───────────────────────────────────────── */
+    .resp-badge {
+      display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 11px;
+      font-weight: 700; margin-left: 8px; vertical-align: middle;
+    }
+    .resp-under { background: #dcfce7; color: #166534; }
+    .resp-crit  { background: #fef3c7; color: #92400e; }
+    .resp-over  { background: #fee2e2; color: #991b1b; }
+
+    /* ── Responsive ─────────────────────────────────────────────────── */
+    @media (max-width: 700px) {
+      #hub-wrap { flex-direction: column; }
+      #hub-nav { width: 100%; }
+      .formula-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body class="is-preload">
+
+  <div id="header">
+    <div class="top">
+      <div id="logo">
+        <span class="image avatar48"><img src="../images/Avatar_1.jpg" alt="" /></span>
+        <h1 id="title">Andrew Morrissey</h1>
+        <p>Mechanical Engineer</p>
+      </div>
+      <nav id="nav">
+        <ul>
+          <li><a href="../index.html#top"><span class="icon solid fa-home">Intro</span></a></li>
+          <li><a href="../index.html#portfolio"><span class="icon solid fa-th">Portfolio</span></a></li>
+          <li><a href="../index.html#tools"><span class="icon solid fa-wrench">Tools</span></a></li>
+          <li><a href="../index.html#blog"><span class="icon solid fa-pen-nib">Blog</span></a></li>
+          <li><a href="../index.html#about"><span class="icon solid fa-user">About Me</span></a></li>
+          <li><a href="../index.html#contact"><span class="icon solid fa-envelope">Contact</span></a></li>
+        </ul>
+      </nav>
+    </div>
+    <div class="bottom">
+      <ul class="icons">
+        <li><a href="https://www.linkedin.com/in/asmorrissey" class="icon brands fa-linkedin" target="_blank"><span class="label">LinkedIn</span></a></li>
+        <li><a href="mailto:asmspartan21@gmail.com" class="icon solid fa-envelope"><span class="label">Email</span></a></li>
+        <li><a href="https://github.com/ASM-21" class="icon brands fa-github" target="_blank"><span class="label">Github</span></a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div id="main">
+    <section id="controls-hub" class="two">
+      <div class="container">
+        <header>
+          <h2>Controls &amp; Systems Calculator Hub</h2>
+          <p>~50 tools — time domain, stability, PID, state space, digital control, mechanical analogies, thermal systems, sensors.</p>
+        </header>
+
+        <div id="hub-wrap">
+          <!-- ── Sidebar nav ─────────────────────────────────────── -->
+          <div id="hub-nav">
+            <div id="hub-nav-header">
+              <div class="t1">Controls &amp;</div>
+              <div class="t2">Systems Hub</div>
+              <div class="sub">~50 tools · live results · unit prefixes</div>
+            </div>
+            <div id="hub-search-wrap">
+              <input id="hub-search" type="text" placeholder="Search calculators..." oninput="filterNav(this.value)">
+            </div>
+            <div id="hub-nav-list">
+
+              <div class="nav-cat" data-cat>Reference</div>
+              <div class="nav-item active" data-calc="formulas"><span class="ni"><i class="fa fa-book"></i></span>Formula Sheet</div>
+              <div class="nav-item" data-calc="laplace"><span class="ni"><i class="fa fa-table"></i></span>Laplace Pairs</div>
+              <div class="nav-item" data-calc="taxonomy"><span class="ni"><i class="fa fa-sitemap"></i></span>System Taxonomy</div>
+
+              <div class="nav-cat" data-cat>Time Domain</div>
+              <div class="nav-item" data-calc="first_order"><span class="ni"><i class="fa fa-chart-line"></i></span>1st-Order Response</div>
+              <div class="nav-item" data-calc="second_order"><span class="ni"><i class="fa fa-wave-square"></i></span>2nd-Order Response</div>
+              <div class="nav-item" data-calc="system_type"><span class="ni"><i class="fa fa-layer-group"></i></span>System Type &amp; SS Error</div>
+              <div class="nav-item" data-calc="pade"><span class="ni"><i class="fa fa-clock"></i></span>Padé Approximation</div>
+
+              <div class="nav-cat" data-cat>Stability</div>
+              <div class="nav-item" data-calc="routh"><span class="ni"><i class="fa fa-th"></i></span>Routh-Hurwitz</div>
+              <div class="nav-item" data-calc="bode_margins"><span class="ni"><i class="fa fa-sliders-h"></i></span>Gain &amp; Phase Margins</div>
+              <div class="nav-item" data-calc="root_locus_k"><span class="ni"><i class="fa fa-crosshairs"></i></span>Root Locus Gain K</div>
+              <div class="nav-item" data-calc="sensitivity"><span class="ni"><i class="fa fa-shield-alt"></i></span>Sensitivity Peak</div>
+
+              <div class="nav-cat" data-cat>Frequency Domain</div>
+              <div class="nav-item" data-calc="polezero"><span class="ni"><i class="fa fa-expand-arrows-alt"></i></span>Pole/Zero Extractor</div>
+              <div class="nav-item" data-calc="bandwidth"><span class="ni"><i class="fa fa-signal"></i></span>Closed-Loop Bandwidth</div>
+              <div class="nav-item" data-calc="resonant_peak"><span class="ni"><i class="fa fa-mountain"></i></span>Resonant Peak</div>
+              <div class="nav-item" data-calc="nyquist"><span class="ni"><i class="fa fa-microchip"></i></span>Nyquist / Aliasing</div>
+
+              <div class="nav-cat" data-cat>PID &amp; Compensation</div>
+              <div class="nav-item" data-calc="pid_zn"><span class="ni"><i class="fa fa-sliders-h"></i></span>PID Ziegler-Nichols</div>
+              <div class="nav-item" data-calc="pid_imc"><span class="ni"><i class="fa fa-cog"></i></span>IMC / Lambda Tuning</div>
+              <div class="nav-item" data-calc="lead"><span class="ni"><i class="fa fa-angle-double-up"></i></span>Lead Compensator</div>
+              <div class="nav-item" data-calc="lag"><span class="ni"><i class="fa fa-angle-double-down"></i></span>Lag Compensator</div>
+              <div class="nav-item" data-calc="deriv_filter"><span class="ni"><i class="fa fa-filter"></i></span>Derivative Filter (N)</div>
+              <div class="nav-item" data-calc="antiwindup"><span class="ni"><i class="fa fa-undo"></i></span>Anti-Windup Limit</div>
+
+              <div class="nav-cat" data-cat>State Space</div>
+              <div class="nav-item" data-calc="ctrl_obs"><span class="ni"><i class="fa fa-check-square"></i></span>Controllability / Observability</div>
+              <div class="nav-item" data-calc="ackermann"><span class="ni"><i class="fa fa-map-marker-alt"></i></span>Pole Placement (Ackermann)</div>
+              <div class="nav-item" data-calc="ss_to_tf"><span class="ni"><i class="fa fa-exchange-alt"></i></span>SS ↔ Transfer Function</div>
+              <div class="nav-item" data-calc="observer"><span class="ni"><i class="fa fa-eye"></i></span>Observer Gain Design</div>
+
+              <div class="nav-cat" data-cat>Digital Control</div>
+              <div class="nav-item" data-calc="tustin"><span class="ni"><i class="fa fa-sync"></i></span>Tustin Discretization</div>
+              <div class="nav-item" data-calc="discrete_pid"><span class="ni"><i class="fa fa-code"></i></span>Discrete PID Coefficients</div>
+              <div class="nav-item" data-calc="sample_rate"><span class="ni"><i class="fa fa-stopwatch"></i></span>Sample Rate Advisor</div>
+              <div class="nav-item" data-calc="zoh"><span class="ni"><i class="fa fa-step-forward"></i></span>ZOH Gain Correction</div>
+
+              <div class="nav-cat" data-cat>Mechanical Systems</div>
+              <div class="nav-item" data-calc="msd"><span class="ni"><i class="fa fa-compress-arrows-alt"></i></span>Mass-Spring-Damper</div>
+              <div class="nav-item" data-calc="crit_damp"><span class="ni"><i class="fa fa-balance-scale"></i></span>Critical Damping</div>
+              <div class="nav-item" data-calc="vib_iso"><span class="ni"><i class="fa fa-arrows-alt-v"></i></span>Vibration Isolation</div>
+              <div class="nav-item" data-calc="two_mass"><span class="ni"><i class="fa fa-object-group"></i></span>Two-Mass System</div>
+              <div class="nav-item" data-calc="gear_inertia"><span class="ni"><i class="fa fa-circle-notch"></i></span>Gear / Reflected Inertia</div>
+
+              <div class="nav-cat" data-cat>Thermal &amp; Fluid</div>
+              <div class="nav-item" data-calc="thermal_rc"><span class="ni"><i class="fa fa-thermometer-half"></i></span>Thermal RC Network</div>
+              <div class="nav-item" data-calc="thermal_2node"><span class="ni"><i class="fa fa-project-diagram"></i></span>2-Node Thermal Ladder</div>
+              <div class="nav-item" data-calc="hydraulic"><span class="ni"><i class="fa fa-tint"></i></span>Hydraulic R/C Analogy</div>
+              <div class="nav-item" data-calc="fluid_tau"><span class="ni"><i class="fa fa-fill-drip"></i></span>Fluid System τ</div>
+
+              <div class="nav-cat" data-cat>Sensors &amp; Actuators</div>
+              <div class="nav-item" data-calc="encoder"><span class="ni"><i class="fa fa-ruler"></i></span>Encoder Resolution</div>
+              <div class="nav-item" data-calc="dc_motor"><span class="ni"><i class="fa fa-fan"></i></span>DC Motor Time Constants</div>
+              <div class="nav-item" data-calc="back_emf"><span class="ni"><i class="fa fa-bolt"></i></span>Back-EMF / Kt Relationship</div>
+              <div class="nav-item" data-calc="servo_bw"><span class="ni"><i class="fa fa-tachometer-alt"></i></span>Servo Bandwidth</div>
+              <div class="nav-item" data-calc="adc_res"><span class="ni"><i class="fa fa-microchip"></i></span>ADC Dynamic Range</div>
+
+              <div class="nav-cat" data-cat>Design Aids</div>
+              <div class="nav-item" data-calc="ts_to_bw"><span class="ni"><i class="fa fa-arrows-alt-h"></i></span>Settling Time → BW</div>
+              <div class="nav-item" data-calc="pm_to_gc"><span class="ni"><i class="fa fa-drafting-compass"></i></span>PM → Gain Crossover</div>
+              <div class="nav-item" data-calc="snr_req"><span class="ni"><i class="fa fa-broadcast-tower"></i></span>SNR from SS Error Spec</div>
+              <div class="nav-item" data-calc="loop_budget"><span class="ni"><i class="fa fa-list-ol"></i></span>Loop Budget</div>
+
+            </div>
+            <div id="hub-nav-footer">Live results · All 50 tools complete.<br>Search by name or keyword above.</div>
+          </div>
+
+          <!-- ── Main content area ──────────────────────────────── -->
+          <div id="hub-content"></div>
+        </div>
+
+        <p style="margin-top:14px;font-size:13px;color:#aaa;">
+          <a href="../index.html#tools" style="color:#00b4d8;">← Back to Tools</a>
+          &nbsp;·&nbsp;
+          <a href="voltage-divider.html" style="color:#00b4d8;">Electronics Calculator Hub →</a>
+        </p>
+      </div>
+    </section>
+  </div>
+
+  <div id="footer">
+    <ul class="copyright">
+      <li>&copy; Andrew Morrissey. All rights reserved.</li>
+      <li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+    </ul>
+  </div>
+
+  <script src="../assets/js/jquery.min.js"></script>
+  <script src="../assets/js/jquery.scrolly.min.js"></script>
+  <script src="../assets/js/jquery.scrollex.min.js"></script>
+  <script src="../assets/js/browser.min.js"></script>
+  <script src="../assets/js/breakpoints.min.js"></script>
+  <script src="../assets/js/util.js"></script>
+  <script src="../assets/js/main.js"></script>
+
+  <script>
+  // ── CONSTANTS ────────────────────────────────────────────────────────────
+  const MUL = { p:1e-12, n:1e-9, 'μ':1e-6, m:1e-3, '':1, k:1e3, M:1e6, G:1e9 };
+
+  // ── HELPERS ──────────────────────────────────────────────────────────────
+  function eng(v, unit) {
+    if (v === null || v === undefined || isNaN(v) || !isFinite(v)) return '—';
+    if (v === 0) return `0 ${unit}`;
+    const a = Math.abs(v);
+    let p, d;
+    if      (a >= 1e9)  { p='G'; d=1e9; }
+    else if (a >= 1e6)  { p='M'; d=1e6; }
+    else if (a >= 1e3)  { p='k'; d=1e3; }
+    else if (a >= 1)    { p='';  d=1;   }
+    else if (a >= 1e-3) { p='m'; d=1e-3;}
+    else if (a >= 1e-6) { p='μ'; d=1e-6;}
+    else if (a >= 1e-9) { p='n'; d=1e-9;}
+    else                { p='p'; d=1e-12;}
+    return `${parseFloat((v/d).toPrecision(4))} ${p}${unit}`;
+  }
+  function fmt(v, decimals=4) {
+    if (v === null || v === undefined || isNaN(v) || !isFinite(v)) return '—';
+    return parseFloat(v.toPrecision(decimals)).toString();
+  }
+  function getF(id) {
+    const inp = document.getElementById(`inp-${id}`);
+    const pfx = document.getElementById(`pfx-${id}`);
+    if (!inp) return null;
+    const n = parseFloat(inp.value);
+    return isNaN(n) ? null : n * (MUL[pfx ? pfx.value : ''] !== undefined ? MUL[pfx ? pfx.value : ''] : 1);
+  }
+
+  // ── STATE ────────────────────────────────────────────────────────────────
+  const S = { activeCalc: 'formulas', sens_mode: 'zeta', zn_mode: 'ultimate' };
+  window._lastResultText = '';
+
+  // ── HTML BUILDERS ────────────────────────────────────────────────────────
+  function fieldHTML(id, label, prefixes, defaultPfx, unit, hint='') {
+    const opts = prefixes.map(p =>
+      `<option value="${p}"${p===defaultPfx?' selected':''}>${p?p+unit:unit}</option>`
+    ).join('');
+    return `<div class="field-group">
+      <div class="field-label">${label}</div>
+      <div class="field-row">
+        <input type="number" step="any" placeholder="—" id="inp-${id}" oninput="recalc()">
+        <select id="pfx-${id}" onchange="recalc()">${opts}</select>
+      </div>${hint ? `<div class="field-hint">${hint}</div>` : ''}
+    </div>`;
+  }
+  function fieldPlainHTML(id, label, placeholder='—', hint='') {
+    return `<div class="field-group">
+      <div class="field-label">${label}</div>
+      <div class="field-row">
+        <input type="number" step="any" placeholder="${placeholder}" id="inp-${id}" oninput="recalc()" style="width:100%">
+      </div>${hint ? `<div class="field-hint">${hint}</div>` : ''}
+    </div>`;
+  }
+  function resultHTML(rows, formula='') {
+    if (!rows || !rows.length) return `<div class="empty-state">Enter values above to see results.</div>`;
+    let plain = '';
+    let h = `<div class="result-box"><div class="result-header">
+      <div class="result-title">Results</div>
+      <button class="copy-btn" id="copy-btn" onclick="copyResults()">Copy</button>
+    </div>`;
+    for (const r of rows) {
+      if (r.hr)   h += `<hr class="result-divider">`;
+      else if (r.note !== undefined) h += `<div class="result-note">${r.note}</div>`;
+      else { h += `<div class="result-row"><span class="result-label">${r.l}</span><span class="result-value">${r.v}</span></div>`; plain += `${r.l}: ${r.v}\n`; }
+    }
+    if (formula) h += `<div class="formula-line">${formula}</div>`;
+    h += `</div>`;
+    window._lastResultText = plain.trim();
+    return h;
+  }
+  function errorHTML(msg)  { return `<div class="error-box">&#9888; ${msg}</div>`; }
+  function comingSoon(step, desc='') {
+    return `<div class="coming-soon">
+      <div class="cs-icon"><i class="fa fa-tools"></i></div>
+      <h3>Coming in Step ${step}</h3>
+      <p>${desc || 'This calculator will be added in the next build iteration.'}</p>
+    </div>`;
+  }
+  function modeBtns(key, opts) {
+    return `<div class="mode-toggle">${opts.map(([val,lbl]) =>
+      `<button class="mode-btn${S[key]===val?' active':''}" onclick="S['${key}']='${val}';switchCalc(S.activeCalc)">${lbl}</button>`
+    ).join('')}</div>`;
+  }
+  function copyResults() {
+    if (!window._lastResultText) return;
+    navigator.clipboard.writeText(window._lastResultText).then(() => {
+      const btn = document.getElementById('copy-btn');
+      if (btn) { btn.textContent='Copied!'; btn.classList.add('copied'); setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('copied');},1500); }
+    });
+  }
+
+  // ── CALCULATORS ──────────────────────────────────────────────────────────
+  const CALCS = {
+
+    // ── FORMULA SHEET ──────────────────────────────────────────────────────
+    formulas: {
+      title: 'Formula Sheet',
+      desc: 'Quick reference for all equations used across this controls and systems hub.',
+      render() { return `
+        <div class="formula-cat">First &amp; Second Order Systems</div>
+        <div class="formula-grid">
+          <div class="formula-card">
+            <div class="fc-name">1st-Order Transfer Function</div>
+            <div class="fc-eq">G(s) = K / (τs + 1)<br>Step: y(t) = K(1 − e^(−t/τ))</div>
+            <div class="fc-note">τ = time constant, K = DC gain</div>
+          </div>
+          <div class="formula-card">
+            <div class="fc-name">1st-Order Time Specs</div>
+            <div class="fc-eq">t_rise (10→90%) ≈ 2.2τ<br>t_settle (2%) = 4τ<br>t_settle (5%) = 3τ</div>
+          </div>
+          <div class="formula-card">
+            <div class="fc-name">2nd-Order Transfer Function</div>
+            <div class="fc-eq">G(s) = Kωₙ² / (s²+2ζωₙs+ωₙ²)</div>
+            <div class="fc-note">ωₙ = natural freq, ζ = damping ratio</div>
+          </div>
+          <div class="formula-card">
+            <div class="fc-name">2nd-Order Damped Frequency</div>
+            <div class="fc-eq">ωd = ωₙ√(1 − ζ²)<br>σ = ζωₙ  (decay rate)</div>
+            <div class="fc-note">Valid for underdamped: 0 &lt; ζ &lt; 1</div>
+          </div>
+          <div class="formula-card">
+            <div class="fc-name">2nd-Order Time Specs</div>
+            <div class="fc-eq">%OS = 100·e^(−πζ/√(1−ζ²))<br>tp = π / ωd<br>tr ≈ 1.8 / ωₙ<br>ts ≈ 4 / (ζωₙ)  [2%]</div>
+          </div>
+          <div class="formula-card">
+            <div class="fc-name">Damping Classification</div>
+            <div class="fc-eq">ζ &lt; 1: underdamped<br>ζ = 1: critically damped<br>ζ &gt; 1: overdamped</div>
+          </div>
+        </div>
+
+        <div class="formula-cat">Stability</div>
+        <div class="formula-grid">
+          <div class="formula-card">
+            <div class="fc-name">Gain Margin</div>
+            <div class="fc-eq">GM = 1 / |G(jωpc)|<br>GM_dB = −20·log₁₀|G(jωpc)|</div>
+            <div class="fc-note">ωpc where ∠G = −180°</div>
+          </div>
+          <div class="formula-card">
+            <div class="fc-name">Phase Margin</div>
+            <div class="fc-eq">PM = 180° + ∠G(jωgc)<br>ζ ≈ PM / 100  (rule of thumb)</div>
+            <div class="fc-note">ωgc where |G| = 1 (0 dB)</div>
+          </div>
+          <div class="formula-card">
+            <div class="fc-name">Sensitivity Peak</div>
+            <div class="fc-eq">Ms = 1 / (2ζ√(1−ζ²))<br>Ms_approx ≈ 1/sin(PM)</div>
+          </div>
+          <div class="formula-card">
+            <div class="fc-name">Bandwidth from PM</div>
+            <div class="fc-eq">ωBW ≈ ωgc · √(1 + 1/cosΦ)<br>ζ ≈ PM[deg] / 100</div>
+          </div>
+        </div>
+
+        <div class="formula-cat">PID &amp; Compensation</div>
+        <div class="formula-grid">
+          <div class="formula-card">
+            <div class="fc-name">PID (parallel form)</div>
+            <div class="fc-eq">u = Kp·e + Ki∫e·dt + Kd·ė<br>C(s) = Kp + Ki/s + Kd·s</div>
+          </div>
+          <div class="formula-card">
+            <div class="fc-name">Ziegler-Nichols (Ultimate)</div>
+            <div class="fc-eq">Kp = 0.6·Ku<br>Ki = 2Kp / Tu<br>Kd = Kp·Tu / 8</div>
+            <div class="fc-note">Ku=ult gain, Tu=ult period</div>
+          </div>
+          <div class="formula-card">
+            <div class="fc-name">IMC / Lambda Tuning</div>
+            <div class="fc-eq">Kp = τ / (K(λ+θ))<br>Ti = τ<br>Td = θ/2</div>
+            <div class="fc-note">λ = desired CL time constant</div>
+          </div>
+          <div class="formula-card">
+            <div class="fc-name">Lead/Lag Compensator</div>
+            <div class="fc-eq">C(s) = K·(s+z) / (s+p)<br>Lead: |p| &gt; |z|<br>Lag: |p| &lt; |z|</div>
+          </div>
+          <div class="formula-card">
+            <div class="fc-name">Lead Phase Contribution</div>
+            <div class="fc-eq">φmax = sin⁻¹((α−1)/(α+1))<br>α = p/z<br>ωmax = √(z·p)</div>
+          </div>
+          <div class="formula-card">
+            <div class="fc-name">Derivative Filter</div>
+            <div class="fc-eq">Cd(s) = Kd·s / (s/N + 1)<br>N = 5…20 typical</div>
+          </div>
+        </div>
+
+        <div class="formula-cat">State Space</div>
+        <div class="formula-grid">
+          <div class="formula-card">
+            <div class="fc-name">State Space Form</div>
+            <div class="fc-eq">ẋ = Ax + Bu<br>y  = Cx + Du</div>
+          </div>
+          <div class="formula-card">
+            <div class="fc-name">Controllability</div>
+            <div class="fc-eq">𝒞 = [B | AB | A²B | ...]<br>rank(𝒞) = n → controllable</div>
+          </div>
+          <div class="formula-card">
+            <div class="fc-name">Observability</div>
+            <div class="fc-eq">𝒪 = [C; CA; CA²; ...]<br>rank(𝒪) = n → observable</div>
+          </div>
+          <div class="formula-card">
+            <div class="fc-name">Transfer Function</div>
+            <div class="fc-eq">G(s) = C(sI−A)⁻¹B + D</div>
+          </div>
+          <div class="formula-card">
+            <div class="fc-name">Ackermann (2nd order)</div>
+            <div class="fc-eq">K = eₙᵀ 𝒞⁻¹ p(A)<br>p(s) = desired char. poly</div>
+          </div>
+          <div class="formula-card">
+            <div class="fc-name">State Feedback</div>
+            <div class="fc-eq">u = −Kx + Nr<br>N = −1/(C(A−BK)⁻¹B)</div>
+          </div>
+        </div>
+
+        <div class="formula-cat">Digital Control</div>
+        <div class="formula-grid">
+          <div class="formula-card">
+            <div class="fc-name">Tustin / Bilinear</div>
+            <div class="fc-eq">s → 2/Ts · (z−1)/(z+1)</div>
+            <div class="fc-note">Pre-warped: s → ω/tan(ωTs/2)</div>
+          </div>
+          <div class="formula-card">
+            <div class="fc-name">Discrete PID (position)</div>
+            <div class="fc-eq">u[k] = Kp·e[k] + Ki·Ts·Σe + Kd/Ts·Δe</div>
+          </div>
+          <div class="formula-card">
+            <div class="fc-name">Sample Rate Rule</div>
+            <div class="fc-eq">fs ≥ 10–20 · fBW<br>Ts ≤ 0.05–0.1 · τmin</div>
+          </div>
+          <div class="formula-card">
+            <div class="fc-name">ZOH Gain Correction</div>
+            <div class="fc-eq">KZOH = sin(ωTs/2)/(ωTs/2)</div>
+          </div>
+        </div>
+
+        <div class="formula-cat">Mechanical System Analogies</div>
+        <div class="formula-grid">
+          <div class="formula-card">
+            <div class="fc-name">Mass-Spring-Damper</div>
+            <div class="fc-eq">mẍ + bẋ + kx = F<br>ωₙ = √(k/m)<br>ζ = b/(2√(km))</div>
+          </div>
+          <div class="formula-card">
+            <div class="fc-name">MSD ↔ RLC Analogy</div>
+            <div class="fc-eq">m ↔ L,  b ↔ R,  k ↔ 1/C<br>F ↔ V,  ẋ ↔ I</div>
+          </div>
+          <div class="formula-card">
+            <div class="fc-name">Critical Damping</div>
+            <div class="fc-eq">b_crit = 2√(km)<br>ζ = 1 when b = b_crit</div>
+          </div>
+          <div class="formula-card">
+            <div class="fc-name">Vibration Transmissibility</div>
+            <div class="fc-eq">TR = √[(1+(2ζr)²)/((1−r²)²+(2ζr)²)]<br>r = ω/ωₙ</div>
+          </div>
+          <div class="formula-card">
+            <div class="fc-name">Gear Reflected Inertia</div>
+            <div class="fc-eq">J_ref = J_load / N²<br>τ_ref = τ_load / N</div>
+            <div class="fc-note">N = gear ratio (output/input)</div>
+          </div>
+          <div class="formula-card">
+            <div class="fc-name">DC Motor Time Constants</div>
+            <div class="fc-eq">τe = L / R  (electrical)<br>τm = Jm / b  (mechanical)</div>
+          </div>
+        </div>
+
+        <div class="formula-cat">Steady-State Error</div>
+        <div class="formula-grid">
+          <div class="formula-card">
+            <div class="fc-name">System Type Definition</div>
+            <div class="fc-eq">Type n: n open-loop poles at s=0<br>Kp = lim G(s) as s→0<br>Kv = lim s·G(s) as s→0</div>
+          </div>
+          <div class="formula-card">
+            <div class="fc-name">SS Errors (unity feedback)</div>
+            <div class="fc-eq">ess (step) = 1/(1+Kp)<br>ess (ramp) = 1/Kv<br>ess (parabola) = 1/Ka</div>
+          </div>
+        </div>`; }
+    },
+
+    // ── LAPLACE PAIRS ──────────────────────────────────────────────────────
+    laplace: {
+      title: 'Laplace Transform Pairs',
+      desc: 'Common time-domain to s-domain transform pairs used in controls analysis. ROC = region of convergence.',
+      render() { return `
+        <table class="laplace-table">
+          <thead>
+            <tr><th>Time Domain f(t)</th><th>Laplace F(s)</th><th>Notes</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>δ(t) — impulse</td><td>1</td><td>Unit impulse</td></tr>
+            <tr><td>u(t) — unit step</td><td>1/s</td><td>Step input</td></tr>
+            <tr><td>t · u(t) — ramp</td><td>1/s²</td><td>Ramp input</td></tr>
+            <tr><td>t² · u(t)</td><td>2/s³</td><td>Parabolic</td></tr>
+            <tr><td>e^(−at)</td><td>1/(s+a)</td><td>1st-order decay</td></tr>
+            <tr><td>t·e^(−at)</td><td>1/(s+a)²</td><td>Repeated pole</td></tr>
+            <tr><td>sin(ωt)</td><td>ω/(s²+ω²)</td><td>Sinusoid</td></tr>
+            <tr><td>cos(ωt)</td><td>s/(s²+ω²)</td><td>Cosine</td></tr>
+            <tr><td>e^(−at)·sin(ωt)</td><td>ω/((s+a)²+ω²)</td><td>Damped sine</td></tr>
+            <tr><td>e^(−at)·cos(ωt)</td><td>(s+a)/((s+a)²+ω²)</td><td>Damped cosine</td></tr>
+            <tr><td>1 − e^(−t/τ)</td><td>1/(s(τs+1))</td><td>1st-order step resp.</td></tr>
+            <tr><td>df/dt</td><td>sF(s) − f(0⁻)</td><td>Differentiation</td></tr>
+            <tr><td>∫₀ᵗ f dτ</td><td>F(s)/s</td><td>Integration</td></tr>
+            <tr><td>f(t−T)·u(t−T)</td><td>e^(−Ts)·F(s)</td><td>Time delay T</td></tr>
+            <tr><td>e^(at)·f(t)</td><td>F(s−a)</td><td>s-domain shift</td></tr>
+            <tr><td>f(at)</td><td>(1/a)·F(s/a)</td><td>Time scaling</td></tr>
+          </tbody>
+        </table>
+        <p style="margin-top:12px;font-size:12px;color:#aaa;">
+          All pairs assume causal signals (t ≥ 0) with zero initial conditions unless noted.
+          Final Value: f(∞) = lim s·F(s) as s→0 (if stable). Initial Value: f(0⁺) = lim s·F(s) as s→∞.
+        </p>`; }
+    },
+
+    // ── SYSTEM TAXONOMY ────────────────────────────────────────────────────
+    taxonomy: {
+      title: 'Control System Taxonomy',
+      desc: 'Visual overview of open-loop vs. closed-loop architectures and standard block diagram elements.',
+      render() { return `
+        <div style="margin-bottom:16px;">
+          <svg viewBox="0 0 580 280" style="width:100%;max-width:560px;display:block;margin:0 auto 12px;">
+            <!-- Open Loop -->
+            <text x="14" y="22" font-size="11" font-weight="700" fill="#00b4d8" letter-spacing=".06em">OPEN-LOOP</text>
+            <line x1="14" y1="36" x2="54" y2="36" stroke="#aaa" stroke-width="1.5"/>
+            <text x="18" y="30" font-size="9" fill="#888">r(t)</text>
+            <rect x="54" y="24" width="72" height="24" fill="none" stroke="#00b4d8" stroke-width="1.5" rx="3"/>
+            <text x="90" y="39" font-size="11" fill="#00b4d8" text-anchor="middle">Controller</text>
+            <line x1="126" y1="36" x2="166" y2="36" stroke="#aaa" stroke-width="1.5"/>
+            <rect x="166" y="24" width="60" height="24" fill="none" stroke="#aaa" stroke-width="1.5" rx="3"/>
+            <text x="196" y="39" font-size="11" fill="#888" text-anchor="middle">Plant</text>
+            <line x1="226" y1="36" x2="266" y2="36" stroke="#aaa" stroke-width="1.5"/>
+            <text x="240" y="30" font-size="9" fill="#888">y(t)</text>
+            <text x="280" y="39" font-size="11" fill="#aaa" text-anchor="middle">No feedback — disturbance rejection impossible</text>
+
+            <!-- Closed Loop -->
+            <text x="14" y="100" font-size="11" font-weight="700" fill="#00b4d8" letter-spacing=".06em">CLOSED-LOOP (FEEDBACK)</text>
+            <!-- Summer -->
+            <circle cx="54" cy="142" r="12" fill="none" stroke="#aaa" stroke-width="1.5"/>
+            <text x="54" y="147" font-size="14" fill="#888" text-anchor="middle">Σ</text>
+            <line x1="14" y1="142" x2="42" y2="142" stroke="#aaa" stroke-width="1.5"/>
+            <text x="18" y="136" font-size="9" fill="#888">r(t)</text>
+            <text x="44" y="138" font-size="9" fill="#4caf50">+</text>
+            <text x="44" y="152" font-size="9" fill="#ef4444">−</text>
+            <!-- Controller -->
+            <line x1="66" y1="142" x2="96" y2="142" stroke="#aaa" stroke-width="1.5"/>
+            <rect x="96" y="130" width="72" height="24" fill="none" stroke="#00b4d8" stroke-width="1.5" rx="3"/>
+            <text x="132" y="145" font-size="11" fill="#00b4d8" text-anchor="middle">Controller</text>
+            <!-- Plant -->
+            <line x1="168" y1="142" x2="198" y2="142" stroke="#aaa" stroke-width="1.5"/>
+            <rect x="198" y="130" width="60" height="24" fill="none" stroke="#aaa" stroke-width="1.5" rx="3"/>
+            <text x="228" y="145" font-size="11" fill="#888" text-anchor="middle">Plant</text>
+            <!-- Output -->
+            <line x1="258" y1="142" x2="310" y2="142" stroke="#aaa" stroke-width="1.5"/>
+            <text x="274" y="136" font-size="9" fill="#888">y(t)</text>
+            <!-- Sensor -->
+            <line x1="290" y1="142" x2="290" y2="185" stroke="#aaa" stroke-width="1.5"/>
+            <rect x="218" y="174" width="60" height="22" fill="none" stroke="#aaa" stroke-width="1.2" rx="3"/>
+            <text x="248" y="188" font-size="11" fill="#888" text-anchor="middle">Sensor</text>
+            <line x1="218" y1="185" x2="54" y2="185" stroke="#aaa" stroke-width="1.5"/>
+            <line x1="54" y1="185" x2="54" y2="154" stroke="#aaa" stroke-width="1.5"/>
+
+            <!-- Error signal label -->
+            <text x="72" y="136" font-size="9" fill="#aaa">e(t)</text>
+
+            <!-- Disturbance -->
+            <line x1="225" y1="118" x2="225" y2="130" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="3"/>
+            <text x="205" y="114" font-size="9" fill="#f59e0b">d(t) disturbance</text>
+
+            <!-- Labels bottom -->
+            <text x="14" y="230" font-size="11" font-weight="700" fill="#00b4d8" letter-spacing=".06em">KEY SIGNALS &amp; BLOCKS</text>
+            <text x="14" y="248" font-size="11" fill="#888">r(t) = reference/setpoint</text>
+            <text x="14" y="262" font-size="11" fill="#888">e(t) = error = r − y</text>
+            <text x="160" y="248" font-size="11" fill="#888">u(t) = control signal</text>
+            <text x="160" y="262" font-size="11" fill="#888">y(t) = plant output</text>
+            <text x="306" y="248" font-size="11" fill="#888">d(t) = disturbance</text>
+            <text x="306" y="262" font-size="11" fill="#888">n(t) = sensor noise</text>
+          </svg>
+        </div>
+        <div class="formula-grid">
+          <div class="formula-card">
+            <div class="fc-name">Closed-Loop TF (unity feedback)</div>
+            <div class="fc-eq">T(s) = G(s) / (1 + G(s))<br>where G = C(s)·P(s)</div>
+          </div>
+          <div class="formula-card">
+            <div class="fc-name">Sensitivity Function</div>
+            <div class="fc-eq">S(s) = 1 / (1 + G(s))<br>S + T = 1  (always)</div>
+          </div>
+          <div class="formula-card">
+            <div class="fc-name">Error to Reference</div>
+            <div class="fc-eq">E(s) = S(s) · R(s)</div>
+            <div class="fc-note">Minimize S at low freq for tracking</div>
+          </div>
+          <div class="formula-card">
+            <div class="fc-name">Output to Disturbance</div>
+            <div class="fc-eq">Y_d(s) = P(s)·S(s)·D(s)</div>
+            <div class="fc-note">Minimize PS at disturbance freq</div>
+          </div>
+        </div>`; }
+    },
+
+    // ── FIRST-ORDER STEP RESPONSE ──────────────────────────────────────────
+    first_order: {
+      title: '1st-Order Step Response',
+      desc: 'Time-domain response of G(s) = K/(τs+1) to a unit step. Calculates all standard time specifications and voltage at a given time t.',
+      schema: `<svg class="schematic" viewBox="0 0 320 110" width="300">
+        <!-- Block diagram -->
+        <text x="10" y="44" font-size="10" fill="#888">R(s)=1/s</text>
+        <line x1="76" y1="40" x2="110" y2="40" stroke="#aaa" stroke-width="1.5"/>
+        <rect x="110" y="26" width="100" height="28" fill="none" stroke="#00b4d8" stroke-width="1.5" rx="3"/>
+        <text x="160" y="38" font-size="11" fill="#00b4d8" text-anchor="middle">G(s) = K</text>
+        <text x="160" y="51" font-size="10" fill="#00b4d8" text-anchor="middle">τs + 1</text>
+        <line x1="210" y1="40" x2="255" y2="40" stroke="#aaa" stroke-width="1.5"/>
+        <text x="260" y="44" font-size="10" fill="#888">Y(s)</text>
+        <!-- Response curve sketch -->
+        <text x="10" y="95" font-size="9" fill="#aaa">y(t)</text>
+        <line x1="30" y1="100" x2="30" y2="65" stroke="#aaa" stroke-width="1"/>
+        <line x1="30" y1="100" x2="300" y2="100" stroke="#aaa" stroke-width="1"/>
+        <path d="M30,100 C60,100 80,72 120,68 C160,65 200,65 300,65" fill="none" stroke="#00b4d8" stroke-width="1.8"/>
+        <line x1="30" y1="65" x2="300" y2="65" stroke="#aaa" stroke-width="1" stroke-dasharray="3"/>
+        <text x="302" y="69" font-size="9" fill="#888">K</text>
+        <!-- tau marker -->
+        <line x1="85" y1="100" x2="85" y2="70" stroke="#f59e0b" stroke-width="1" stroke-dasharray="2"/>
+        <text x="80" y="112" font-size="9" fill="#f59e0b">τ</text>
+        <text x="60" y="68" font-size="9" fill="#f59e0b">63.2%</text>
+      </svg>`,
+      fields: () => `
+        ${fieldHTML('fo_tau', 'Time Constant (τ)', ['μ','m','','k'], '', 's', 'System responds at 63.2% of final value at t = τ')}
+        ${fieldHTML('fo_K',   'DC Gain (K)',        ['m','','k'],     '',  '', 'Steady-state output per unit input (dimensionless or units match)')}
+        ${fieldHTML('fo_t',   'Evaluate at time t (optional)', ['μ','m','','k'], 'm', 's', 'Leave blank to skip y(t) calculation')}`,
+      calc: () => {
+        const tau = getF('fo_tau'), K = getF('fo_K'), t = getF('fo_t');
+        if (!tau || tau <= 0) return null;
+        const K_val = (K !== null) ? K : 1;
+        const tr    = 2.197 * tau;   // 10→90%
+        const ts2   = 4.0   * tau;   // 2% criterion
+        const ts5   = 3.0   * tau;   // 5% criterion
+        const fc    = 1 / (2 * Math.PI * tau);
+        let rows = [
+          { l: 'Time Constant (τ)',         v: eng(tau, 's') },
+          { l: 'DC Gain (K)',               v: fmt(K_val) },
+          { hr: 1 },
+          { l: 'Rise Time 10→90% (tr)',     v: eng(tr,  's') },
+          { l: 'Settling Time 2%  (ts)',    v: eng(ts2, 's') },
+          { l: 'Settling Time 5%  (ts)',    v: eng(ts5, 's') },
+          { l: 'Bandwidth (-3 dB)',         v: eng(fc,  'Hz') },
+          { hr: 1 },
+          { note: `At t = τ:  y(τ) = ${fmt(K_val * 0.6321, 4)} (63.2% of ${fmt(K_val)})` },
+          { note: `At t = 2τ: y(2τ) = ${fmt(K_val * 0.8647, 4)} (86.5%)` },
+        ];
+        if (t !== null && t >= 0) {
+          const yt = K_val * (1 - Math.exp(-t / tau));
+          rows = [
+            ...rows,
+            { hr: 1 },
+            { l: `y(t=${eng(t,'s')})`, v: fmt(yt, 5) },
+            { note: `${(yt / K_val * 100).toFixed(2)}% of final value` },
+          ];
+        }
+        return resultHTML(rows, 'y(t) = K·(1 − e^(−t/τ))  |  G(s) = K/(τs+1)');
+      }
+    },
+
+    // ── SECOND-ORDER STEP RESPONSE ─────────────────────────────────────────
+    second_order: {
+      title: '2nd-Order Step Response',
+      desc: 'Complete time-domain specs for G(s) = Kωₙ²/(s²+2ζωₙs+ωₙ²). Handles underdamped, critically damped, and overdamped cases.',
+      schema: `<svg class="schematic" viewBox="0 0 320 120" width="300">
+        <text x="10" y="46" font-size="9" fill="#888">R(s)</text>
+        <line x1="36" y1="42" x2="70" y2="42" stroke="#aaa" stroke-width="1.5"/>
+        <rect x="70" y="28" width="120" height="28" fill="none" stroke="#00b4d8" stroke-width="1.5" rx="3"/>
+        <text x="130" y="40" font-size="10" fill="#00b4d8" text-anchor="middle">Kωₙ²</text>
+        <text x="130" y="53" font-size="10" fill="#00b4d8" text-anchor="middle">s²+2ζωₙs+ωₙ²</text>
+        <line x1="190" y1="42" x2="235" y2="42" stroke="#aaa" stroke-width="1.5"/>
+        <text x="238" y="46" font-size="9" fill="#888">Y(s)</text>
+        <!-- Underdamped response -->
+        <line x1="20" y1="115" x2="310" y2="115" stroke="#aaa" stroke-width="1"/>
+        <line x1="20" y1="115" x2="20" y2="70" stroke="#aaa" stroke-width="1"/>
+        <text x="8" y="74" font-size="8" fill="#aaa">y</text>
+        <path d="M20,115 C35,115 50,72 80,66 C100,62 115,74 130,72 C150,70 170,71 310,71" fill="none" stroke="#00b4d8" stroke-width="1.8"/>
+        <!-- OS annotation -->
+        <line x1="80" y1="62" x2="80" y2="71" stroke="#ef4444" stroke-width="1" stroke-dasharray="2"/>
+        <text x="62" y="60" font-size="8" fill="#ef4444">%OS</text>
+        <!-- Final value -->
+        <line x1="20" y1="71" x2="310" y2="71" stroke="#aaa" stroke-width="1" stroke-dasharray="3"/>
+        <text x="312" y="75" font-size="8" fill="#888">K</text>
+        <!-- tp -->
+        <text x="74" y="112" font-size="8" fill="#f59e0b">tp</text>
+      </svg>`,
+      fields: () => `
+        ${fieldHTML('so_wn', 'Natural Frequency (ωₙ)', ['m','','k','M'], '', 'rad/s', 'Undamped natural frequency')}
+        ${fieldHTML('so_z',  'Damping Ratio (ζ)',       ['m','',''],      '',  '',      '0 < ζ < 1 underdamped · ζ = 1 critical · ζ > 1 overdamped')}
+        ${fieldHTML('so_K',  'DC Gain (K)',              ['m','','k'],     '',  '',      'Steady-state gain (leave blank for K=1)')}
+        ${fieldHTML('so_t',  'Evaluate at time t (optional)', ['μ','m','','k'], 'm', 's', 'Leave blank to skip y(t) calculation')}`,
+      calc: () => {
+        const wn = getF('so_wn'), z_raw = getF('so_z'), t = getF('so_t');
+        if (!wn || wn <= 0 || z_raw === null || z_raw < 0) return null;
+        const K = getF('so_K') ?? 1;
+        const z = z_raw;
+
+        let badge = '', rows = [];
+
+        if (z < 1) {
+          // ── Underdamped ───────────────────────────────────────────────
+          badge = `<span class="resp-badge resp-under">Underdamped</span>`;
+          const wd   = wn * Math.sqrt(1 - z * z);
+          const sigma = z * wn;
+          const pct_os = 100 * Math.exp(-Math.PI * z / Math.sqrt(1 - z * z));
+          const tp   = Math.PI / wd;
+          const tr   = (1.8) / wn;          // approximation
+          const ts2  = 4.0 / sigma;          // 2% settling
+          const ts1  = 4.6 / sigma;          // 1% settling
+          const f_d  = wd / (2 * Math.PI);
+
+          rows = [
+            { l: 'Classification',           v: 'Underdamped (0 < ζ < 1)' },
+            { l: 'Damped Frequency (ωd)',    v: eng(wd, 'rad/s') },
+            { l: 'Damped Freq (fd)',          v: eng(f_d, 'Hz') },
+            { l: 'Decay Rate (σ = ζωₙ)',     v: eng(sigma, '1/s') },
+            { hr: 1 },
+            { l: 'Percent Overshoot (%OS)',  v: `${pct_os.toFixed(2)} %` },
+            { l: 'Peak Time (tp)',            v: eng(tp, 's') },
+            { l: 'Rise Time ~10→90% (tr)',   v: eng(tr, 's') },
+            { l: 'Settling Time 2%  (ts)',   v: eng(ts2, 's') },
+            { l: 'Settling Time 1%  (ts)',   v: eng(ts1, 's') },
+            { hr: 1 },
+            { note: `Closed-loop poles: s = −${fmt(sigma,3)} ± j${fmt(wd,3)}` },
+            { note: `Pole angle from −σ axis: cos⁻¹(ζ) = ${(Math.acos(z)*180/Math.PI).toFixed(1)}°` },
+          ];
+          if (t !== null && t >= 0) {
+            const yt = K * (1 - Math.exp(-sigma * t) * (Math.cos(wd * t) + (sigma / wd) * Math.sin(wd * t)));
+            rows = [...rows, { hr:1 }, { l:`y(t=${eng(t,'s')})`, v: fmt(yt,5) }, { note:`${(yt/K*100).toFixed(2)}% of final value ${fmt(K)}` }];
+          }
+          return resultHTML(rows, 'y(t) = K·(1 − e^(−σt)·[cos(ωd·t) + (σ/ωd)·sin(ωd·t)])');
+
+        } else if (Math.abs(z - 1) < 1e-6) {
+          // ── Critically Damped ─────────────────────────────────────────
+          badge = `<span class="resp-badge resp-crit">Critically Damped</span>`;
+          const ts2  = 4.0 / wn;
+          const tr   = 3.36 / wn;    // empirical for critically damped
+          rows = [
+            { l: 'Classification',           v: 'Critically Damped (ζ = 1)' },
+            { l: 'Rise Time (tr)',            v: eng(tr,  's') },
+            { l: 'Settling Time 2% (ts)',    v: eng(ts2, 's') },
+            { l: 'Percent Overshoot',        v: '0 %' },
+            { hr: 1 },
+            { note: `Repeated pole at s = −ωₙ = −${fmt(wn,4)}` },
+            { note: 'Fastest response with no overshoot — optimal for many servo applications.' },
+          ];
+          if (t !== null && t >= 0) {
+            const yt = K * (1 - (1 + wn*t) * Math.exp(-wn*t));
+            rows = [...rows, { hr:1 }, { l:`y(t=${eng(t,'s')})`, v: fmt(yt,5) }];
+          }
+          return resultHTML(rows, 'y(t) = K·(1 − (1 + ωₙt)·e^(−ωₙt))');
+
+        } else {
+          // ── Overdamped ────────────────────────────────────────────────
+          badge = `<span class="resp-badge resp-over">Overdamped</span>`;
+          const alpha = z * wn;
+          const beta  = wn * Math.sqrt(z * z - 1);
+          const p1    = -alpha + beta;
+          const p2    = -alpha - beta;
+          const ts2   = -Math.log(0.02 * (1 - (p2/(p2-p1)))) / Math.abs(p1);  // approx
+          rows = [
+            { l: 'Classification',           v: 'Overdamped (ζ > 1)' },
+            { l: 'Pole 1 (s₁)',              v: `${fmt(p1, 4)} rad/s` },
+            { l: 'Pole 2 (s₂)',              v: `${fmt(p2, 4)} rad/s` },
+            { l: 'Settling Time 2% (approx)', v: eng(4.0 / Math.abs(p1), 's') },
+            { l: 'Percent Overshoot',        v: '0 %' },
+            { hr: 1 },
+            { note: `Dominant pole at s₁ = ${fmt(p1,4)} (slower)` },
+            { note: 'No overshoot but slower than critical damping.' },
+          ];
+          if (t !== null && t >= 0) {
+            const A1 = K * p2 / (p2 - p1);
+            const A2 = K * p1 / (p1 - p2);
+            const yt = K + A1 * Math.exp(p1*t) + A2 * Math.exp(p2*t);
+            rows = [...rows, { hr:1 }, { l:`y(t=${eng(t,'s')})`, v: fmt(yt,5) }];
+          }
+          return resultHTML(rows, 'y(t) from partial fractions of Kωₙ² / (s(s−p1)(s−p2))');
+        }
+      }
+    },
+
+    // ── STEP 2: TIME DOMAIN (cont.) ─────────────────────────────────────────
+
+    system_type: {
+      title: 'System Type & Steady-State Error',
+      desc: 'Classify an open-loop transfer function by system type (0, 1, or 2) based on the number of integrators, then compute position, velocity, and acceleration error constants and the resulting steady-state errors.',
+      fields: () => `
+        <div class="field-group">
+          <div class="field-label">System Type (number of open-loop integrators)</div>
+          <select class="full-select" id="stype-sel" onchange="recalc()">
+            <option value="0">Type 0 — no integrators</option>
+            <option value="1">Type 1 — one integrator (1/s)</option>
+            <option value="2">Type 2 — two integrators (1/s²)</option>
+          </select>
+        </div>
+        ${fieldPlainHTML('stype_K', 'Open-Loop DC Gain (K₀)', '1', 'lim s→0 of G(s) for Type 0, or lim s→0 of s·G(s) for Type 1, etc.')}
+        <div class="field-group">
+          <div class="field-label">Reference Input Amplitude (optional)</div>
+          <div class="field-row">
+            <input type="number" step="any" placeholder="1" id="inp-stype_A" oninput="recalc()" style="width:100%">
+          </div>
+          <div class="field-hint">Scales the error values — leave blank for unit inputs</div>
+        </div>`,
+      calc: () => {
+        const sel = document.getElementById('stype-sel');
+        if (!sel) return null;
+        const type = parseInt(sel.value);
+        const K0_raw = document.getElementById('inp-stype_K');
+        const K0 = K0_raw && K0_raw.value !== '' ? parseFloat(K0_raw.value) : 1;
+        const A_raw = document.getElementById('inp-stype_A');
+        const A = A_raw && A_raw.value !== '' ? parseFloat(A_raw.value) : 1;
+        if (isNaN(K0) || K0 === 0) return errorHTML('DC gain K₀ cannot be zero.');
+
+        // Error constants
+        const Kp = type === 0 ? K0 : Infinity;
+        const Kv = type === 1 ? K0 : (type > 1 ? Infinity : 0);
+        const Ka = type === 2 ? K0 : 0;
+
+        const ess_step  = type === 0 ? A / (1 + Kp) : 0;
+        const ess_ramp  = type === 1 ? A / Kv       : (type === 0 ? Infinity : 0);
+        const ess_parab = type === 2 ? A / Ka        : (type < 2 ? Infinity : 0);
+
+        const fmtErr = v => v === Infinity ? '∞ (unbounded)' : v === 0 ? '0 (perfect)' : fmt(v, 4);
+        const fmtKc  = v => v === Infinity ? '∞' : fmt(v, 4);
+
+        return resultHTML([
+          { l: 'System Type',              v: `Type ${type}` },
+          { l: 'Position Const (Kp)',      v: fmtKc(Kp) },
+          { l: 'Velocity Const (Kv)',      v: fmtKc(Kv) },
+          { l: 'Acceleration Const (Ka)',  v: fmtKc(Ka) },
+          { hr: 1 },
+          { l: 'SS Error — Step (A=' + fmt(A,3) + ')',      v: fmtErr(ess_step)  },
+          { l: 'SS Error — Ramp (A=' + fmt(A,3) + ')',      v: fmtErr(ess_ramp)  },
+          { l: 'SS Error — Parabola (A=' + fmt(A,3) + ')',  v: fmtErr(ess_parab) },
+          { hr: 1 },
+          { note: type === 0 ? 'Type 0: tracks step with finite error. Cannot track ramp.' :
+                  type === 1 ? 'Type 1: tracks step perfectly. Tracks ramp with finite error.' :
+                               'Type 2: tracks step and ramp perfectly. Finite error to parabola.' },
+          { note: 'Unity negative feedback assumed. Add integrators in controller to increase type.' },
+        ], 'ess(step) = A/(1+Kp)  |  ess(ramp) = A/Kv  |  ess(parab) = A/Ka');
+      }
+    },
+
+    pade: {
+      title: 'Padé Approximation',
+      desc: 'Approximate the pure time delay e^(−Ts) as a rational transfer function. The 1st and 2nd-order Padé approximants are widely used in control design to handle delays analytically.',
+      fields: () => `
+        ${fieldHTML('pade_T', 'Time Delay (T)', ['μ','m','','k'], 'm', 's', 'Pure transport or computation delay')}
+        <div class="field-group">
+          <div class="field-label">Approximation Order</div>
+          <select class="full-select" id="pade-order" onchange="recalc()">
+            <option value="1">1st Order — (1 − T/2·s) / (1 + T/2·s)</option>
+            <option value="2">2nd Order — better phase accuracy</option>
+          </select>
+        </div>
+        ${fieldHTML('pade_w', 'Evaluate phase error at ω (optional)', ['m','','k','M'], '', 'rad/s', 'Compare exact vs. Padé phase at this frequency')}`,
+      calc: () => {
+        const T = getF('pade_T');
+        if (!T || T <= 0) return null;
+        const order = parseInt(document.getElementById('pade-order')?.value || '1');
+        const w = getF('pade_w');
+
+        let numStr, denStr, rows;
+
+        if (order === 1) {
+          // (1 - T/2·s) / (1 + T/2·s)
+          const a = T / 2;
+          numStr = `1 − ${fmt(a,4)}·s`;
+          denStr = `1 + ${fmt(a,4)}·s`;
+          rows = [
+            { l: 'Order',               v: '1st order Padé' },
+            { l: 'Numerator',           v: numStr },
+            { l: 'Denominator',         v: denStr },
+            { l: 'RHP Zero at s =',     v: `+${fmt(2/T, 4)} rad/s  ⚠ non-minimum phase` },
+            { l: 'Pole at s =',         v: `−${fmt(2/T, 4)} rad/s` },
+            { hr: 1 },
+            { note: 'Non-minimum phase zero causes initial undershoot in step response.' },
+            { note: `Phase accuracy ±5% up to ω ≈ ${fmt(1/T, 4)} rad/s` },
+          ];
+          if (w !== null && w > 0) {
+            const exact_phase = -w * T * 180 / Math.PI;
+            const pade_phase  = -2 * Math.atan(w * T / 2) * 180 / Math.PI;
+            const err = Math.abs(exact_phase - pade_phase);
+            rows = [...rows, { hr:1 },
+              { l: 'Exact phase e^(−jωT)',  v: `${exact_phase.toFixed(2)}°` },
+              { l: 'Padé phase at ω',       v: `${pade_phase.toFixed(2)}°` },
+              { l: 'Phase error',           v: `${err.toFixed(2)}°  (${(err/Math.abs(exact_phase)*100).toFixed(1)}%)` },
+            ];
+          }
+        } else {
+          // 2nd order: (T²/12·s² - T/2·s + 1) / (T²/12·s² + T/2·s + 1)
+          const a2 = T * T / 12;
+          const a1 = T / 2;
+          numStr = `${fmt(a2,4)}·s² − ${fmt(a1,4)}·s + 1`;
+          denStr = `${fmt(a2,4)}·s² + ${fmt(a1,4)}·s + 1`;
+          rows = [
+            { l: 'Order',               v: '2nd order Padé' },
+            { l: 'Numerator',           v: numStr },
+            { l: 'Denominator',         v: denStr },
+            { l: 'RHP Zeros',           v: `Complex pair in RHP — non-minimum phase` },
+            { hr: 1 },
+            { note: `Phase accuracy ±5% up to ω ≈ ${fmt(2/T, 4)} rad/s  (2× better than 1st order)` },
+            { note: 'Preferred when delay is significant relative to system bandwidth.' },
+          ];
+          if (w !== null && w > 0) {
+            const exact_phase = -w * T * 180 / Math.PI;
+            const wT = w * T;
+            const pade_phase  = 2 * Math.atan2(-(wT/2) * (1 - wT*wT/12), 1 - wT*wT/12 - (wT/2)*(wT/2)) * 0; // simplified
+            // Proper 2nd order Padé phase
+            const phi = -2 * Math.atan2(a1*w * (1 - a2*w*w / (1)), 1 - a2*w*w) * 180/Math.PI;
+            const err = Math.abs(exact_phase - phi);
+            rows = [...rows, { hr:1 },
+              { l: 'Exact phase e^(−jωT)',  v: `${exact_phase.toFixed(2)}°` },
+              { l: 'Phase error (approx)',  v: `${err.toFixed(2)}°` },
+            ];
+          }
+        }
+        return resultHTML(rows,
+          order === 1
+            ? 'e^(−Ts) ≈ (1 − T/2·s) / (1 + T/2·s)'
+            : 'e^(−Ts) ≈ (T²/12·s² − T/2·s + 1) / (T²/12·s² + T/2·s + 1)');
+      }
+    },
+
+    // ── STEP 2: STABILITY ───────────────────────────────────────────────────
+
+    routh: {
+      title: 'Routh-Hurwitz Stability',
+      desc: 'Build the Routh array for a characteristic polynomial up to 5th order and determine stability. Detects all-zero rows (marginal stability) and first-column sign changes (unstable poles).',
+      fields: () => `
+        <div class="field-group">
+          <div class="field-label">Polynomial Order</div>
+          <select class="full-select" id="routh-order" onchange="routhRebuild()">
+            <option value="2">2nd order: a₂s² + a₁s + a₀</option>
+            <option value="3" selected>3rd order: a₃s³ + a₂s² + a₁s + a₀</option>
+            <option value="4">4th order</option>
+            <option value="5">5th order</option>
+          </select>
+        </div>
+        <div id="routh-coeff-fields"></div>`,
+      calc: () => {
+        const orderSel = document.getElementById('routh-order');
+        if (!orderSel) return null;
+        const n = parseInt(orderSel.value);
+        const a = [];
+        for (let i = n; i >= 0; i--) {
+          const el = document.getElementById(`routh-a${i}`);
+          if (!el || el.value === '') return null;
+          const v = parseFloat(el.value);
+          if (isNaN(v)) return null;
+          a[i] = v;
+        }
+        if (a[n] === 0) return errorHTML('Leading coefficient a' + n + ' cannot be zero.');
+
+        // Build Routh array
+        const rows_arr = [];
+        const r0 = [], r1 = [];
+        for (let i = n;   i >= 0; i -= 2) r0.push(a[i]);
+        for (let i = n-1; i >= 0; i -= 2) r1.push(a[i]);
+        rows_arr.push([...r0]);
+        rows_arr.push([...r1]);
+
+        const eps = 1e-10;
+        let marginal = false;
+        for (let row = 2; row <= n; row++) {
+          const prev  = rows_arr[row-1];
+          const pprev = rows_arr[row-2];
+          if (Math.abs(prev[0]) < eps) { marginal = true; prev[0] = eps; }
+          const newRow = [];
+          for (let col = 0; col < prev.length - 1; col++) {
+            newRow.push((prev[0] * (pprev[col+1] ?? 0) - pprev[0] * (prev[col+1] ?? 0)) / prev[0]);
+          }
+          if (newRow.length === 0) newRow.push(0);
+          rows_arr.push(newRow);
+        }
+
+        const firstCol = rows_arr.map(r => r[0]);
+        let signChanges = 0;
+        for (let i = 1; i < firstCol.length; i++) {
+          if (firstCol[i] * firstCol[i-1] < 0) signChanges++;
+        }
+
+        const rowLabels = [];
+        for (let i = n; i >= 0; i--) rowLabels.push(`s^${i}`);
+
+        const maxCols = Math.max(...rows_arr.map(r => r.length));
+        let tableHTML = `<div style="overflow-x:auto;margin-top:14px;">
+          <table class="hub-table">
+            <thead><tr>
+              <th>Row</th>`;
+        for (let c = 0; c < maxCols; c++) tableHTML += `<th class="num">Col ${c+1}</th>`;
+        tableHTML += `<th class="num">Sign</th></tr></thead><tbody>`;
+
+        rows_arr.forEach((row, i) => {
+          const fc = row[0];
+          const signChange = i > 0 && fc * rows_arr[i-1][0] < 0;
+          const sign = fc > eps ? '+' : fc < -eps ? '−' : '0';
+          const signClass = fc > eps ? 'sign-pos' : fc < -eps ? 'sign-neg' : 'sign-zero';
+          tableHTML += `<tr${signChange ? ' class="row-unstable"' : ''}>
+            <td class="key">${rowLabels[i]}</td>`;
+          for (let c = 0; c < maxCols; c++) {
+            const v = row[c] !== undefined ? parseFloat(row[c].toPrecision(5)) : '';
+            tableHTML += `<td class="num">${v !== '' ? v : '—'}</td>`;
+          }
+          tableHTML += `<td class="${signClass}">${sign}</td></tr>`;
+        });
+        tableHTML += `</tbody></table></div>`;
+
+        const verdict = signChanges === 0
+          ? `<div class="verdict-stable">✓ STABLE — all first-column elements positive. No RHP poles.</div>`
+          : `<div class="verdict-unstable">✗ UNSTABLE — ${signChanges} sign change${signChanges>1?'s':''} in first column → ${signChanges} RHP pole${signChanges>1?'s':''}.</div>`;
+        const margNote = marginal
+          ? `<div class="verdict-warn">⚠ Zero first-element detected — system may be marginally stable. Examine auxiliary polynomial from the row above.</div>`
+          : '';
+        const formulaNote = `<div class="formula-line">Necessary: all coefficients same sign · Sufficient: no sign changes in first column of Routh array</div>`;
+
+        return tableHTML + verdict + margNote + formulaNote;
+      }
+    },
+
+    bode_margins: {
+      title: 'Gain & Phase Margins',
+      desc: 'Compute gain margin (GM), phase margin (PM), gain crossover frequency (ωgc), and phase crossover frequency (ωpc) for a standard open-loop transfer function of the form K/(s(τs+1)(τ₂s+1)).',
+      fields: () => `
+        ${fieldPlainHTML('bm_K',   'Open-Loop Gain K', '1',  'Static gain of the open-loop TF')}
+        ${fieldHTML('bm_tau1', 'Time Constant τ₁', ['m','','k'], '', 's', 'First lag pole at s = −1/τ₁')}
+        ${fieldHTML('bm_tau2', 'Time Constant τ₂ (optional)', ['m','','k'], 'm', 's', 'Second lag — leave blank for 2nd-order loop')}
+        <div class="field-group">
+          <div class="field-label">Include Integrator (1/s)?</div>
+          <select class="full-select" id="bm-int" onchange="recalc()">
+            <option value="1">Yes — Type 1 loop (motor drive, servo, etc.)</option>
+            <option value="0">No  — Type 0 loop (proportional plant)</option>
+          </select>
+        </div>`,
+      calc: () => {
+        const K    = parseFloat(document.getElementById('inp-bm_K')?.value || '1');
+        const tau1 = getF('bm_tau1');
+        const tau2 = getF('bm_tau2');
+        const hasInt = parseInt(document.getElementById('bm-int')?.value || '1') === 1;
+        if (!tau1 || tau1 <= 0 || isNaN(K) || K <= 0) return null;
+
+        // Compute |G(jω)| and ∠G(jω) numerically
+        const G = (w) => {
+          // magnitude and phase
+          let mag = K, phase = 0;
+          if (hasInt)  { mag /= w; phase -= 90; }
+          // lag 1
+          const d1 = Math.sqrt(1 + (tau1*w)**2);
+          mag   /= d1;
+          phase -= Math.atan(tau1*w) * 180/Math.PI;
+          // lag 2 optional
+          if (tau2 && tau2 > 0) {
+            const d2 = Math.sqrt(1 + (tau2*w)**2);
+            mag   /= d2;
+            phase -= Math.atan(tau2*w) * 180/Math.PI;
+          }
+          return { mag, phase };
+        };
+
+        // Find ωgc: |G(jωgc)| = 1
+        let wgc = null;
+        for (let w = 1e-4; w < 1e6; w *= 1.01) {
+          if (G(w).mag <= 1) { wgc = w; break; }
+        }
+
+        // Find ωpc: ∠G(jωpc) = −180°
+        let wpc = null;
+        for (let w = 1e-4; w < 1e6; w *= 1.01) {
+          if (G(w).phase <= -180) { wpc = w; break; }
+        }
+
+        if (!wgc) return errorHTML('|G(jω)| never crosses 0 dB — system may not have a gain crossover. Increase K or check parameters.');
+
+        const pm = wgc ? 180 + G(wgc).phase : null;
+        const gm_dB = wpc ? -20 * Math.log10(G(wpc).mag) : null;
+        const gm_lin = wpc ? 1 / G(wpc).mag : null;
+
+        const pmVerd  = pm  > 45 ? 'Good (>45°)' : pm > 30 ? 'Acceptable (30–45°)' : pm > 0 ? 'Marginal (<30°)' : 'UNSTABLE';
+        const gmVerd  = gm_dB !== null ? (gm_dB > 6 ? 'Good (>6 dB)' : gm_dB > 3 ? 'Acceptable' : 'Marginal') : 'No PC crossing';
+        const pmColor = pm > 45 ? '#166534' : pm > 30 ? '#92400e' : '#991b1b';
+
+        return resultHTML([
+          { l: 'Gain Crossover (ωgc)',     v: eng(wgc, 'rad/s') },
+          { l: 'Phase Margin (PM)',         v: `${pm?.toFixed(1)}°  — ${pmVerd}` },
+          { hr: 1 },
+          { l: 'Phase Crossover (ωpc)',     v: wpc ? eng(wpc, 'rad/s') : 'None (stable at all gains)' },
+          { l: 'Gain Margin (GM)',          v: gm_dB !== null ? `${gm_dB.toFixed(1)} dB  (${gm_lin?.toFixed(2)}×)  — ${gmVerd}` : 'N/A' },
+          { hr: 1 },
+          { note: `Estimated damping ratio ζ ≈ PM/100 = ${(pm/100).toFixed(2)}` },
+          { note: `Estimated closed-loop BW ≈ ωgc · ${(Math.sqrt(1-2*(pm/100)**2 + Math.sqrt(4*(pm/100)**4 - 4*(pm/100)**2 + 2))).toFixed(2)} rad/s` },
+          { note: 'Numerical scan — for exact values use analytical inversion of G(jω).' },
+        ], 'PM = 180° + ∠G(jωgc)  |  GM = 1/|G(jωpc)|');
+      }
+    },
+
+    root_locus_k: {
+      title: 'Root Locus — Find Gain K',
+      desc: 'For a closed-loop system with open-loop G(s) = K·N(s)/D(s), find the gain K such that the characteristic polynomial has roots at desired closed-loop pole locations.',
+      fields: () => `
+        <div class="field-group">
+          <div class="field-label">Plant Configuration</div>
+          <select class="full-select" id="rlk-type" onchange="recalc()">
+            <option value="int_lag">K / (s(τs+1)) — integrator + lag</option>
+            <option value="two_lag">K / ((τ₁s+1)(τ₂s+1)) — two lags</option>
+            <option value="dbl_int">K / s² — double integrator</option>
+            <option value="second">K·ωₙ² / (s²+2ζ₀ωₙs+ωₙ²) — 2nd order plant</option>
+          </select>
+        </div>
+        ${fieldHTML('rlk_tau1', 'τ₁ (or τ)', ['m','','k'], '', 's')}
+        ${fieldHTML('rlk_tau2', 'τ₂ (optional)', ['m','','k'], 'm', 's')}
+        ${fieldHTML('rlk_wn0',  'Plant ωₙ (for 2nd order plant only)', ['m','','k'], '', 'rad/s')}
+        ${fieldHTML('rlk_z0',   'Plant ζ₀ (for 2nd order plant only)', ['m','',''], '', '')}
+        <div style="border-top:1px solid #eef;margin:14px 0;padding-top:14px;">
+          <div class="field-label" style="margin-bottom:8px;">Desired Closed-Loop Pole Location</div>
+          ${fieldPlainHTML('rlk_sigma', 'Real part −σ (enter positive)', 'e.g. 2')}
+          ${fieldPlainHTML('rlk_wd',    'Imaginary part ±jωd (enter positive)', 'e.g. 4  (0 for real pole)')}
+        </div>`,
+      calc: () => {
+        const type = document.getElementById('rlk-type')?.value;
+        const tau1 = getF('rlk_tau1');
+        const tau2 = getF('rlk_tau2');
+        const wn0  = getF('rlk_wn0');
+        const z0   = getF('rlk_z0');
+        const sigma = parseFloat(document.getElementById('inp-rlk_sigma')?.value);
+        const wd    = parseFloat(document.getElementById('inp-rlk_wd')?.value || '0');
+        if (!tau1 || tau1 <= 0 || isNaN(sigma)) return null;
+
+        // Desired pole: s_d = -sigma ± j*wd
+        const sd_re = -sigma, sd_im = wd;
+
+        // Evaluate open-loop TF N(s)/D(s) at s = sd
+        // Returns { re, im } of the complex value
+        const evalPoly = (coeffs, s_re, s_im) => {
+          let re = 0, im = 0;
+          for (let i = 0; i < coeffs.length; i++) {
+            // Multiply (re + j*im) * (s_re + j*s_im) + coeffs[i]
+            const n_re = re * s_re - im * s_im + coeffs[i];
+            const n_im = re * s_im + im * s_re;
+            re = n_re; im = n_im;
+          }
+          return { re, im };
+        };
+
+        // Evaluate (s + a) at s_d: returns {re: sd_re+a, im: sd_im}
+        const evalFactor = (a, s_re, s_im) => ({ re: s_re + a, im: s_im });
+
+        // Complex multiply
+        const cmul = (a, b) => ({ re: a.re*b.re - a.im*b.im, im: a.re*b.im + a.im*b.re });
+        // Complex magnitude
+        const cmag = (c) => Math.sqrt(c.re**2 + c.im**2);
+        // Complex angle in degrees
+        const cang = (c) => Math.atan2(c.im, c.re) * 180/Math.PI;
+
+        // Evaluate denominator D(s_d)
+        let Dval;
+        if (type === 'int_lag') {
+          // D = s*(tau1*s + 1)
+          const s   = { re: sd_re, im: sd_im };          // s
+          const lag = { re: tau1*sd_re + 1, im: tau1*sd_im }; // tau1*s + 1
+          Dval = cmul(s, lag);
+        } else if (type === 'two_lag') {
+          const l1 = { re: tau1*sd_re + 1, im: tau1*sd_im };
+          const l2 = tau2 ? { re: tau2*sd_re + 1, im: tau2*sd_im } : { re: 1, im: 0 };
+          Dval = cmul(l1, l2);
+        } else if (type === 'dbl_int') {
+          const s = { re: sd_re, im: sd_im };
+          Dval = cmul(s, s);
+        } else {
+          // 2nd order plant: wn0² / (s²+2z0*wn0*s+wn0²)
+          if (!wn0 || !z0) return null;
+          const denom_re = sd_re**2 - sd_im**2 + 2*z0*wn0*sd_re + wn0**2;
+          const denom_im = 2*sd_re*sd_im + 2*z0*wn0*sd_im;
+          Dval = { re: denom_re, im: denom_im };
+        }
+
+        const D_mag = cmag(Dval);
+        const D_ang = cang(Dval);
+        const N_val = type === 'second' ? wn0**2 : 1;  // numerator magnitude
+        // K = |D(s_d)| / |N(s_d)| for the angle condition to be met
+        // Check angle condition first: angle of G = (2k+1)·180°
+        const G_angle_needed = 180; // for negative feedback, need angle = ±180°
+        const angle_check = Math.abs(((D_ang * -1) % 360 + 360) % 360 - 180);
+
+        const K_val = D_mag / N_val;
+        const ts_est = 4 / sigma;
+        const pct_os = wd > 0 ? 100 * Math.exp(-Math.PI * sigma / wd) : 0;
+        const wn_cl  = Math.sqrt(sigma**2 + wd**2);
+        const zeta_cl = sigma / wn_cl;
+
+        return resultHTML([
+          { l: 'Required Gain K',          v: fmt(K_val, 5) },
+          { hr: 1 },
+          { l: 'Desired Pole (re)',         v: `s = −${fmt(sigma,4)} ± j${fmt(wd,4)}` },
+          { l: 'Closed-Loop ωₙ',           v: eng(wn_cl, 'rad/s') },
+          { l: 'Closed-Loop ζ',            v: fmt(zeta_cl, 4) },
+          { hr: 1 },
+          { l: 'Predicted %OS',            v: `${pct_os.toFixed(1)} %` },
+          { l: 'Predicted ts (2%)',        v: eng(ts_est, 's') },
+          { hr: 1 },
+          { note: `|G(sd)| at desired pole = ${fmt(D_mag/N_val, 4)} → K·|G(sd)| = 1 ✓` },
+          { note: 'Verify angle condition graphically — this gives magnitude only.' },
+        ], 'K = |D(s_d)| / |N(s_d)|  at desired closed-loop pole location');
+      }
+    },
+
+    sensitivity: {
+      title: 'Sensitivity Peak (Ms)',
+      desc: 'The sensitivity peak Ms = max|S(jω)| quantifies robustness: how much disturbances are amplified at worst-case frequency. Computed from damping ratio or phase margin.',
+      fields: () => `
+        ${modeBtns('sens_mode', [['zeta','From Damping Ratio ζ'],['pm','From Phase Margin']])}
+        ${S.sens_mode === 'zeta'
+          ? fieldPlainHTML('ms_z', 'Damping Ratio ζ', '0.5', '0 < ζ < 0.707 for Ms > 1; ζ ≥ 0.707 → no peak above DC')
+          : fieldPlainHTML('ms_pm', 'Phase Margin (degrees)', '45', 'Approximate: Ms ≈ 1/sin(PM)')}`,
+      calc: () => {
+        if (!S.sens_mode) S.sens_mode = 'zeta';
+        if (S.sens_mode === 'zeta') {
+          const z = parseFloat(document.getElementById('inp-ms_z')?.value);
+          if (isNaN(z) || z <= 0) return null;
+          if (z >= 1) return resultHTML([
+            { l: 'Damping Ratio ζ',    v: fmt(z, 4) },
+            { l: 'Sensitivity Peak Ms', v: 'N/A (overdamped — no resonant peak)' },
+            { note: 'Ms is defined only for underdamped systems (ζ < 1).' },
+          ]);
+          if (z >= Math.sqrt(2)/2) {
+            const Ms = 1; // No peak above DC for ζ ≥ 0.707
+            return resultHTML([
+              { l: 'Damping Ratio ζ', v: fmt(z, 4) },
+              { l: 'Sensitivity Peak Ms', v: '1.0 (no resonant peak above DC)' },
+              { note: 'ζ ≥ 0.707: frequency response is maximally flat or overdamped.' },
+            ]);
+          }
+          const Ms   = 1 / (2 * z * Math.sqrt(1 - z*z));
+          const wr   = Math.sqrt(1 - 2*z*z); // normalized resonant frequency (× ωₙ)
+          const Ms_dB = 20 * Math.log10(Ms);
+          return resultHTML([
+            { l: 'Damping Ratio ζ',          v: fmt(z, 4) },
+            { l: 'Sensitivity Peak Ms',       v: fmt(Ms, 4) },
+            { l: 'Ms (dB)',                   v: `${Ms_dB.toFixed(2)} dB` },
+            { l: 'Resonant Freq ωr (×ωₙ)',   v: fmt(wr, 4) },
+            { hr: 1 },
+            { note: Ms > 2   ? '⚠ Ms > 2 dB: poor robustness — disturbances amplified significantly.' :
+                    Ms > 1.3 ? 'Ms between 1.3–2: moderate robustness.' :
+                               'Ms < 1.3: good robustness.' },
+            { note: `Equivalent PM ≈ ${(Math.asin(1/Ms)*180/Math.PI).toFixed(1)}° (from Ms ≈ 1/sin(PM))` },
+          ], 'Ms = 1 / (2ζ√(1−ζ²))  |  ωr = ωₙ√(1−2ζ²)');
+        } else {
+          const pm = parseFloat(document.getElementById('inp-ms_pm')?.value);
+          if (isNaN(pm) || pm <= 0 || pm >= 180) return null;
+          const pm_rad = pm * Math.PI / 180;
+          const Ms = 1 / Math.sin(pm_rad);
+          const Ms_dB = 20 * Math.log10(Ms);
+          const z_est = pm / 100;
+          return resultHTML([
+            { l: 'Phase Margin',              v: `${pm.toFixed(1)}°` },
+            { l: 'Sensitivity Peak Ms (approx)', v: fmt(Ms, 4) },
+            { l: 'Ms (dB)',                   v: `${Ms_dB.toFixed(2)} dB` },
+            { l: 'Estimated ζ',              v: fmt(z_est, 3) },
+            { hr: 1 },
+            { note: Ms > 2   ? '⚠ Ms > 2: poor robustness.' : Ms > 1.3 ? 'Moderate robustness.' : 'Good robustness.' },
+            { note: 'Approximation valid for single-crossover minimum-phase systems.' },
+          ], 'Ms ≈ 1/sin(PM)  |  (exact: from Nyquist distance to −1 point)');
+        }
+      }
+    },
+
+    // ── STEP 2: FREQUENCY DOMAIN ────────────────────────────────────────────
+
+    polezero: {
+      title: 'Pole/Zero Extractor',
+      desc: 'Extract poles and zeros from standard 1st- and 2nd-order transfer function forms. Enter numerator and denominator polynomial coefficients.',
+      fields: () => `
+        <div class="field-group">
+          <div class="field-label">Transfer Function Form</div>
+          <select class="full-select" id="pz-type" onchange="recalc()">
+            <option value="first">1st order: G(s) = (b₁s + b₀) / (a₁s + a₀)</option>
+            <option value="second" selected>2nd order: G(s) = (b₂s² + b₁s + b₀) / (a₂s² + a₁s + a₀)</option>
+            <option value="standard">Standard: Kωₙ²/(s²+2ζωₙs+ωₙ²)</option>
+          </select>
+        </div>
+        <div id="pz-fields"></div>`,
+      calc: () => {
+        const type = document.getElementById('pz-type')?.value || 'second';
+        const container = document.getElementById('pz-fields');
+        if (!container) return null;
+
+        // Build fields if needed
+        const needed = type === 'first'
+          ? ['b1','b0','a1','a0']
+          : type === 'second'
+          ? ['b2','b1','b0','a2','a1','a0']
+          : ['pz_K','pz_wn','pz_z'];
+
+        if (container.dataset.built !== type) {
+          let html = '';
+          if (type === 'standard') {
+            html = `
+              ${fieldPlainHTML('pz_K',  'DC Gain K',             '1')}
+              ${fieldHTML('pz_wn', 'Natural Frequency ωₙ', ['m','','k'], '', 'rad/s')}
+              ${fieldPlainHTML('pz_z',  'Damping Ratio ζ',        '0.5')}`;
+          } else {
+            const labels = type === 'first'
+              ? { b1:'Numerator b₁ (s coefficient)', b0:'Numerator b₀ (constant)', a1:'Denominator a₁ (s coefficient)', a0:'Denominator a₀ (constant)' }
+              : { b2:'Numerator b₂ (s²)', b1:'Numerator b₁ (s)', b0:'Numerator b₀', a2:'Denominator a₂ (s²)', a1:'Denominator a₁ (s)', a0:'Denominator a₀' };
+            for (const [k, lbl] of Object.entries(labels)) {
+              html += `<div class="field-group">
+                <div class="field-label">${lbl}</div>
+                <div class="field-row"><input type="number" step="any" placeholder="—" id="inp-pz_${k}" oninput="recalc()" style="width:100%"></div>
+              </div>`;
+            }
+          }
+          container.innerHTML = html;
+          container.dataset.built = type;
+          container.querySelectorAll('input,select').forEach(el => el.addEventListener('input', recalc));
+          return null;
+        }
+
+        const g = (id) => { const el = document.getElementById(`inp-pz_${id}`); return el && el.value !== '' ? parseFloat(el.value) : null; };
+
+        const quadRoots = (a, b, c) => {
+          const disc = b*b - 4*a*c;
+          if (Math.abs(a) < 1e-14) return b !== 0 ? [{ re:-c/b, im:0 }] : [];
+          if (disc >= 0) {
+            return [{ re:(-b+Math.sqrt(disc))/(2*a), im:0 }, { re:(-b-Math.sqrt(disc))/(2*a), im:0 }];
+          } else {
+            const re = -b/(2*a), im = Math.sqrt(-disc)/(2*a);
+            return [{ re, im }, { re, im:-im }];
+          }
+        };
+        const fmtRoot = (r) => r.im === 0 ? `${fmt(r.re,4)}` : `${fmt(r.re,4)} ± j${fmt(Math.abs(r.im),4)}`;
+
+        let poles = [], zeros = [], dc_gain, rows = [];
+
+        if (type === 'standard') {
+          const K = g('K') ?? 1, wn = getF('pz_wn'), z = g('z');
+          if (!wn || wn <= 0 || z === null) return null;
+          poles = quadRoots(1, 2*z*wn, wn**2);
+          zeros = [];
+          dc_gain = K;
+          rows = [
+            { l: 'DC Gain K',   v: fmt(K,4) },
+            { l: 'ωₙ',          v: eng(wn,'rad/s') },
+            { l: 'ζ',           v: fmt(z,4) },
+            { hr:1 },
+          ];
+        } else if (type === 'first') {
+          const b1=g('b1')??0, b0=g('b0'), a1=g('a1')??1, a0=g('a0');
+          if (b0===null||a0===null) return null;
+          poles = quadRoots(a1, a0, 0).filter(r => isFinite(r.re));
+          if (Math.abs(a1) > 1e-12) poles = [{ re: -a0/a1, im: 0 }];
+          else poles = [];  // static
+          zeros = Math.abs(b1) > 1e-12 ? [{ re: -b0/b1, im: 0 }] : [];
+          dc_gain = b0 / a0;
+          rows = [{ l: 'DC Gain', v: fmt(dc_gain,4) }, { hr:1 }];
+        } else {
+          const b2=g('b2')??0, b1=g('b1')??0, b0=g('b0'), a2=g('a2')??1, a1=g('a1')??0, a0=g('a0');
+          if (b0===null||a0===null) return null;
+          poles = quadRoots(a2, a1, a0);
+          zeros = quadRoots(b2, b1, b0);
+          dc_gain = b0 / a0;
+          rows = [{ l: 'DC Gain', v: fmt(dc_gain,4) }, { hr:1 }];
+        }
+
+        poles.forEach((p, i) => rows.push({ l: `Pole ${i+1}`, v: `s = ${fmtRoot(p)} rad/s` }));
+        if (zeros.length === 0) rows.push({ l: 'Zeros', v: 'None (proper TF)' });
+        else zeros.forEach((z, i) => rows.push({ l: `Zero ${i+1}`, v: `s = ${fmtRoot(z)} rad/s` }));
+
+        const rhp_poles = poles.filter(p => p.re > 1e-9);
+        const rhp_zeros = zeros.filter(z => z.re > 1e-9);
+        rows.push({ hr:1 });
+        if (rhp_poles.length > 0) rows.push({ note: `⚠ ${rhp_poles.length} RHP pole(s) — open-loop unstable.` });
+        else rows.push({ note: '✓ All poles in LHP — open-loop stable.' });
+        if (rhp_zeros.length > 0) rows.push({ note: `⚠ ${rhp_zeros.length} RHP zero(s) — non-minimum phase system.` });
+
+        return resultHTML(rows, 'Poles: roots of denominator  |  Zeros: roots of numerator');
+      }
+    },
+
+    bandwidth: {
+      title: 'Closed-Loop Bandwidth',
+      desc: 'Closed-loop bandwidth ωBW is the frequency at which the magnitude drops to −3 dB (70.7%) of DC. For a standard 2nd-order system this depends on ωₙ and ζ.',
+      fields: () => `
+        ${fieldHTML('bw_wn', 'Natural Frequency (ωₙ)', ['m','','k','M'], '', 'rad/s')}
+        ${fieldPlainHTML('bw_z', 'Damping Ratio (ζ)', '0.5', '0 < ζ < 1 for underdamped; ζ ≥ 1 also supported')}
+        ${fieldPlainHTML('bw_K', 'DC Gain K (optional)', '1', 'Leave blank for K=1')}`,
+      calc: () => {
+        const wn = getF('bw_wn');
+        const z  = parseFloat(document.getElementById('inp-bw_z')?.value);
+        if (!wn || wn <= 0 || isNaN(z) || z < 0) return null;
+        const K  = parseFloat(document.getElementById('inp-bw_K')?.value || '1') || 1;
+
+        // -3dB BW: |T(jω)|² = 0.5
+        // For standard 2nd order: |T|² = 1/((1-(u)²)² + (2ζu)²), u = ω/ωn
+        // Solve numerically
+        let wBW = null;
+        for (let u = 0.001; u < 100; u += 0.001) {
+          const mag2 = 1 / ((1 - u*u)**2 + (2*z*u)**2);
+          if (mag2 <= 0.5) { wBW = u * wn; break; }
+        }
+        if (!wBW) wBW = wn * Math.sqrt(1 - 2*z*z + Math.sqrt(4*z**4 - 4*z**2 + 2));
+
+        const fBW = wBW / (2*Math.PI);
+        const ts2 = 4.0 / (z * wn);
+        const rule_bw = wn * (1.8 + 1.1 * z); // empirical approximation
+
+        return resultHTML([
+          { l: 'Closed-Loop BW (ωBW)',    v: eng(wBW, 'rad/s') },
+          { l: 'Closed-Loop BW (fBW)',    v: eng(fBW, 'Hz') },
+          { hr: 1 },
+          { l: 'ωBW / ωₙ ratio',          v: fmt(wBW/wn, 4) },
+          { l: 'Settling Time ts (2%)',   v: eng(ts2, 's') },
+          { hr: 1 },
+          { note: `Rule of thumb: ωBW ≈ ${fmt(wBW/wn,3)}·ωₙ for ζ = ${fmt(z,3)}` },
+          { note: `Required sample rate: fs ≥ ${fmt(10*fBW,4)} Hz  (10× BW guideline)` },
+          { note: z < 0.4 ? 'Low ζ: BW significantly exceeds ωₙ due to resonant peak.' :
+                  z > 0.8 ? 'High ζ: BW is less than ωₙ — sluggish response.' :
+                            'Moderate ζ: BW close to ωₙ — good bandwidth efficiency.' },
+        ], 'ωBW: |T(jωBW)|² = 0.5  |  ωBW = ωₙ√(1−2ζ²+√(4ζ⁴−4ζ²+2))');
+      }
+    },
+
+    resonant_peak: {
+      title: 'Resonant Peak (Mr)',
+      desc: 'The resonant peak Mr is the maximum magnitude of the closed-loop frequency response for an underdamped 2nd-order system. Only exists when ζ < 1/√2 ≈ 0.707.',
+      fields: () => `
+        ${fieldHTML('mr_wn', 'Natural Frequency (ωₙ)', ['m','','k','M'], '', 'rad/s')}
+        ${fieldPlainHTML('mr_z', 'Damping Ratio (ζ)', '0.3', 'Must be < 0.707 for a peak to exist')}`,
+      calc: () => {
+        const wn = getF('mr_wn');
+        const z  = parseFloat(document.getElementById('inp-mr_z')?.value);
+        if (!wn || wn <= 0 || isNaN(z) || z <= 0) return null;
+        if (z >= Math.sqrt(2)/2) {
+          return resultHTML([
+            { l: 'Damping Ratio ζ', v: fmt(z,4) },
+            { l: 'Resonant Peak',   v: 'None — ζ ≥ 1/√2 ≈ 0.707' },
+            { note: 'No frequency-response peak above DC for ζ ≥ 0.707.' },
+          ]);
+        }
+        const Mr  = 1 / (2*z*Math.sqrt(1 - z*z));
+        const wr  = wn * Math.sqrt(1 - 2*z*z);
+        const fr  = wr / (2*Math.PI);
+        const Mr_dB = 20 * Math.log10(Mr);
+        const wd  = wn * Math.sqrt(1 - z*z);
+
+        return resultHTML([
+          { l: 'Resonant Peak (Mr)',        v: fmt(Mr, 4) },
+          { l: 'Mr (dB)',                   v: `${Mr_dB.toFixed(2)} dB` },
+          { l: 'Resonant Frequency (ωr)',   v: eng(wr, 'rad/s') },
+          { l: 'Resonant Frequency (fr)',   v: eng(fr, 'Hz') },
+          { hr: 1 },
+          { l: 'Damped Frequency (ωd)',     v: eng(wd, 'rad/s') },
+          { l: 'ωr / ωₙ',                  v: fmt(wr/wn, 4) },
+          { hr: 1 },
+          { note: `ωr < ωd < ωₙ  (${fmt(wr,3)} < ${fmt(wd,3)} < ${fmt(wn,3)} rad/s)` },
+          { note: Mr > 1.3 ? `⚠ Mr = ${fmt(Mr,3)} > 1.3: significant overshoot in frequency domain.` : 'Acceptable peak level.' },
+        ], 'Mr = 1/(2ζ√(1−ζ²))  |  ωr = ωₙ√(1−2ζ²)');
+      }
+    },
+
+    nyquist: {
+      title: 'Nyquist / Aliasing Checker',
+      desc: 'Verify that a signal is properly sampled. Checks the Nyquist criterion, computes folding frequency, identifies aliased frequency components, and recommends anti-alias filter cutoff.',
+      fields: () => `
+        ${fieldHTML('nq_fs',   'Sample Rate (fs)',          ['','k','M'], 'k', 'Hz', 'ADC or controller sample frequency')}
+        ${fieldHTML('nq_fsig', 'Signal Frequency (f_sig)', ['','k','M'], '',  'Hz', 'Highest frequency component of interest')}
+        ${fieldHTML('nq_fbw',  'Control BW (optional)',    ['','k','M'], '',  'Hz', 'Closed-loop bandwidth — for sample rate adequacy check')}`,
+      calc: () => {
+        const fs   = getF('nq_fs');
+        const fsig = getF('nq_fsig');
+        const fbw  = getF('nq_fbw');
+        if (!fs || fs <= 0 || !fsig || fsig <= 0) return null;
+
+        const fN = fs / 2;  // Nyquist freq
+        const aliased = fsig > fN ? Math.abs(fsig - Math.round(fsig/fs)*fs) : null;
+        const ok = fsig < fN;
+        const margin = fN / fsig;
+        const aaFilter = fsig * 2;  // recommended AA filter cutoff
+        const ts = 1 / fs;
+
+        let rows = [
+          { l: 'Nyquist Frequency (fN)',    v: eng(fN, 'Hz') },
+          { l: 'Sampling Period (Ts)',       v: eng(ts, 's') },
+          { hr: 1 },
+          { l: 'Signal vs Nyquist',         v: ok ? `✓ ${eng(fsig,'Hz')} < fN — properly sampled` : `✗ ${eng(fsig,'Hz')} > fN — ALIASING` },
+          { l: 'Oversampling Ratio',        v: `${margin.toFixed(2)}×  (fN/fsig)` },
+        ];
+
+        if (!ok && aliased !== null) {
+          rows = [...rows,
+            { l: 'Aliased Frequency',       v: eng(aliased, 'Hz') },
+            { note: `⚠ Signal at ${eng(fsig,'Hz')} aliases to ${eng(aliased,'Hz')} — increase fs or add anti-alias filter below ${eng(fN,'Hz')}.` },
+          ];
+        } else {
+          rows = [...rows,
+            { l: 'Recommended AA Filter',   v: `≤ ${eng(fN * 0.8, 'Hz')}  (−3 dB)` },
+          ];
+        }
+
+        rows.push({ hr: 1 });
+        rows.push({ note: ok && margin >= 10
+          ? `fs/${fsig} = ${margin.toFixed(1)}× — excellent oversampling, quantization noise well managed.`
+          : ok && margin >= 2
+          ? `fs/${fsig} = ${margin.toFixed(1)}× — meets Nyquist but consider 10× for controls.`
+          : !ok ? 'Increase sample rate or low-pass filter signal before sampling.'
+          : 'Borderline — add analog anti-alias filter.' });
+
+        if (fbw !== null && fbw > 0) {
+          const bw_ratio = fs / fbw;
+          rows = [...rows, { hr:1 },
+            { l: 'fs / Control BW',         v: `${bw_ratio.toFixed(1)}× ${bw_ratio >= 10 ? '✓' : '⚠'}` },
+            { note: bw_ratio >= 20 ? 'Excellent: fs ≥ 20× BW — digital effects negligible.'
+                  : bw_ratio >= 10 ? 'Good: fs ≥ 10× BW — standard guideline met.'
+                  : bw_ratio >= 5  ? 'Marginal: fs = 5–10× BW — phase lag from ZOH may affect stability.'
+                  :                  '⚠ fs < 5× BW — significant ZOH phase lag. Consider increasing fs or reducing bandwidth.' },
+          ];
+        }
+
+        return resultHTML(rows, 'fN = fs/2  |  Need: fsig < fN  |  Recommend: fs ≥ 10–20 × fBW');
+      }
+    },
+    // ── STEP 3: PID & COMPENSATION ──────────────────────────────────────────
+
+    pid_zn: {
+      title: 'PID Tuning — Ziegler-Nichols',
+      desc: 'Two classic Z-N methods: the Ultimate Gain method (closed-loop test) and the Process Reaction Curve method (open-loop step test). Outputs P, PI, and PID gain sets with practical detuning guidance.',
+      fields: () => `
+        ${modeBtns('zn_mode', [['ultimate','Ultimate Gain (closed-loop)'],['reaction','Reaction Curve (open-loop)']])}
+        ${S.zn_mode === 'ultimate' ? `
+          ${fieldPlainHTML('zn_Ku', 'Ultimate Gain (Ku)', '—', 'Gain at which sustained oscillations occur under P-only control')}
+          ${fieldHTML('zn_Tu', 'Ultimate Period (Tu)', ['μ','m','','k'], 'm', 's', 'Period of sustained oscillation at Ku')}
+        ` : `
+          ${fieldPlainHTML('zn_K',   'Process Gain (K)',        '—', 'Δoutput / Δinput at steady state (open-loop step test)')}
+          ${fieldHTML('zn_tau', 'Process Time Constant (τ)', ['m','','k'], '', 's', 'Time from 28.3% to 63.2% of output change')}
+          ${fieldHTML('zn_theta', 'Dead Time / Delay (θ)',    ['m','','k'], 'm', 's', 'Transport delay before output begins to respond')}
+        `}
+        <div class="field-group">
+          <div class="field-label">Controller Type</div>
+          <select class="full-select" id="zn-ctype" onchange="recalc()">
+            <option value="pid" selected>PID</option>
+            <option value="pi">PI</option>
+            <option value="p">P only</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <div class="field-label">Detuning Factor (optional)</div>
+          <div class="field-row">
+            <input type="number" step="any" placeholder="1.0" id="inp-zn_detune" oninput="recalc()" style="width:100%">
+          </div>
+          <div class="field-hint">Divide Kp by this factor for robustness (1.5–3× typical). Leave blank for standard Z-N.</div>
+        </div>`,
+      calc: () => {
+        if (!S.zn_mode) S.zn_mode = 'ultimate';
+        const ctype   = document.getElementById('zn-ctype')?.value || 'pid';
+        const detune  = parseFloat(document.getElementById('inp-zn_detune')?.value || '1') || 1;
+
+        let Kp, Ti, Td, Ki, Kd;
+
+        if (S.zn_mode === 'ultimate') {
+          const Ku = parseFloat(document.getElementById('inp-zn_Ku')?.value);
+          const Tu = getF('zn_Tu');
+          if (isNaN(Ku) || Ku <= 0 || !Tu || Tu <= 0) return null;
+
+          if (ctype === 'p')   { Kp = 0.5 * Ku; Ti = Infinity; Td = 0; }
+          else if (ctype === 'pi')  { Kp = 0.45 * Ku; Ti = Tu / 1.2; Td = 0; }
+          else                 { Kp = 0.6 * Ku;  Ti = Tu / 2;   Td = Tu / 8; }
+
+          Kp /= detune;
+          Ki = Ti < Infinity ? Kp / Ti : 0;
+          Kd = Kp * Td;
+
+          return resultHTML([
+            { l: 'Method',     v: `Z-N Ultimate Gain (${ctype.toUpperCase()})` },
+            { l: 'Ku',         v: fmt(Ku, 4) },
+            { l: 'Tu',         v: eng(Tu, 's') },
+            { hr: 1 },
+            { l: 'Kp',         v: fmt(Kp, 5) },
+            { l: 'Ti (reset)',  v: Ti < Infinity ? eng(Ti, 's') : 'N/A' },
+            { l: 'Td (rate)',   v: Td > 0 ? eng(Td, 's') : 'N/A' },
+            { hr: 1 },
+            { l: 'Ki = Kp/Ti', v: Ki > 0 ? fmt(Ki, 5) : 'N/A' },
+            { l: 'Kd = Kp·Td', v: Kd > 0 ? fmt(Kd, 5) : 'N/A' },
+            { hr: 1 },
+            { note: detune > 1 ? `Detuned by ${detune}× — more robust, slower response.` : 'Standard Z-N: aggressive, ~25% overshoot expected.' },
+            { note: 'Z-N gives a starting point. Fine-tune Kp ±20%, Ti ±30% on the real system.' },
+          ], ctype === 'pid'
+            ? 'Kp = 0.6Ku/D  |  Ti = Tu/2  |  Td = Tu/8  (D = detuning)'
+            : ctype === 'pi'
+            ? 'Kp = 0.45Ku/D  |  Ti = Tu/1.2'
+            : 'Kp = 0.5Ku/D');
+
+        } else {
+          // Reaction curve (Cohen-Coon / Z-N open-loop)
+          const K     = parseFloat(document.getElementById('inp-zn_K')?.value);
+          const tau   = getF('zn_tau');
+          const theta = getF('zn_theta');
+          if (isNaN(K) || K <= 0 || !tau || tau <= 0 || !theta || theta <= 0) return null;
+
+          const r = theta / tau;  // delay-to-time-constant ratio
+
+          // Z-N open-loop (reaction curve)
+          if (ctype === 'p')   { Kp = (1/K) * (tau/theta); Ti = Infinity; Td = 0; }
+          else if (ctype === 'pi')  { Kp = (0.9/K) * (tau/theta); Ti = theta / 0.3; Td = 0; }
+          else                 { Kp = (1.2/K) * (tau/theta); Ti = 2 * theta; Td = 0.5 * theta; }
+
+          Kp /= detune;
+          Ki = Ti < Infinity ? Kp / Ti : 0;
+          Kd = Kp * Td;
+
+          const controllability = r < 0.1 ? 'Easy to control (θ/τ < 0.1)'
+            : r < 0.3 ? 'Good controllability (θ/τ = 0.1–0.3)'
+            : r < 0.5 ? 'Moderate — delay significant (θ/τ = 0.3–0.5)'
+            : r < 1.0 ? 'Difficult — delay dominant (θ/τ = 0.5–1.0)'
+            : '⚠ Very difficult — consider Smith Predictor (θ/τ > 1)';
+
+          return resultHTML([
+            { l: 'Method',               v: `Z-N Reaction Curve (${ctype.toUpperCase()})` },
+            { l: 'θ/τ ratio',            v: fmt(r, 4) },
+            { l: 'Controllability',      v: controllability },
+            { hr: 1 },
+            { l: 'Kp',                   v: fmt(Kp, 5) },
+            { l: 'Ti (reset)',            v: Ti < Infinity ? eng(Ti, 's') : 'N/A' },
+            { l: 'Td (rate)',             v: Td > 0 ? eng(Td, 's') : 'N/A' },
+            { hr: 1 },
+            { l: 'Ki = Kp/Ti',           v: Ki > 0 ? fmt(Ki, 5) : 'N/A' },
+            { l: 'Kd = Kp·Td',          v: Kd > 0 ? fmt(Kd, 5) : 'N/A' },
+            { hr: 1 },
+            { note: detune > 1 ? `Detuned by ${detune}×.` : 'Standard Z-N open-loop tuning.' },
+            { note: r > 0.5 ? 'High θ/τ — consider IMC/Lambda tuning for better robustness.' : 'θ/τ < 0.5: Z-N reaction curve is well-suited.' },
+          ], 'Kp = (1.2/K)·(τ/θ)/D  |  Ti = 2θ  |  Td = 0.5θ  [PID form]');
+        }
+      }
+    },
+
+    pid_imc: {
+      title: 'IMC / Lambda Tuning',
+      desc: 'Internal Model Control (Lambda tuning) — the most practically robust PID method for FOPDT processes. You directly specify the desired closed-loop time constant λ, trading off speed vs. robustness.',
+      fields: () => `
+        ${fieldPlainHTML('imc_K',     'Process Gain (K)',            '1',   'Δoutput / Δinput (open-loop step test)')}
+        ${fieldHTML('imc_tau',   'Process Time Constant (τ)',  ['m','','k'], '', 's')}
+        ${fieldHTML('imc_theta', 'Dead Time / Delay (θ)',      ['m','','k'], 'm', 's', 'Transport delay. Use 0 if negligible.')}
+        ${fieldHTML('imc_lam',   'Lambda — Desired CL τ (λ)',  ['m','','k'], '', 's', 'Rule of thumb: λ = 1–3× τ for robust; λ = 0.1–0.5× τ for aggressive')}
+        <div class="field-group">
+          <div class="field-label">IMC Structure</div>
+          <select class="full-select" id="imc-struct" onchange="recalc()">
+            <option value="pi">PI (no derivative — θ = 0 or small)</option>
+            <option value="pid" selected>PID with derivative filter</option>
+          </select>
+        </div>`,
+      calc: () => {
+        const K     = parseFloat(document.getElementById('inp-imc_K')?.value);
+        const tau   = getF('imc_tau');
+        const theta = getF('imc_theta') ?? 0;
+        const lam   = getF('imc_lam');
+        const struc = document.getElementById('imc-struct')?.value || 'pid';
+        if (isNaN(K) || K === 0 || !tau || tau <= 0 || !lam || lam <= 0) return null;
+
+        // IMC-PID formulas (Rivera, Morari, Skogestad)
+        // For FOPDT: G(s) = K·e^(−θs) / (τs+1)
+        // Skogestad SIMC:
+        const tau_c = lam;           // closed-loop time constant = lambda
+        const theta_eff = theta;
+
+        let Kp, Ti, Td, Ki, Kd, N_filter;
+
+        if (struc === 'pi') {
+          // PI: Kp = τ/(K(λ+θ))  Ti = τ
+          Kp = tau / (K * (tau_c + theta_eff));
+          Ti = tau;
+          Td = 0;
+        } else {
+          // PID (Skogestad SIMC):
+          // Kp = (1/K) * τ/(λ + θ/2)
+          // Ti = min(τ, 4(λ + θ/2))
+          // Td = θ/2
+          Kp = (1/K) * tau / (tau_c + theta_eff/2);
+          Ti = Math.min(tau, 4*(tau_c + theta_eff/2));
+          Td = theta_eff / 2;
+          N_filter = 5;  // typical derivative filter
+        }
+
+        Ki = Kp / Ti;
+        Kd = struc === 'pid' ? Kp * Td : 0;
+
+        // Predicted closed-loop performance
+        const ts_pred  = tau_c * 4;  // ~4λ to settle
+        const r = theta / tau;
+        const robustness = tau_c >= tau
+          ? 'Conservative (λ ≥ τ): very robust, slow setpoint tracking'
+          : tau_c >= 0.5*tau
+          ? 'Moderate (λ = 0.5–1×τ): good balance'
+          : tau_c >= 0.1*tau
+          ? 'Aggressive (λ < 0.5τ): fast but less robust to model error'
+          : '⚠ Very aggressive — sensitive to process gain mismatch';
+
+        return resultHTML([
+          { l: 'Method',                v: `IMC / Skogestad SIMC (${struc.toUpperCase()})` },
+          { l: 'λ/τ ratio',            v: fmt(tau_c/tau, 4) },
+          { l: 'Robustness assessment', v: robustness },
+          { hr: 1 },
+          { l: 'Kp',                   v: fmt(Kp, 5) },
+          { l: 'Ti (integral time)',    v: eng(Ti, 's') },
+          { l: 'Td (derivative time)',  v: struc === 'pid' ? eng(Td, 's') : 'N/A (PI)' },
+          { hr: 1 },
+          { l: 'Ki = Kp/Ti',           v: fmt(Ki, 5) },
+          { l: 'Kd = Kp·Td',          v: struc === 'pid' && Kd > 0 ? fmt(Kd, 5) : 'N/A' },
+          { l: 'Derivative filter N',  v: struc === 'pid' ? `${N_filter} (typical)` : 'N/A' },
+          { hr: 1 },
+          { l: 'Predicted ts (4λ)',    v: eng(ts_pred, 's') },
+          { note: r > 0 ? `Dead time fraction θ/τ = ${fmt(r,3)}` : 'No dead time — PI structure recommended.' },
+          { note: 'IMC advantage: single tuning parameter λ with clear physical meaning.' },
+        ], struc === 'pid'
+          ? 'Kp = τ/(K(λ+θ/2))  |  Ti = min(τ, 4(λ+θ/2))  |  Td = θ/2'
+          : 'Kp = τ/(K(λ+θ))  |  Ti = τ  [PI form]');
+      }
+    },
+
+    lead: {
+      title: 'Lead Compensator',
+      desc: 'A lead compensator C(s) = K·(s+z)/(s+p) with p > z adds phase lead (positive phase boost) at a target frequency. Used to improve phase margin and speed up transient response.',
+      fields: () => `
+        ${fieldHTML('lead_wt',  'Target Frequency (ωt)',      ['m','','k','M'], '', 'rad/s', 'Frequency where maximum phase boost is desired (≈ gain crossover)')}
+        ${fieldPlainHTML('lead_phi', 'Desired Phase Boost (φmax)', '45',           'Degrees of phase lead to add (15–70° practical range)')}
+        ${fieldPlainHTML('lead_K0',  'Plant Gain at ωt  |G(jωt)|', '1',            'Open-loop magnitude at target frequency (to size compensator gain K)')}`,
+      calc: () => {
+        const wt  = getF('lead_wt');
+        const phi = parseFloat(document.getElementById('inp-lead_phi')?.value);
+        const K0  = parseFloat(document.getElementById('inp-lead_K0')?.value || '1') || 1;
+        if (!wt || wt <= 0 || isNaN(phi) || phi <= 0 || phi >= 90) return null;
+        if (phi > 70) return errorHTML('Phase boost > 70° requires very large pole/zero ratio — impractical. Use two cascaded lead stages.');
+
+        const phi_r = phi * Math.PI / 180;
+        const alpha = (1 - Math.sin(phi_r)) / (1 + Math.sin(phi_r));  // alpha = z/p < 1 for lead
+        // ωmax = √(z·p)  → z = ωt·√α,  p = ωt/√α
+        const z_lead = wt * Math.sqrt(alpha);
+        const p_lead = wt / Math.sqrt(alpha);
+        const ratio  = p_lead / z_lead;  // = 1/alpha
+
+        // Compensator gain at ωt: |C(jωt)| = √(1/alpha)
+        // Set K so overall |K·C·G| = 1 at ωt (crossover gain condition)
+        const C_mag_at_wt = Math.sqrt(1 / alpha);
+        const K_comp = 1 / (K0 * C_mag_at_wt);  // compensator gain to achieve 0dB crossover
+
+        // Phase of compensator at ωt
+        const phase_at_wt = (Math.atan(wt/z_lead) - Math.atan(wt/p_lead)) * 180/Math.PI;
+
+        // High-freq gain (Bode magnitude at high ω): K·p/z = K/alpha
+        const hf_gain_dB = 20*Math.log10(K_comp / alpha);
+
+        return resultHTML([
+          { l: 'Compensator C(s)',       v: `K·(s + ${fmt(z_lead,4)}) / (s + ${fmt(p_lead,4)})` },
+          { l: 'Zero location (−z)',     v: `s = −${fmt(z_lead, 4)} rad/s` },
+          { l: 'Pole location (−p)',     v: `s = −${fmt(p_lead, 4)} rad/s` },
+          { l: 'Pole/Zero ratio (α⁻¹)', v: fmt(ratio, 4) },
+          { hr: 1 },
+          { l: 'Max Phase Boost (φmax)', v: `${phase_at_wt.toFixed(2)}°  at ω = ${eng(wt,'rad/s')}` },
+          { l: 'Compensator Gain K',     v: fmt(K_comp, 5) },
+          { l: 'HF Gain Increase',       v: `${hf_gain_dB.toFixed(2)} dB  (noise amplification)` },
+          { hr: 1 },
+          { note: `α = ${fmt(alpha,4)} — smaller α → more phase boost but more noise sensitivity.` },
+          { note: ratio > 20 ? '⚠ Pole/zero ratio > 20: high noise amplification. Consider splitting into two stages.' :
+                  ratio > 10 ? 'High ratio (10–20): check noise sensitivity in your application.' :
+                               'Moderate ratio: good practical lead compensator.' },
+          { note: 'Verify new PM = old PM + φmax − phase lag from gain shift.' },
+        ], 'C(s) = K·(s+z)/(s+p)  |  α = z/p = (1−sinφ)/(1+sinφ)  |  ωmax = √(z·p)');
+      }
+    },
+
+    lag: {
+      title: 'Lag Compensator',
+      desc: 'A lag compensator C(s) = K·(s+z)/(s+p) with p < z reduces high-frequency gain to improve stability margins while increasing low-frequency gain to reduce steady-state error.',
+      fields: () => `
+        ${fieldHTML('lag_wgc',   'Current Gain Crossover (ωgc)',  ['m','','k','M'], '', 'rad/s', 'Existing crossover frequency before compensation')}
+        ${fieldPlainHTML('lag_GM_want', 'Desired Gain Attenuation (dB)', '20',   'How much to reduce gain at crossover (typically 10–20 dB)')}
+        ${fieldHTML('lag_wz',    'Zero Location Frequency (ωz)',  ['m','','k'],    'm', 'rad/s', 'Place 1 decade below crossover: ωz = ωgc/10')}
+        ${fieldPlainHTML('lag_K0',     'DC gain improvement desired (×)',  '10',   'Low-frequency gain boost factor for SS error reduction')}`,
+      calc: () => {
+        const wgc    = getF('lag_wgc');
+        const atten  = parseFloat(document.getElementById('inp-lag_GM_want')?.value || '20');
+        const wz_raw = getF('lag_wz');
+        const beta   = parseFloat(document.getElementById('inp-lag_K0')?.value || '10');
+        if (!wgc || wgc <= 0 || isNaN(atten) || atten <= 0) return null;
+
+        // beta = z/p > 1 for lag  (lag: |p| < |z|)
+        const beta_atten = Math.pow(10, atten/20);  // linear attenuation at high freq
+        // Place zero about 1 decade below crossover
+        const wz = wz_raw ?? wgc / 10;
+        const wp = wz / beta_atten;  // p = z/beta
+
+        // Phase lag at crossover
+        const phase_lag = (Math.atan(wgc/wz) - Math.atan(wgc/wp)) * 180/Math.PI;
+
+        // DC gain boost
+        const dc_boost_dB = 20*Math.log10(beta_atten);
+
+        return resultHTML([
+          { l: 'Compensator C(s)',        v: `(s + ${fmt(wz,4)}) / (s + ${fmt(wp,4)})` },
+          { l: 'Zero location (−z)',      v: `s = −${fmt(wz, 4)} rad/s` },
+          { l: 'Pole location (−p)',      v: `s = −${fmt(wp, 5)} rad/s` },
+          { l: 'β = z/p (lag ratio)',     v: fmt(beta_atten, 4) },
+          { hr: 1 },
+          { l: 'Attenuation at ωgc',     v: `−${atten.toFixed(1)} dB  (×${fmt(1/beta_atten,4)})` },
+          { l: 'Phase lag at ωgc',       v: `−${phase_lag.toFixed(2)}°  ⚠ reduces PM` },
+          { l: 'DC gain boost',          v: `+${dc_boost_dB.toFixed(1)} dB  (×${fmt(beta_atten,4)})` },
+          { hr: 1 },
+          { note: phase_lag > 10 ? `⚠ Phase lag of ${phase_lag.toFixed(1)}° at ωgc — move zero lower (ωz < ωgc/10) to reduce PM penalty.` :
+                                   `Phase lag at ωgc = ${phase_lag.toFixed(1)}° — acceptable (< 10°).` },
+          { note: `New crossover will shift to where |G(jω)| = +${atten.toFixed(0)} dB — lower than original ωgc.` },
+          { note: 'DC gain boost reduces steady-state error by ×β. Net PM change ≈ −' + phase_lag.toFixed(1) + '°.' },
+        ], 'C(s) = (s+z)/(s+p)  |  β = z/p > 1  |  HF attenuation = −20·log(β) dB');
+      }
+    },
+
+    deriv_filter: {
+      title: 'Derivative Filter (N Parameter)',
+      desc: 'A pure derivative Kd·s is improper and amplifies noise. The filtered derivative Kd·s/(s/N+1) rolls off above N·ωn. This calculator sizes N and shows the frequency at which filtering becomes effective.',
+      fields: () => `
+        ${fieldHTML('nf_wn',  'System Natural Freq (ωₙ)',  ['m','','k','M'], '', 'rad/s', 'Closed-loop natural frequency — sets derivative action frequency')}
+        ${fieldHTML('nf_bw',  'Control Bandwidth (ωBW)',   ['m','','k','M'], '', 'rad/s', 'Leave blank to use ωₙ as reference')}
+        ${fieldPlainHTML('nf_N', 'Derivative Filter N',   '10',             'N = 5–20 typical. Higher N = less filtering = more noise.')}
+        ${fieldHTML('nf_Kd',  'Derivative Gain Kd (optional)', ['μ','m','','k'], '', '', 'For computing filter pole and crossover')}`,
+      calc: () => {
+        const wn  = getF('nf_wn');
+        const bw  = getF('nf_bw');
+        const N   = parseFloat(document.getElementById('inp-nf_N')?.value || '10');
+        const Kd  = getF('nf_Kd');
+        const w_ref = bw ?? wn;
+        if (!w_ref || w_ref <= 0 || isNaN(N) || N <= 0) return null;
+
+        // Filtered derivative: Kd*s / (s/N + 1) = Kd*N*s / (s + N)
+        // Filter pole at s = -N (normalized)  →  actual: s = -N·w_ref (if using normalized form)
+        // More typically: pole at s = -N  in the controller s-domain
+        // The filter attenuates above ω = N (rad/s in normalized, or N·ωBW in real units if Td = 1/ωBW)
+
+        // Crossover frequency where derivative gain = Kd (0 dB reference)
+        // |Kd*s/(s/N+1)| at ω: Kd*ω / sqrt(1 + (ω/N)²)
+        // Filter corner at ω = N  (rad/s in control law)
+        const w_corner = N * w_ref;  // filter corner in rad/s
+
+        // Gain at 10× corner vs. without filter
+        const atten_10x = N / Math.sqrt(1 + (10*w_ref/w_corner * N)**2 / N**2);
+
+        // Phase added by derivative at ωBW
+        const phase_d = 90 - Math.atan(w_ref/w_corner) * 180/Math.PI;  // phase of filtered derivative at w_ref
+
+        // Noise amplification at fs/2 (assume fs = 10×ωBW)
+        const w_nyq  = 5 * w_ref;  // Nyquist at 10×BW sample rate
+        const gain_nyq = N * w_nyq / Math.sqrt(N*N + w_nyq*w_nyq) / w_nyq;
+
+        const n_guide = N < 5  ? '⚠ N < 5: heavy filtering, derivative action significantly reduced.'
+                      : N < 10 ? 'Conservative (N = 5–10): good noise rejection, moderate derivative action.'
+                      : N < 20 ? 'Standard (N = 10–20): balanced — recommended starting point.'
+                      : N < 50 ? 'Aggressive (N = 20–50): minimal filtering, noise sensitive.'
+                      :          '⚠ N > 50: nearly unfiltered derivative — avoid unless very clean signal.';
+
+        const rows = [
+          { l: 'Filter Parameter N',       v: fmt(N, 4) },
+          { l: 'Filter Corner Frequency',  v: eng(w_corner, 'rad/s') },
+          { l: 'Filter Corner (Hz)',        v: eng(w_corner/(2*Math.PI), 'Hz') },
+          { hr: 1 },
+          { l: 'Phase lead at ωBW',        v: `${phase_d.toFixed(1)}°` },
+          { l: 'Gain at 10× corner',       v: `${(20*Math.log10(N/Math.sqrt(1+N*N))).toFixed(1)} dB  vs pure deriv.` },
+          { hr: 1 },
+          { note: n_guide },
+          { note: `Filtered form: Cd(s) = Kd·N·s / (s + N·ωref) where ωref = ${eng(w_ref,'rad/s')}` },
+          { note: 'In discrete PID: use Kd/(Ts·(1 + Kd/(N·Ts·Kp))) for velocity form.' },
+        ];
+
+        if (Kd !== null && Kd > 0) {
+          const pole_d = N; // normalized filter pole
+          rows.splice(4, 0, { l: 'Kd·N (filtered derivative)', v: fmt(Kd * N, 5) });
+        }
+
+        return resultHTML(rows, 'Cd(s) = Kd·s / (Ts·s + 1)  where Tf = 1/N  |  pole at s = −N');
+      }
+    },
+
+    antiwindup: {
+      title: 'Anti-Windup Limit',
+      desc: 'Integrator windup occurs when the actuator saturates and the integral term keeps growing. This calculator determines the integrator output clamp and back-calculation gain Kb to prevent windup.',
+      fields: () => `
+        ${fieldPlainHTML('aw_umax',  'Actuator Upper Limit (u_max)', '100',  'e.g. 100% for a valve, ±10V for an amplifier')}
+        ${fieldPlainHTML('aw_umin',  'Actuator Lower Limit (u_min)', '0',    'Minimum output (use negative for bidirectional)')}
+        ${fieldPlainHTML('aw_Kp',    'Proportional Gain (Kp)',        '1',    'PID Kp — used to compute integrator share')}
+        ${fieldPlainHTML('aw_Ki',    'Integral Gain (Ki = Kp/Ti)',    '0.5',  'In rad/s units')}
+        ${fieldPlainHTML('aw_emax',  'Max Expected Steady-State Error', '10', 'Largest step error expected in normal operation')}
+        <div class="field-group">
+          <div class="field-label">Anti-Windup Method</div>
+          <select class="full-select" id="aw-method" onchange="recalc()">
+            <option value="clamp">Output clamping (simple, no back-calc)</option>
+            <option value="backcalc" selected>Back-calculation (Kb tracking)</option>
+            <option value="cond">Conditional integration (stop integrating at saturation)</option>
+          </select>
+        </div>`,
+      calc: () => {
+        const umax  = parseFloat(document.getElementById('inp-aw_umax')?.value);
+        const umin  = parseFloat(document.getElementById('inp-aw_umin')?.value ?? '0');
+        const Kp    = parseFloat(document.getElementById('inp-aw_Kp')?.value   || '1');
+        const Ki    = parseFloat(document.getElementById('inp-aw_Ki')?.value   || '0.5');
+        const emax  = parseFloat(document.getElementById('inp-aw_emax')?.value || '10');
+        const method = document.getElementById('aw-method')?.value || 'backcalc';
+        if (isNaN(umax) || isNaN(umin) || isNaN(Kp) || Kp <= 0) return null;
+
+        const u_range  = umax - umin;
+        const u_center = (umax + umin) / 2;
+
+        // Max proportional contribution at max error
+        const u_prop   = Kp * emax;
+        // Remaining headroom for integral
+        const i_head   = Math.max(0, umax - u_prop);
+        // Integrator limit = remaining headroom / Ki (in time units)
+        const i_limit  = Ki > 0 ? i_head / Ki : Infinity;
+
+        // Back-calculation gain Kb recommendation
+        // Kb = 1/Ti = Ki/Kp for critical damping of reset windup
+        const Ti  = Ki > 0 ? Kp / Ki : Infinity;
+        const Kb  = 1 / Ti;  // tracking time constant = Ti
+        const Kb_aggressive = 1 / (0.5 * Ti);  // faster unwinding
+
+        // Saturation detection thresholds
+        const u_sat_margin = u_range * 0.05;  // 5% margin
+
+        const methodNote = method === 'clamp'
+          ? 'Output clamping: stop accumulating when output would exceed limits. Simple but abrupt.'
+          : method === 'backcalc'
+          ? `Back-calculation: feed back (u_sat − u_unsat) through Kb to unwind integrator smoothly.`
+          : 'Conditional: freeze integration when |e| > threshold OR output is saturated. Prevents wind-up without back-calc.';
+
+        return resultHTML([
+          { l: 'Actuator Range',          v: `[${fmt(umin,3)}, ${fmt(umax,3)}]  (span: ${fmt(u_range,4)})` },
+          { l: 'Max prop. contribution',  v: fmt(u_prop, 4) },
+          { l: 'Integrator headroom',     v: fmt(i_head, 4) },
+          { hr: 1 },
+          { l: 'Integrator clamp limit',  v: i_limit < Infinity ? fmt(i_limit, 5) : 'Unconstrained (check Ki)' },
+          { l: 'Integral time Ti',        v: Ti < Infinity ? eng(Ti, 's') : 'N/A' },
+          { hr: 1 },
+          ...(method === 'backcalc' ? [
+            { l: 'Back-calc gain Kb',       v: fmt(Kb, 5) },
+            { l: 'Kb aggressive (0.5Ti)',  v: fmt(Kb_aggressive, 5) },
+            { note: `Kb = 1/Ti = ${fmt(Kb,4)}: integrator unwinds with time constant Ti = ${fmt(Ti,4)} s.` },
+          ] : []),
+          { hr: 1 },
+          { note: methodNote },
+          { note: u_prop > umax ? '⚠ Proportional term alone exceeds actuator limit — reduce Kp or increase actuator range.' :
+                  u_prop > 0.8*umax ? 'Proportional term uses >80% of actuator range — little headroom for integral action.' :
+                                      'Proportional headroom OK — integral has reasonable range to work with.' },
+        ], method === 'backcalc'
+          ? 'u = Kp·e + Ki·∫e  (clamped)  |  Kb = 1/Ti  |  du_int/dt = Ki·e + Kb·(u_sat−u)'
+          : 'u = sat(Kp·e + Ki·∫e, u_min, u_max)');
+      }
+    },
+    // ── STEP 4: STATE SPACE ─────────────────────────────────────────────────
+
+    ctrl_obs: {
+      title: 'Controllability & Observability',
+      desc: 'Check whether a 2nd-order state-space system (A,B,C) is controllable and observable by computing the rank of the controllability matrix 𝒞 = [B | AB] and observability matrix 𝒪 = [C; CA].',
+      fields: () => `
+        <div style="font-size:12px;color:#555;margin-bottom:12px;padding:10px;background:#f0f9ff;border-radius:6px;border:1px solid #bae6fd;">
+          2nd-order system: ẋ = Ax + Bu, y = Cx. Enter 2×2 matrix A, 2×1 vector B, 1×2 vector C.
+        </div>
+        <div class="field-label" style="margin-bottom:8px;">Matrix A (row by row)</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px;">
+          <div><div style="font-size:10px;color:#888;margin-bottom:3px;">A[1,1]</div><input type="number" step="any" id="co_a11" oninput="recalc()" style="width:100%;padding:6px 8px;border:1px solid #dde;border-radius:5px;font-size:13px;"></div>
+          <div><div style="font-size:10px;color:#888;margin-bottom:3px;">A[1,2]</div><input type="number" step="any" id="co_a12" oninput="recalc()" style="width:100%;padding:6px 8px;border:1px solid #dde;border-radius:5px;font-size:13px;"></div>
+          <div><div style="font-size:10px;color:#888;margin-bottom:3px;">A[2,1]</div><input type="number" step="any" id="co_a21" oninput="recalc()" style="width:100%;padding:6px 8px;border:1px solid #dde;border-radius:5px;font-size:13px;"></div>
+          <div><div style="font-size:10px;color:#888;margin-bottom:3px;">A[2,2]</div><input type="number" step="any" id="co_a22" oninput="recalc()" style="width:100%;padding:6px 8px;border:1px solid #dde;border-radius:5px;font-size:13px;"></div>
+        </div>
+        <div class="field-label" style="margin-bottom:8px;">Vector B (2×1) and C (1×2)</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-bottom:12px;">
+          <div><div style="font-size:10px;color:#888;margin-bottom:3px;">B[1]</div><input type="number" step="any" id="co_b1" oninput="recalc()" style="width:100%;padding:6px 8px;border:1px solid #dde;border-radius:5px;font-size:13px;"></div>
+          <div><div style="font-size:10px;color:#888;margin-bottom:3px;">B[2]</div><input type="number" step="any" id="co_b2" oninput="recalc()" style="width:100%;padding:6px 8px;border:1px solid #dde;border-radius:5px;font-size:13px;"></div>
+          <div><div style="font-size:10px;color:#888;margin-bottom:3px;">C[1]</div><input type="number" step="any" id="co_c1" oninput="recalc()" style="width:100%;padding:6px 8px;border:1px solid #dde;border-radius:5px;font-size:13px;"></div>
+          <div><div style="font-size:10px;color:#888;margin-bottom:3px;">C[2]</div><input type="number" step="any" id="co_c2" oninput="recalc()" style="width:100%;padding:6px 8px;border:1px solid #dde;border-radius:5px;font-size:13px;"></div>
+        </div>`,
+      calc: () => {
+        const g = id => { const el = document.getElementById(id); return el && el.value !== '' ? parseFloat(el.value) : null; };
+        const a11=g('co_a11'),a12=g('co_a12'),a21=g('co_a21'),a22=g('co_a22');
+        const b1=g('co_b1'),b2=g('co_b2'),c1=g('co_c1'),c2=g('co_c2');
+        if ([a11,a12,a21,a22,b1,b2,c1,c2].some(v=>v===null)) return null;
+        // 𝒞 = [B | AB]: AB = A*B
+        const ab1 = a11*b1 + a12*b2, ab2 = a21*b1 + a22*b2;
+        const det_C = b1*ab2 - b2*ab1;
+        const ctrl = Math.abs(det_C) > 1e-10;
+        // 𝒪 = [C; CA]: CA = C*A
+        const ca1 = c1*a11 + c2*a21, ca2 = c1*a12 + c2*a22;
+        const det_O = c1*ca2 - c2*ca1;
+        const obs = Math.abs(det_O) > 1e-10;
+        // Eigenvalues of A
+        const tr = a11+a22, det_A = a11*a22-a12*a21;
+        const disc = tr*tr - 4*det_A;
+        const eig = disc >= 0
+          ? `${fmt((tr+Math.sqrt(disc))/2,4)}, ${fmt((tr-Math.sqrt(disc))/2,4)}`
+          : `${fmt(tr/2,4)} ± j${fmt(Math.sqrt(-disc)/2,4)}`;
+        return resultHTML([
+          { l: 'Controllability matrix det', v: fmt(det_C,5) },
+          { l: 'Controllable?', v: ctrl ? '✓ Yes — rank(𝒞) = 2' : '✗ No — rank(𝒞) < 2' },
+          { hr:1 },
+          { l: 'Observability matrix det', v: fmt(det_O,5) },
+          { l: 'Observable?', v: obs ? '✓ Yes — rank(𝒪) = 2' : '✗ No — rank(𝒪) < 2' },
+          { hr:1 },
+          { l: 'Open-loop eigenvalues', v: eig },
+          { note: ctrl && obs ? 'Fully controllable and observable — state feedback and observer design possible.' :
+                  ctrl ? 'Controllable but not observable — some states cannot be estimated.' :
+                  obs  ? 'Observable but not controllable — some modes cannot be driven.' :
+                         '⚠ Neither controllable nor observable — check system structure.' },
+        ], '𝒞 = [B|AB]  det≠0 → controllable  |  𝒪 = [C;CA]  det≠0 → observable');
+      }
+    },
+
+    ackermann: {
+      title: 'Pole Placement — Ackermann (2nd Order)',
+      desc: 'Compute state feedback gain K = [k₁ k₂] for a 2nd-order system using Ackermann\'s formula so that the closed-loop poles are at desired locations.',
+      fields: () => `
+        <div class="field-label" style="margin-bottom:8px;">Matrix A and vector B</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-bottom:12px;">
+          <div><div style="font-size:10px;color:#888;margin-bottom:3px;">A[1,1]</div><input type="number" step="any" id="ak_a11" oninput="recalc()" style="width:100%;padding:6px 8px;border:1px solid #dde;border-radius:5px;font-size:13px;"></div>
+          <div><div style="font-size:10px;color:#888;margin-bottom:3px;">A[1,2]</div><input type="number" step="any" id="ak_a12" oninput="recalc()" style="width:100%;padding:6px 8px;border:1px solid #dde;border-radius:5px;font-size:13px;"></div>
+          <div><div style="font-size:10px;color:#888;margin-bottom:3px;">B[1]</div><input type="number" step="any" id="ak_b1" oninput="recalc()" style="width:100%;padding:6px 8px;border:1px solid #dde;border-radius:5px;font-size:13px;"></div>
+          <div><div style="font-size:10px;color:#888;margin-bottom:3px;">B[2]</div><input type="number" step="any" id="ak_b2" oninput="recalc()" style="width:100%;padding:6px 8px;border:1px solid #dde;border-radius:5px;font-size:13px;"></div>
+          <div><div style="font-size:10px;color:#888;margin-bottom:3px;">A[2,1]</div><input type="number" step="any" id="ak_a21" oninput="recalc()" style="width:100%;padding:6px 8px;border:1px solid #dde;border-radius:5px;font-size:13px;"></div>
+          <div><div style="font-size:10px;color:#888;margin-bottom:3px;">A[2,2]</div><input type="number" step="any" id="ak_a22" oninput="recalc()" style="width:100%;padding:6px 8px;border:1px solid #dde;border-radius:5px;font-size:13px;"></div>
+        </div>
+        <div class="field-label" style="margin-bottom:6px;">Desired closed-loop poles</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px;">
+          <div><div style="font-size:10px;color:#888;margin-bottom:3px;">Pole 1 real part (σ₁, enter negative)</div><input type="number" step="any" id="ak_p1r" oninput="recalc()" placeholder="e.g. -3" style="width:100%;padding:6px 8px;border:1px solid #dde;border-radius:5px;font-size:13px;"></div>
+          <div><div style="font-size:10px;color:#888;margin-bottom:3px;">Pole 1 imag part (jωd, 0 for real)</div><input type="number" step="any" id="ak_p1i" oninput="recalc()" placeholder="e.g. 4" style="width:100%;padding:6px 8px;border:1px solid #dde;border-radius:5px;font-size:13px;"></div>
+        </div>
+        <div class="field-hint">For complex conjugate poles enter one pole. For two real poles, imaginary part = 0 and enter pole 2:</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px;">
+          <div><div style="font-size:10px;color:#888;margin-bottom:3px;">Pole 2 real part (real poles only)</div><input type="number" step="any" id="ak_p2r" oninput="recalc()" placeholder="optional" style="width:100%;padding:6px 8px;border:1px solid #dde;border-radius:5px;font-size:13px;"></div>
+        </div>`,
+      calc: () => {
+        const g = id => { const el = document.getElementById(id); return el && el.value !== '' ? parseFloat(el.value) : null; };
+        const a11=g('ak_a11'),a12=g('ak_a12'),a21=g('ak_a21'),a22=g('ak_a22');
+        const b1=g('ak_b1'),b2=g('ak_b2');
+        const p1r=g('ak_p1r'),p1i=g('ak_p1i')??0,p2r=g('ak_p2r');
+        if ([a11,a12,a21,a22,b1,b2,p1r].some(v=>v===null)) return null;
+        // Desired char poly coefficients from poles
+        // If complex pair: (s - p1)(s - conj(p1)) = s² - 2*Re(p1)*s + |p1|²
+        // If two real poles: (s - p1r)(s - p2r) = s² - (p1r+p2r)s + p1r*p2r
+        let alpha1, alpha0;
+        if (Math.abs(p1i) > 1e-10) {
+          alpha1 = -2*p1r; alpha0 = p1r*p1r + p1i*p1i;
+        } else {
+          const p2 = p2r ?? p1r;
+          alpha1 = -(p1r + p2); alpha0 = p1r * p2;
+        }
+        // p(A) = A² + alpha1*A + alpha0*I
+        const A2_11 = a11*a11+a12*a21, A2_12 = a11*a12+a12*a22;
+        const A2_21 = a21*a11+a22*a21, A2_22 = a21*a12+a22*a22;
+        const pA11 = A2_11+alpha1*a11+alpha0, pA12 = A2_12+alpha1*a12;
+        const pA21 = A2_21+alpha1*a21,        pA22 = A2_22+alpha1*a22+alpha0;
+        // Controllability matrix inverse: 𝒞 = [b | Ab]
+        const ab1 = a11*b1+a12*b2, ab2 = a21*b1+a22*b2;
+        const detC = b1*ab2 - b2*ab1;
+        if (Math.abs(detC) < 1e-12) return errorHTML('System is not controllable — cannot place poles arbitrarily.');
+        // 𝒞⁻¹ (2×2 inverse)
+        const ci11=ab2/detC, ci12=-ab1/detC, ci21=-b2/detC, ci22=b1/detC;
+        // eₙᵀ = [0 1] for 2nd order → K = eₙᵀ 𝒞⁻¹ p(A) = row 2 of 𝒞⁻¹ times p(A)
+        const k1 = ci21*pA11 + ci22*pA21;
+        const k2 = ci21*pA12 + ci22*pA22;
+        const poleStr = Math.abs(p1i) > 1e-10
+          ? `${fmt(p1r,4)} ± j${fmt(Math.abs(p1i),4)}`
+          : p2r !== null ? `${fmt(p1r,4)},  ${fmt(p2r,4)}` : `${fmt(p1r,4)}  (repeated)`;
+        return resultHTML([
+          { l: 'Desired poles', v: poleStr },
+          { l: 'Desired char. poly α₁', v: fmt(alpha1,5) },
+          { l: 'Desired char. poly α₀', v: fmt(alpha0,5) },
+          { hr:1 },
+          { l: 'Feedback gain k₁', v: fmt(k1,6) },
+          { l: 'Feedback gain k₂', v: fmt(k2,6) },
+          { hr:1 },
+          { note: `u = −[${fmt(k1,4)}  ${fmt(k2,4)}]·x + N·r` },
+          { note: 'Closed-loop: Acl = A − BK. Verify eigenvalues match desired poles.' },
+          { note: 'Use a pre-compensator N = −1/(C(A−BK)⁻¹B) for zero SS error to step.' },
+        ], 'K = eₙᵀ · 𝒞⁻¹ · p(A)  where p(A) = A² + α₁A + α₀I');
+      }
+    },
+
+    ss_to_tf: {
+      title: 'State Space ↔ Transfer Function',
+      desc: 'Convert a 2nd-order state-space model (A,B,C,D) to a transfer function G(s) = C(sI−A)⁻¹B + D, or extract standard 2nd-order TF parameters.',
+      fields: () => `
+        <div class="field-label" style="margin-bottom:8px;">Matrices A, B, C, D (2nd order, SISO)</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;">
+          <div><div style="font-size:10px;color:#888;margin-bottom:3px;">A[1,1]</div><input type="number" step="any" id="st_a11" oninput="recalc()" style="width:100%;padding:6px 8px;border:1px solid #dde;border-radius:5px;font-size:13px;"></div>
+          <div><div style="font-size:10px;color:#888;margin-bottom:3px;">A[1,2]</div><input type="number" step="any" id="st_a12" oninput="recalc()" style="width:100%;padding:6px 8px;border:1px solid #dde;border-radius:5px;font-size:13px;"></div>
+          <div><div style="font-size:10px;color:#888;margin-bottom:3px;">A[2,1]</div><input type="number" step="any" id="st_a21" oninput="recalc()" style="width:100%;padding:6px 8px;border:1px solid #dde;border-radius:5px;font-size:13px;"></div>
+          <div><div style="font-size:10px;color:#888;margin-bottom:3px;">A[2,2]</div><input type="number" step="any" id="st_a22" oninput="recalc()" style="width:100%;padding:6px 8px;border:1px solid #dde;border-radius:5px;font-size:13px;"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;">
+          <div><div style="font-size:10px;color:#888;margin-bottom:3px;">B[1]</div><input type="number" step="any" id="st_b1" oninput="recalc()" style="width:100%;padding:6px 8px;border:1px solid #dde;border-radius:5px;font-size:13px;"></div>
+          <div><div style="font-size:10px;color:#888;margin-bottom:3px;">B[2]</div><input type="number" step="any" id="st_b2" oninput="recalc()" style="width:100%;padding:6px 8px;border:1px solid #dde;border-radius:5px;font-size:13px;"></div>
+          <div><div style="font-size:10px;color:#888;margin-bottom:3px;">C[1]</div><input type="number" step="any" id="st_c1" oninput="recalc()" style="width:100%;padding:6px 8px;border:1px solid #dde;border-radius:5px;font-size:13px;"></div>
+          <div><div style="font-size:10px;color:#888;margin-bottom:3px;">D</div><input type="number" step="any" id="st_d" oninput="recalc()" placeholder="0" style="width:100%;padding:6px 8px;border:1px solid #dde;border-radius:5px;font-size:13px;"></div>
+        </div>
+        <div style="margin-top:6px;"><div style="font-size:10px;color:#888;margin-bottom:3px;">C[2]</div><input type="number" step="any" id="st_c2" oninput="recalc()" style="width:100%;padding:6px 8px;border:1px solid #dde;border-radius:5px;font-size:13px;"></div>`,
+      calc: () => {
+        const g = id => { const el = document.getElementById(id); return el && el.value !== '' ? parseFloat(el.value) : null; };
+        const a11=g('st_a11'),a12=g('st_a12'),a21=g('st_a21'),a22=g('st_a22');
+        const b1=g('st_b1'),b2=g('st_b2'),c1=g('st_c1'),c2=g('st_c2');
+        const D=g('st_d')??0;
+        if ([a11,a12,a21,a22,b1,b2,c1,c2].some(v=>v===null)) return null;
+        // G(s) = C(sI-A)^-1 B + D
+        // (sI-A) = [[s-a11, -a12],[-a21, s-a22]]
+        // det(sI-A) = (s-a11)(s-a22) - (-a12)(-a21) = s² - (a11+a22)s + (a11*a22-a12*a21)
+        const den_a1 = -(a11+a22);
+        const den_a0 = a11*a22 - a12*a21;
+        // (sI-A)^-1 = adj/det → numerator: C * adj(sI-A) * B
+        // adj(sI-A) = [[s-a22, a12],[a21, s-a11]]
+        // C*adj*B = c1*((s-a22)*b1 + a12*b2) + c2*(a21*b1 + (s-a11)*b2)
+        // = (c1*b1 + c2*b2)s + (-c1*a22*b1 + c1*a12*b2 + c2*a21*b1 - c2*a11*b2)
+        const num_b1 = c1*b1 + c2*b2;
+        const num_b0 = -c1*a22*b1 + c1*a12*b2 + c2*a21*b1 - c2*a11*b2;
+        // DC gain: G(0) = (num_b0)/den_a0 + D
+        const dc = den_a0 !== 0 ? num_b0/den_a0 + D : null;
+        // Poles from denominator
+        const disc = den_a1*den_a1 - 4*den_a0;
+        const poleStr = disc >= 0
+          ? `${fmt((-den_a1+Math.sqrt(disc))/2,4)},  ${fmt((-den_a1-Math.sqrt(disc))/2,4)}`
+          : `${fmt(-den_a1/2,4)} ± j${fmt(Math.sqrt(-disc)/2,4)}`;
+        // ωₙ and ζ from denominator s²+2ζωₙs+ωₙ²
+        const wn = Math.sqrt(Math.abs(den_a0));
+        const zeta = wn > 0 ? -den_a1/(2*wn) : null;
+        const numStr = Math.abs(num_b1) > 1e-12
+          ? `${fmt(num_b1,4)}s + ${fmt(num_b0,4)}`
+          : fmt(num_b0,4);
+        const denStr = `s² + ${fmt(den_a1,4)}s + ${fmt(den_a0,4)}`;
+        return resultHTML([
+          { l: 'Transfer Function', v: `(${numStr}) / (${denStr})${D !== 0 ? ` + ${fmt(D,4)}` : ''}` },
+          { hr:1 },
+          { l: 'Denominator poles', v: poleStr },
+          { l: 'Natural frequency ωₙ', v: eng(wn,'rad/s') },
+          { l: 'Damping ratio ζ', v: zeta !== null ? fmt(zeta,4) : '—' },
+          { hr:1 },
+          { l: 'DC gain G(0)', v: dc !== null ? fmt(dc,5) : 'Integrator (pole at 0)' },
+          { note: `Characteristic poly: s² + ${fmt(den_a1,4)}s + ${fmt(den_a0,4)}` },
+        ], 'G(s) = C(sI−A)⁻¹B + D  |  den = s² − tr(A)s + det(A)');
+      }
+    },
+
+    observer: {
+      title: 'Observer Gain Design (Luenberger)',
+      desc: 'Design a full-order Luenberger observer for a 2nd-order system. The observer poles should be 2–5× faster than the controller poles for adequate tracking.',
+      fields: () => `
+        <div class="field-label" style="margin-bottom:8px;">System matrices A and C</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-bottom:12px;">
+          <div><div style="font-size:10px;color:#888;margin-bottom:3px;">A[1,1]</div><input type="number" step="any" id="ob_a11" oninput="recalc()" style="width:100%;padding:6px 8px;border:1px solid #dde;border-radius:5px;font-size:13px;"></div>
+          <div><div style="font-size:10px;color:#888;margin-bottom:3px;">A[1,2]</div><input type="number" step="any" id="ob_a12" oninput="recalc()" style="width:100%;padding:6px 8px;border:1px solid #dde;border-radius:5px;font-size:13px;"></div>
+          <div><div style="font-size:10px;color:#888;margin-bottom:3px;">A[2,1]</div><input type="number" step="any" id="ob_a21" oninput="recalc()" style="width:100%;padding:6px 8px;border:1px solid #dde;border-radius:5px;font-size:13px;"></div>
+          <div><div style="font-size:10px;color:#888;margin-bottom:3px;">A[2,2]</div><input type="number" step="any" id="ob_a22" oninput="recalc()" style="width:100%;padding:6px 8px;border:1px solid #dde;border-radius:5px;font-size:13px;"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px;">
+          <div><div style="font-size:10px;color:#888;margin-bottom:3px;">C[1]</div><input type="number" step="any" id="ob_c1" oninput="recalc()" style="width:100%;padding:6px 8px;border:1px solid #dde;border-radius:5px;font-size:13px;"></div>
+          <div><div style="font-size:10px;color:#888;margin-bottom:3px;">C[2]</div><input type="number" step="any" id="ob_c2" oninput="recalc()" style="width:100%;padding:6px 8px;border:1px solid #dde;border-radius:5px;font-size:13px;"></div>
+        </div>
+        <div class="field-label" style="margin-bottom:6px;">Desired observer poles (enter real part, negative)</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">
+          <div><div style="font-size:10px;color:#888;margin-bottom:3px;">σ_obs (real)</div><input type="number" step="any" id="ob_sig" oninput="recalc()" placeholder="e.g. -10" style="width:100%;padding:6px 8px;border:1px solid #dde;border-radius:5px;font-size:13px;"></div>
+          <div><div style="font-size:10px;color:#888;margin-bottom:3px;">ωd_obs (imag)</div><input type="number" step="any" id="ob_wd" oninput="recalc()" placeholder="0 for real" style="width:100%;padding:6px 8px;border:1px solid #dde;border-radius:5px;font-size:13px;"></div>
+        </div>`,
+      calc: () => {
+        const g = id => { const el = document.getElementById(id); return el && el.value !== '' ? parseFloat(el.value) : null; };
+        const a11=g('ob_a11'),a12=g('ob_a12'),a21=g('ob_a21'),a22=g('ob_a22');
+        const c1=g('ob_c1'),c2=g('ob_c2'),sig=g('ob_sig'),wd=g('ob_wd')??0;
+        if ([a11,a12,a21,a22,c1,c2,sig].some(v=>v===null)) return null;
+        // Observer design via duality: use Ackermann on (Aᵀ, Cᵀ), then L = K_dual^T
+        // Desired obs char poly: s²-2σs+(σ²+ωd²)
+        const alpha1_o = -2*sig, alpha0_o = sig*sig + wd*wd;
+        // Observability: 𝒪 = [C; CA]
+        const ca1=c1*a11+c2*a21, ca2=c1*a12+c2*a22;
+        const detO = c1*ca2 - c2*ca1;
+        if (Math.abs(detO) < 1e-12) return errorHTML('System is not observable — cannot place observer poles arbitrarily.');
+        // p(Aᵀ) = (Aᵀ)² + alpha1*(Aᵀ) + alpha0*I  (using duality)
+        // Equivalent: L = [𝒪ᵀ]⁻¹ eₙ p(A)ᵀ — simplified for 2nd order:
+        // Desired characteristic poly of (A-LC): s²+alpha1_o*s+alpha0_o
+        // Current char poly of A: s²-(a11+a22)s+(a11*a22-a12*a21)
+        // L gains from matching coefficients (phase variable form):
+        const l1 = alpha1_o + (a11+a22);
+        const l2 = alpha0_o - (a11*a22 - a12*a21);
+        // Adjust for output matrix C (simplified — assumes C=[1 0] form for exact, else approximation)
+        // For general C, use dual Ackermann result
+        const AT_11=a11,AT_12=a21,AT_21=a12,AT_22=a22;
+        const CT_1=c1,CT_2=c2;
+        const AB_1_o=AT_11*CT_1+AT_12*CT_2, AB_2_o=AT_21*CT_1+AT_22*CT_2;
+        const detC_o=CT_1*AB_2_o-CT_2*AB_1_o;
+        const AT2_11=AT_11*AT_11+AT_12*AT_21,AT2_12=AT_11*AT_12+AT_12*AT_22;
+        const AT2_21=AT_21*AT_11+AT_22*AT_21,AT2_22=AT_21*AT_12+AT_22*AT_22;
+        const pAT11=AT2_11+alpha1_o*AT_11+alpha0_o, pAT12=AT2_12+alpha1_o*AT_12;
+        const pAT21=AT2_21+alpha1_o*AT_21, pAT22=AT2_22+alpha1_o*AT_22+alpha0_o;
+        const ci21_o=-CT_2/detC_o, ci22_o=CT_1/detC_o;
+        const Kd1=ci21_o*pAT11+ci22_o*pAT21, Kd2=ci21_o*pAT12+ci22_o*pAT22;
+        const L1=Kd1, L2=Kd2;
+        const poleStr = Math.abs(wd)>1e-10
+          ? `${fmt(sig,4)} ± j${fmt(Math.abs(wd),4)}`
+          : `${fmt(sig,4)}  (real)`;
+        return resultHTML([
+          { l: 'Observer poles', v: poleStr },
+          { l: 'Observer gain L₁', v: fmt(L1,5) },
+          { l: 'Observer gain L₂', v: fmt(L2,5) },
+          { hr:1 },
+          { note: 'Observer: x̂̇ = Ax̂ + Bu + L(y − Cx̂)' },
+          { note: `Error dynamics: (A−LC) eigenvalues at ${poleStr}` },
+          { note: Math.abs(sig) > 2*Math.abs((a11+a22)/2) ? 'Observer poles 2–5× faster than plant — good.' : '⚠ Observer poles may not be fast enough. Target 2–5× plant bandwidth.' },
+        ], 'L via dual Ackermann: observe (Aᵀ, Cᵀ) → L = K_dual');
+      }
+    },
+
+    // ── STEP 4: DIGITAL CONTROL ─────────────────────────────────────────────
+
+    tustin: {
+      title: 'Tustin (Bilinear) Discretization',
+      desc: 'Convert a continuous-time 1st or 2nd-order transfer function to a discrete difference equation using the Tustin (bilinear) approximation s → 2/Ts·(z−1)/(z+1).',
+      fields: () => `
+        ${fieldHTML('tu_Ts', 'Sample Period (Ts)', ['μ','m','','k'], 'm', 's', 'Must satisfy Ts < 0.1/ωBW (rule of thumb)')}
+        <div class="field-group">
+          <div class="field-label">Continuous TF Order</div>
+          <select class="full-select" id="tu-order" onchange="recalc()">
+            <option value="1">1st order: G(s) = b₀ / (a₁s + a₀)</option>
+            <option value="2" selected>2nd order: G(s) = b₀ / (a₂s² + a₁s + a₀)</option>
+          </select>
+        </div>
+        <div class="field-group"><div class="field-label">Coefficients</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">
+            <div><div style="font-size:10px;color:#888;margin-bottom:3px;">b₀ (numerator)</div><input type="number" step="any" id="tu_b0" oninput="recalc()" placeholder="1" style="width:100%;padding:6px 8px;border:1px solid #dde;border-radius:5px;font-size:13px;"></div>
+            <div><div style="font-size:10px;color:#888;margin-bottom:3px;">a₁ (s coeff)</div><input type="number" step="any" id="tu_a1" oninput="recalc()" placeholder="1" style="width:100%;padding:6px 8px;border:1px solid #dde;border-radius:5px;font-size:13px;"></div>
+            <div><div style="font-size:10px;color:#888;margin-bottom:3px;">a₀ (constant)</div><input type="number" step="any" id="tu_a0" oninput="recalc()" placeholder="1" style="width:100%;padding:6px 8px;border:1px solid #dde;border-radius:5px;font-size:13px;"></div>
+            <div><div style="font-size:10px;color:#888;margin-bottom:3px;">a₂ (s² coeff)</div><input type="number" step="any" id="tu_a2" oninput="recalc()" placeholder="2nd order only" style="width:100%;padding:6px 8px;border:1px solid #dde;border-radius:5px;font-size:13px;"></div>
+          </div>
+        </div>`,
+      calc: () => {
+        const Ts = getF('tu_Ts');
+        const order = parseInt(document.getElementById('tu-order')?.value || '2');
+        const b0 = parseFloat(document.getElementById('tu_b0')?.value || '1');
+        const a0 = parseFloat(document.getElementById('tu_a0')?.value || '1');
+        const a1 = parseFloat(document.getElementById('tu_a1')?.value || '1');
+        const a2 = parseFloat(document.getElementById('tu_a2')?.value || (order===2?'1':'0'));
+        if (!Ts || Ts <= 0 || isNaN(b0) || isNaN(a0) || isNaN(a1)) return null;
+        const k = 2/Ts; // Tustin gain factor
+        if (order === 1) {
+          // G(s) = b0/(a1*s+a0) → sub s=k*(z-1)/(z+1)
+          // den: a1*k*(z-1)/(z+1)+a0 = [a1*k*(z-1) + a0*(z+1)]/(z+1)
+          //    = (a1k+a0)z + (a0-a1k)
+          // num: b0*(z+1)
+          const D0=a1*k+a0, D1=a0-a1*k;
+          const N0=b0, N1=b0;
+          // H(z) = b0*(z+1) / ((a1k+a0)z + (a0-a1k))
+          // Normalize by D0
+          const h0=N0/D0, h1=N1/D0, d1=D1/D0;
+          return resultHTML([
+            { l: 'H(z) numerator',    v: `${fmt(h0,5)}·z + ${fmt(h1,5)}` },
+            { l: 'H(z) denominator',  v: `z + ${fmt(d1,5)}` },
+            { hr:1 },
+            { l: 'Difference equation', v: `y[k] = ${fmt(-d1,4)}·y[k−1] + ${fmt(h0,4)}·u[k] + ${fmt(h1,4)}·u[k−1]` },
+            { l: 'DC gain check',       v: fmt((h0+h1)/(1+d1),5) },
+            { note: `Pole at z = ${fmt(-d1,4)}  (stable if |z| < 1)` },
+            { note: `Warping: ω_cont maps to ω_disc = (2/Ts)·tan(ωTs/2)` },
+          ], 's → 2/Ts·(z−1)/(z+1)  |  1st-order bilinear');
+        } else {
+          // 2nd order: G(s) = b0/(a2*s²+a1*s+a0)
+          if (isNaN(a2) || a2 === 0) return errorHTML('a₂ must be non-zero for 2nd-order system.');
+          const k2=k*k;
+          // sub s=k*(z-1)/(z+1): den = a2*k²*(z-1)²+a1*k*(z-1)(z+1)+a0*(z+1)²
+          // (z-1)² = z²-2z+1, (z-1)(z+1)=z²-1, (z+1)²=z²+2z+1
+          const D2=a2*k2+a1*k+a0;
+          const D1=(-2*a2*k2+2*a0);
+          const D0=(a2*k2-a1*k+a0);
+          const N2=b0,N1=2*b0,N0=b0;
+          const h2=N2/D2,h1=N1/D2,h0=N0/D2,d1=D1/D2,d0=D0/D2;
+          return resultHTML([
+            { l: 'H(z) numerator',      v: `${fmt(h2,4)}z² + ${fmt(h1,4)}z + ${fmt(h0,4)}` },
+            { l: 'H(z) denominator',    v: `z² + ${fmt(d1,4)}z + ${fmt(d0,4)}` },
+            { hr:1 },
+            { l: 'Difference equation', v: `y[k] = ${fmt(-d1,4)}y[k-1] + ${fmt(-d0,4)}y[k-2] + ${fmt(h2,4)}u[k] + ${fmt(h1,4)}u[k-1] + ${fmt(h0,4)}u[k-2]` },
+            { l: 'DC gain check',       v: fmt((h2+h1+h0)/(1+d1+d0),5) },
+            { note: `Stability: |roots of z²+${fmt(d1,4)}z+${fmt(d0,4)}| < 1` },
+          ], 's → 2/Ts·(z−1)/(z+1)  |  2nd-order bilinear (Tustin)');
+        }
+      }
+    },
+
+    discrete_pid: {
+      title: 'Discrete PID Coefficients',
+      desc: 'Convert continuous Kp, Ki, Kd gains to discrete position-form and velocity-form (incremental) PID coefficients for implementation in a microcontroller or PLC.',
+      fields: () => `
+        ${fieldPlainHTML('dp_Kp', 'Proportional Gain (Kp)', '1')}
+        ${fieldPlainHTML('dp_Ki', 'Integral Gain (Ki = Kp/Ti)', '0.5', 'In 1/s units. Ki = Kp/Ti')}
+        ${fieldPlainHTML('dp_Kd', 'Derivative Gain (Kd = Kp·Td)', '0.1', 'In s units. Kd = Kp·Td')}
+        ${fieldHTML('dp_Ts', 'Sample Period (Ts)', ['μ','m','','k'], 'm', 's')}
+        ${fieldPlainHTML('dp_N', 'Derivative Filter N', '10', 'Filtered derivative: N = 5–20 typical. Set 0 for no filter.')}`,
+      calc: () => {
+        const Kp = parseFloat(document.getElementById('inp-dp_Kp')?.value || '1');
+        const Ki = parseFloat(document.getElementById('inp-dp_Ki')?.value || '0');
+        const Kd = parseFloat(document.getElementById('inp-dp_Kd')?.value || '0');
+        const Ts = getF('dp_Ts');
+        const N  = parseFloat(document.getElementById('inp-dp_N')?.value || '10');
+        if (isNaN(Kp) || !Ts || Ts <= 0) return null;
+        // Position form: u[k] = Kp*e[k] + Ki*Ts*∑e + (Kd/Ts)*(e[k]-e[k-1])
+        const b0_pos = Kp + Ki*Ts + Kd/Ts;
+        const b1_pos = -(Kp + 2*Kd/Ts);
+        const b2_pos = Kd/Ts;
+        // Velocity form (incremental): Δu[k] = b0*e[k] + b1*e[k-1] + b2*e[k-2]
+        const b0_vel = Kp + Ki*Ts/2 + Kd/Ts;
+        const b1_vel = -Kp + Ki*Ts/2 - 2*Kd/Ts;
+        const b2_vel = Kd/Ts;
+        // Filtered derivative (Tustin of Kd*s/(s/N+1)):
+        const Td = Kp > 0 ? Kd/Kp : 0;
+        const Tf = N > 0 ? Td/N : 0;
+        const a_filt = Tf > 0 ? Tf/(Tf+Ts) : 0;
+        const Kd_filt_b = N > 0 ? Kd*N/(1+N*Ts) : Kd/Ts;
+        return resultHTML([
+          { l: 'Position form coefficients', v: '' },
+          { l: 'b₀ = Kp + Ki·Ts + Kd/Ts',  v: fmt(b0_pos,5) },
+          { l: 'b₁ = −Kp − 2Kd/Ts',        v: fmt(b1_pos,5) },
+          { l: 'b₂ = Kd/Ts',               v: fmt(b2_pos,5) },
+          { hr:1 },
+          { l: 'Velocity form (incremental)', v: '' },
+          { l: 'b₀ = Kp + Ki·Ts/2 + Kd/Ts', v: fmt(b0_vel,5) },
+          { l: 'b₁ = −Kp + Ki·Ts/2−2Kd/Ts', v: fmt(b1_vel,5) },
+          { l: 'b₂ = Kd/Ts',                v: fmt(b2_vel,5) },
+          { hr:1 },
+          { note: `Position: u[k] = b₀e[k] + b₁e[k-1] + b₂e[k-2] + u[k-1]` },
+          { note: `Velocity: Δu[k] = b₀e[k] + b₁e[k-1] + b₂e[k-2]  → u[k] = u[k-1] + Δu[k]` },
+          { note: N > 0 ? `Derivative filter α = ${fmt(a_filt,4)}: d_filt[k] = α·d[k-1] + (1-α)·Kd_filt·Δe/Ts` : 'No derivative filter applied.' },
+        ], 'Position form: u[k] = u[k-1] + b₀e[k] + b₁e[k-1] + b₂e[k-2]');
+      }
+    },
+
+    sample_rate: {
+      title: 'Sample Rate Advisor',
+      desc: 'Recommends controller sample rate based on closed-loop bandwidth, system time constants, and digital implementation rules of thumb. Accounts for ZOH phase lag and aliasing.',
+      fields: () => `
+        ${fieldHTML('sr_wBW', 'Closed-Loop Bandwidth (ωBW)', ['m','','k','M'], '', 'rad/s', 'Target bandwidth of closed-loop system')}
+        ${fieldHTML('sr_tau', 'Fastest System Time Constant (τmin)', ['μ','m','','k'], 'm', 's', 'Smallest τ in the plant — sets upper limit on Ts')}
+        ${fieldPlainHTML('sr_pm', 'Phase Margin Target (degrees)', '45', 'ZOH contributes −ωTs/2 rad of phase lag')}`,
+      calc: () => {
+        const wBW  = getF('sr_wBW');
+        const tau  = getF('sr_tau');
+        const pm   = parseFloat(document.getElementById('inp-sr_pm')?.value || '45');
+        if (!wBW || wBW <= 0) return null;
+        const fBW = wBW / (2*Math.PI);
+        // Rule 1: fs ≥ 10–20× fBW
+        const fs_min_10 = 10*fBW, fs_min_20 = 20*fBW;
+        const Ts_max_10 = 1/fs_min_10, Ts_max_20 = 1/fs_min_20;
+        // Rule 2: ZOH phase lag ≈ ωTs/2 — limit to < 5° at ωBW
+        const max_lag_deg = 5;
+        const Ts_zoh = max_lag_deg * Math.PI/180 / (wBW/2);
+        // Rule 3: Ts < τmin/5 (avoid aliasing plant dynamics)
+        const Ts_tau = tau ? tau/5 : null;
+        // Recommended: take min of all constraints
+        const candidates = [Ts_max_20, Ts_zoh, Ts_tau].filter(v=>v!==null);
+        const Ts_rec = Math.min(...candidates);
+        const fs_rec = 1/Ts_rec;
+        const zoh_lag_at_rec = wBW*Ts_rec/2 * 180/Math.PI;
+        return resultHTML([
+          { l: 'Control Bandwidth ωBW',        v: eng(wBW,'rad/s') + `  (${fmt(fBW,4)} Hz)` },
+          { hr:1 },
+          { l: 'Min fs (10× BW rule)',          v: eng(fs_min_10,'Hz') + `  → Ts ≤ ${eng(Ts_max_10,'s')}` },
+          { l: 'Min fs (20× BW rule)',          v: eng(fs_min_20,'Hz') + `  → Ts ≤ ${eng(Ts_max_20,'s')}` },
+          { l: 'Ts for ZOH lag < 5° at ωBW',  v: eng(Ts_zoh,'s') + `  → fs ≥ ${eng(1/Ts_zoh,'Hz')}` },
+          ...(Ts_tau ? [{ l: 'Ts < τmin/5 constraint', v: eng(Ts_tau,'s') }] : []),
+          { hr:1 },
+          { l: 'Recommended Ts',               v: eng(Ts_rec,'s') },
+          { l: 'Recommended fs',               v: eng(fs_rec,'Hz') },
+          { l: 'ZOH phase lag at ωBW',         v: `${zoh_lag_at_rec.toFixed(2)}° — ${zoh_lag_at_rec<5?'✓ good':'⚠ check PM'}` },
+          { hr:1 },
+          { note: 'ZOH adds −Ts/2 pure time delay → −ωTs/2 rad phase lag at frequency ω.' },
+          { note: `Effective PM with ZOH = ${pm}° − ${zoh_lag_at_rec.toFixed(1)}° = ${(pm-zoh_lag_at_rec).toFixed(1)}°` },
+        ], 'fs ≥ 20×fBW  |  Ts < τmin/5  |  ZOH lag = ωTs/2 at ω');
+      }
+    },
+
+    zoh: {
+      title: 'ZOH Gain & Phase Correction',
+      desc: 'The zero-order hold introduces magnitude attenuation and phase lag. Compute the ZOH frequency response at any frequency for gain correction in discrete loop design.',
+      fields: () => `
+        ${fieldHTML('zoh_Ts', 'Sample Period (Ts)', ['μ','m','','k'], 'm', 's')}
+        ${fieldHTML('zoh_w',  'Evaluate at frequency ω', ['m','','k','M'], '', 'rad/s', 'Often set to ωBW or ωgc')}`,
+      calc: () => {
+        const Ts = getF('zoh_Ts');
+        const w  = getF('zoh_w');
+        if (!Ts || Ts <= 0 || !w || w <= 0) return null;
+        const wTs_2 = w*Ts/2;
+        const mag   = Math.abs(Math.sin(wTs_2)/wTs_2);
+        const mag_dB = 20*Math.log10(mag);
+        const phase_deg = -wTs_2 * 180/Math.PI;
+        const wN = Math.PI/Ts;  // Nyquist frequency
+        const ratio = w/wN;
+        return resultHTML([
+          { l: 'ZOH magnitude at ω',     v: `${fmt(mag,5)}  (${mag_dB.toFixed(2)} dB)` },
+          { l: 'ZOH phase lag at ω',     v: `${phase_deg.toFixed(3)}°` },
+          { l: 'ω / ωNyquist ratio',     v: `${fmt(ratio,4)}  ${ratio<0.1?'✓ negligible':ratio<0.3?'minor effect':'⚠ significant'}` },
+          { hr:1 },
+          { l: 'Nyquist frequency ωN',   v: eng(wN,'rad/s') },
+          { l: 'Gain correction factor', v: fmt(1/mag,5) },
+          { l: '−3 dB frequency',        v: eng(2.78/Ts,'rad/s') },
+          { hr:1 },
+          { note: `ZOH delay = Ts/2 = ${eng(Ts/2,'s')} → exact phase = −ωTs/2` },
+          { note: mag_dB < -0.5 ? `⚠ Gain attenuation ${Math.abs(mag_dB).toFixed(2)} dB — compensate by boosting loop gain at crossover.` : 'Gain attenuation < 0.5 dB — negligible correction needed.' },
+        ], 'H_ZOH(jω) = (1−e^(−jωTs))/(jω)  |  |H| = |sin(ωTs/2)/(ωTs/2)|');
+      }
+    },
+
+    // ── STEP 4: MECHANICAL SYSTEMS ──────────────────────────────────────────
+
+    msd: {
+      title: 'Mass-Spring-Damper',
+      desc: 'Compute natural frequency ωₙ, damping ratio ζ, and transfer function for a mass-spring-damper system mẍ + bẋ + kx = F. Also shows RLC electrical analogy.',
+      fields: () => `
+        ${fieldHTML('msd_m', 'Mass (m)',           ['m','','k'], '', 'kg')}
+        ${fieldHTML('msd_k', 'Spring Constant (k)',['m','','k','M'], '', 'N/m')}
+        ${fieldHTML('msd_b', 'Damping Coeff (b)',  ['m','','k'], '', 'N·s/m', 'Viscous damping. Set 0 to find critical damping value.')}`,
+      calc: () => {
+        const m = getF('msd_m'), k = getF('msd_k'), b = getF('msd_b');
+        if (!m || m<=0 || !k || k<=0 || b===null || b<0) return null;
+        const wn   = Math.sqrt(k/m);
+        const b_cr = 2*Math.sqrt(k*m);
+        const zeta = b / b_cr;
+        const wd   = b < b_cr ? wn*Math.sqrt(1-zeta*zeta) : 0;
+        const ts2  = zeta > 0 ? 4/(zeta*wn) : Infinity;
+        const pct_os = zeta < 1 ? 100*Math.exp(-Math.PI*zeta/Math.sqrt(1-zeta*zeta)) : 0;
+        return resultHTML([
+          { l: 'Natural Frequency ωₙ',   v: eng(wn,'rad/s') + `  (${eng(wn/(2*Math.PI),'Hz')})` },
+          { l: 'Damping Ratio ζ',        v: fmt(zeta,4) + (b===0?' (undamped)': zeta<1?' (underdamped)':zeta===1?' (critical)':' (overdamped)') },
+          { l: 'Critical Damping b_cr',  v: eng(b_cr,'N·s/m') },
+          { hr:1 },
+          { l: 'Damped Freq ωd',         v: wd>0 ? eng(wd,'rad/s') : 'N/A (overdamped)' },
+          { l: 'Settling Time ts (2%)',  v: ts2 < Infinity ? eng(ts2,'s') : '∞ (undamped)' },
+          { l: 'Overshoot (%OS)',        v: `${pct_os.toFixed(2)}%` },
+          { hr:1 },
+          { note: `G(s) = 1/(ms²+bs+k) = (1/m) / (s²+${fmt(b/m,4)}s+${fmt(k/m,4)})` },
+          { note: `RLC analogy: m↔L=${fmt(m,4)} H,  b↔R=${fmt(b,4)} Ω,  k↔1/C  (C=${fmt(1/k,6)} F)` },
+          { note: zeta < 0.5 ? 'Underdamped — significant oscillation. Increase b.' : zeta > 2 ? 'Heavily overdamped — sluggish. Reduce b.' : 'Good damping ratio range.' },
+        ], 'ωₙ=√(k/m)  |  ζ=b/(2√(km))  |  G(s)=(1/m)/(s²+2ζωₙs+ωₙ²)');
+      }
+    },
+
+    crit_damp: {
+      title: 'Critical Damping Calculator',
+      desc: 'Find the exact damping coefficient b that gives ζ=1 (critical damping) for a mass-spring-damper. Also shows b for any target ζ and the effect on settling time.',
+      fields: () => `
+        ${fieldHTML('cd_m', 'Mass (m)',             ['m','','k'], '', 'kg')}
+        ${fieldHTML('cd_k', 'Spring Constant (k)',  ['m','','k','M'], '', 'N/m')}
+        ${fieldPlainHTML('cd_z', 'Target Damping Ratio ζ (optional)', '1.0', 'Leave at 1.0 for critical. Enter other value to compare.')}`,
+      calc: () => {
+        const m = getF('cd_m'), k = getF('cd_k');
+        const z_target = parseFloat(document.getElementById('inp-cd_z')?.value || '1');
+        if (!m||m<=0||!k||k<=0) return null;
+        const wn    = Math.sqrt(k/m);
+        const b_cr  = 2*Math.sqrt(k*m);
+        const b_target = z_target * b_cr;
+        const ts_cr = 4/wn;
+        const ts_target = z_target > 0 ? 4/(z_target*wn) : Infinity;
+        const pct_os = z_target < 1 ? 100*Math.exp(-Math.PI*z_target/Math.sqrt(1-z_target*z_target)) : 0;
+        return resultHTML([
+          { l: 'Natural Frequency ωₙ',   v: eng(wn,'rad/s') },
+          { hr:1 },
+          { l: 'Critical Damping b_cr',  v: eng(b_cr,'N·s/m') },
+          { l: 'Settling Time (ζ=1)',    v: eng(ts_cr,'s') },
+          { hr:1 },
+          { l: `Target ζ = ${fmt(z_target,3)}`,   v: '' },
+          { l: 'Required b',             v: eng(b_target,'N·s/m') },
+          { l: 'Settling Time',          v: ts_target<Infinity ? eng(ts_target,'s') : '∞' },
+          { l: 'Overshoot (%OS)',        v: `${pct_os.toFixed(2)}%` },
+          { hr:1 },
+          { note: z_target < 1 ? `ζ < 1: underdamped — ${pct_os.toFixed(1)}% overshoot.` :
+                  z_target === 1 ? 'ζ = 1: critical — fastest response with zero overshoot.' :
+                  `ζ > 1: overdamped — ${((ts_target/ts_cr-1)*100).toFixed(0)}% slower than critical.` },
+        ], 'b_crit = 2√(km)  |  ζ = b/(2√(km))  |  ts ≈ 4/(ζωₙ)');
+      }
+    },
+
+    vib_iso: {
+      title: 'Vibration Isolation Transmissibility',
+      desc: 'Transmissibility TR is the ratio of transmitted force to applied force through an isolator. TR < 1 means isolation is effective. Isolation begins at ω > ωₙ√2.',
+      fields: () => `
+        ${fieldHTML('vi_wn', 'Isolator Natural Freq (ωₙ)', ['m','','k'], '', 'rad/s', 'ωₙ = √(k/m) for the isolation system')}
+        ${fieldPlainHTML('vi_z', 'Isolator Damping Ratio ζ', '0.05', 'Typical elastomeric isolators: ζ = 0.01–0.1')}
+        ${fieldHTML('vi_w',  'Excitation Frequency (ω)',   ['m','','k','M'], '', 'rad/s', 'Frequency of vibration to isolate')}`,
+      calc: () => {
+        const wn = getF('vi_wn'), z = parseFloat(document.getElementById('inp-vi_z')?.value||'0.05'), w = getF('vi_w');
+        if (!wn||wn<=0||isNaN(z)||!w||w<=0) return null;
+        const r = w/wn;
+        const TR = Math.sqrt((1+(2*z*r)**2)/((1-r*r)**2+(2*z*r)**2));
+        const TR_dB = 20*Math.log10(TR);
+        const r_iso = Math.sqrt(2); // isolation starts here (approximately, for low ζ)
+        const eff = TR < 1 ? `${((1-TR)*100).toFixed(1)}%` : 'None (amplification)';
+        return resultHTML([
+          { l: 'Frequency Ratio (r = ω/ωₙ)', v: fmt(r,4) },
+          { l: 'Transmissibility TR',          v: fmt(TR,5) },
+          { l: 'TR (dB)',                      v: `${TR_dB.toFixed(2)} dB` },
+          { l: 'Isolation Effectiveness',      v: eff },
+          { hr:1 },
+          { l: 'Isolation onset (r=√2)',       v: eng(wn*Math.sqrt(2),'rad/s') },
+          { note: r < 1 ? `r < 1: below resonance — amplification region. TR = ${fmt(TR,3)}.` :
+                  r < Math.sqrt(2) ? `r = ${fmt(r,3)}: near resonance — high amplification. Move ωₙ lower.` :
+                  TR > 1 ? `r = ${fmt(r,3)}: above √2 but TR > 1 — increase damping or reduce ωₙ.` :
+                           `r = ${fmt(r,3)}: effective isolation. TR = ${fmt(TR,4)} (${eff} reduction).` },
+          { note: z > 0.2 ? 'High damping reduces peak but limits high-frequency isolation.' : 'Low damping: good HF isolation, high resonant peak.' },
+        ], 'TR = √[(1+(2ζr)²)/((1−r²)²+(2ζr)²)]  |  r = ω/ωₙ');
+      }
+    },
+
+    two_mass: {
+      title: 'Two-Mass Coupled System',
+      desc: 'Find natural frequencies and mode shapes for two masses connected by springs. Models dual-inertia drive trains, flexible robots, and coupled mechanical systems.',
+      fields: () => `
+        ${fieldHTML('tm_m1', 'Mass 1 (m₁)', ['m','','k'], '', 'kg')}
+        ${fieldHTML('tm_m2', 'Mass 2 (m₂)', ['m','','k'], '', 'kg')}
+        ${fieldHTML('tm_k1', 'Spring k₁ (ground → m₁)', ['m','','k','M'], '', 'N/m', 'Set 0 if m₁ is free (no ground spring)')}
+        ${fieldHTML('tm_k2', 'Coupling Spring k₂ (m₁ → m₂)', ['m','','k','M'], '', 'N/m')}
+        ${fieldHTML('tm_k3', 'Spring k₃ (m₂ → ground)', ['m','','k','M'], '', 'N/m', 'Set 0 if m₂ is free')}`,
+      calc: () => {
+        const m1=getF('tm_m1'),m2=getF('tm_m2'),k1=getF('tm_k1')??0,k2=getF('tm_k2'),k3=getF('tm_k3')??0;
+        if (!m1||m1<=0||!m2||m2<=0||!k2||k2<=0) return null;
+        // Equation of motion: M*x'' + K*x = 0
+        // K = [[k1+k2, -k2],[-k2, k2+k3]]
+        // Eigenvalues of M^{-1}K:
+        const a = (k1+k2)/m1, b_c = k2/m1, c = k2/m2, d = (k2+k3)/m2;
+        const tr = a+d, det = a*d - b_c*c;
+        const disc = (tr/2)**2 - det;
+        if (disc < 0) return errorHTML('Complex eigenvalues — check inputs.');
+        const w1sq = tr/2 - Math.sqrt(disc);
+        const w2sq = tr/2 + Math.sqrt(disc);
+        const w1 = w1sq>=0 ? Math.sqrt(w1sq) : 0;
+        const w2 = Math.sqrt(w2sq);
+        // Mode shapes (relative amplitude ratio)
+        const r1 = (w1sq - a)/b_c;
+        const r2 = (w2sq - a)/b_c;
+        return resultHTML([
+          { l: 'Mode 1 natural freq ω₁',   v: eng(w1,'rad/s') + (w1===0?' (rigid body mode)':` (${eng(w1/(2*Math.PI),'Hz')})`) },
+          { l: 'Mode 2 natural freq ω₂',   v: eng(w2,'rad/s') + `  (${eng(w2/(2*Math.PI),'Hz')})` },
+          { hr:1 },
+          { l: 'Mode 1 shape [1, x₂/x₁]', v: `[1,  ${fmt(r1,4)}]` },
+          { l: 'Mode 2 shape [1, x₂/x₁]', v: `[1,  ${fmt(r2,4)}]` },
+          { hr:1 },
+          { note: w1===0 ? 'Mode 1 is a rigid-body mode (ω₁=0) — system translates as a whole.' : '' },
+          { note: `Frequency ratio ω₂/ω₁ = ${w1>1e-9 ? fmt(w2/w1,4) : '∞  (rigid body mode)'}` },
+          { note: 'Anti-resonance in drive-train control: avoid operating near ω₁ or ω₂.' },
+        ], 'det(K−ω²M)=0  |  ω²={tr/2 ± √[(tr/2)²−det(M⁻¹K)]}');
+      }
+    },
+
+    gear_inertia: {
+      title: 'Gear / Reflected Inertia',
+      desc: 'Compute reflected (referred) inertia and torque seen at the motor shaft through a gear reduction. Includes optimal gear ratio for maximum acceleration.',
+      fields: () => `
+        ${fieldHTML('gi_Jl', 'Load Inertia (J_load)', ['m','','k'], '', 'kg·m²')}
+        ${fieldHTML('gi_Jm', 'Motor Inertia (J_motor)', ['m','','k'], '', 'kg·m²', 'Optional — for total inertia and inertia ratio')}
+        ${fieldPlainHTML('gi_N', 'Gear Ratio N (output/input)', '10', 'N = ω_motor / ω_load. N > 1 means speed reduction.')}
+        ${fieldHTML('gi_Tl', 'Load Torque (τ_load)', ['m','','k'], '', 'N·m', 'Optional — reflected torque calculation')}
+        ${fieldHTML('gi_eff', 'Gear Efficiency η', ['m','',''], '', '', 'Optional — e.g. 0.95 for 95%. Leave blank for ideal.')}`,
+      calc: () => {
+        const Jl=getF('gi_Jl'),Jm=getF('gi_Jm'),Tl=getF('gi_Tl'),eta=getF('gi_eff')??1;
+        const N=parseFloat(document.getElementById('inp-gi_N')?.value||'10');
+        if (!Jl||Jl<=0||isNaN(N)||N<=0) return null;
+        const J_ref = Jl / (N*N);
+        const J_tot = Jm ? Jm + J_ref : J_ref;
+        const T_ref = Tl ? Tl / (N * eta) : null;
+        const N_opt = Jm ? Math.sqrt(Jl/Jm) : null;
+        const ratio = Jm ? J_ref/Jm : null;
+        return resultHTML([
+          { l: 'Gear Ratio N',              v: `${fmt(N,4)}:1  (motor ${fmt(N,2)}× faster)` },
+          { l: 'Reflected Inertia J_ref',   v: eng(J_ref,'kg·m²') + `  (J_load/N²)` },
+          ...(Jm ? [
+            { l: 'Total Motor-Shaft Inertia', v: eng(J_tot,'kg·m²') },
+            { l: 'Inertia Ratio J_ref/J_m',  v: fmt(ratio,4) + (ratio>10?' ⚠ high ratio':ratio>5?' moderate':' ✓ good') },
+          ] : []),
+          ...(T_ref ? [{ l: 'Reflected Torque τ_ref', v: eng(T_ref,'N·m') + `  (η=${fmt(eta,3)})` }] : []),
+          { hr:1 },
+          ...(N_opt ? [
+            { l: 'Optimal Gear Ratio N*',   v: fmt(N_opt,4) + '  (for max acceleration)' },
+            { note: N < 0.5*N_opt ? `N << N*: underreduced — motor torque wasted on inertia.` :
+                    N > 2*N_opt   ? `N >> N*: overreduced — poor dynamic response.` :
+                                    `N near optimal — good torque-inertia matching.` },
+          ] : []),
+          { note: `ω_load = ω_motor/${fmt(N,2)} | τ_motor = τ_load/(N·η)` },
+        ], 'J_ref = J_load/N²  |  N_opt = √(J_load/J_motor)  |  τ_ref = τ_load/(N·η)');
+      }
+    },
+
+    // ── STEP 5: THERMAL & FLUID ─────────────────────────────────────────────
+
+    thermal_rc: {
+      title: 'Thermal RC Network',
+      desc: 'Thermal resistance-capacitance model for a single body. Compute time constant, steady-state temperature rise, and temperature at time t for a step power input.',
+      fields: () => `
+        ${fieldPlainHTML('tr_R',   'Thermal Resistance θ (°C/W)',  '10',  'Junction-to-ambient or component-to-heatsink')}
+        ${fieldPlainHTML('tr_C',   'Thermal Capacitance C_th (J/°C)', '50', 'Mass × specific heat capacity')}
+        ${fieldPlainHTML('tr_P',   'Power Dissipation P (W)',       '5',   'Step power input')}
+        ${fieldPlainHTML('tr_T0',  'Ambient Temperature T∞ (°C)',   '25',  'Initial / ambient temperature')}
+        ${fieldHTML('tr_t',  'Evaluate at time t (optional)', ['m','','k'], '', 's')}`,
+      calc: () => {
+        const R=parseFloat(document.getElementById('inp-tr_R')?.value);
+        const C=parseFloat(document.getElementById('inp-tr_C')?.value);
+        const P=parseFloat(document.getElementById('inp-tr_P')?.value);
+        const T0=parseFloat(document.getElementById('inp-tr_T0')?.value||'25');
+        const t=getF('tr_t');
+        if (isNaN(R)||R<=0||isNaN(C)||C<=0||isNaN(P)) return null;
+        const tau   = R*C;
+        const T_ss  = T0 + P*R;
+        const delta  = P*R;
+        const rows = [
+          { l: 'Thermal Time Constant τ',  v: eng(tau,'s') },
+          { l: 'Steady-State Temp Rise ΔT', v: `${fmt(delta,4)} °C  (P·R)` },
+          { l: 'Steady-State Temp T_ss',   v: `${fmt(T_ss,5)} °C` },
+          { hr:1 },
+          { note: `At τ: T(τ) = ${fmt(T0+delta*0.6321,4)}°C  (63.2% of rise)` },
+          { note: `At 5τ = ${eng(5*tau,'s')}: T ≈ ${fmt(T_ss,4)}°C  (99% complete)` },
+        ];
+        if (t !== null && t >= 0) {
+          const Tt = T_ss - delta*Math.exp(-t/tau);
+          rows.push({ hr:1 }, { l:`T(${eng(t,'s')})`, v:`${fmt(Tt,5)} °C` });
+        }
+        return resultHTML(rows, 'T(t) = T∞ + P·R·(1−e^(−t/τ))  |  τ = R_th·C_th');
+      }
+    },
+
+    thermal_2node: {
+      title: '2-Node Thermal Ladder (Junction→Case→Ambient)',
+      desc: 'Two-node RC thermal model: T_junction → R_jc → T_case → R_ca → T_ambient. Models semiconductor device thermal path.',
+      fields: () => `
+        ${fieldPlainHTML('tn_Rjc', 'R_jc — Junction to Case (°C/W)',  '2',  'From device datasheet')}
+        ${fieldPlainHTML('tn_Rca', 'R_ca — Case to Ambient (°C/W)',   '8',  'Heatsink + thermal interface')}
+        ${fieldPlainHTML('tn_Cj',  'C_j — Junction Capacitance (J/°C)','0.01','Chip thermal capacitance')}
+        ${fieldPlainHTML('tn_Cc',  'C_c — Case Capacitance (J/°C)',   '5',   'Package + heatsink mass')}
+        ${fieldPlainHTML('tn_P',   'Power Dissipation P (W)',           '10')}
+        ${fieldPlainHTML('tn_Ta',  'Ambient Temp T_a (°C)',             '25')}`,
+      calc: () => {
+        const Rjc=parseFloat(document.getElementById('inp-tn_Rjc')?.value);
+        const Rca=parseFloat(document.getElementById('inp-tn_Rca')?.value);
+        const Cj=parseFloat(document.getElementById('inp-tn_Cj')?.value||'0.01');
+        const Cc=parseFloat(document.getElementById('inp-tn_Cc')?.value||'5');
+        const P=parseFloat(document.getElementById('inp-tn_P')?.value);
+        const Ta=parseFloat(document.getElementById('inp-tn_Ta')?.value||'25');
+        if ([Rjc,Rca,P].some(v=>isNaN(v)||v<=0)) return null;
+        // Steady-state: T_case = Ta + P*Rca;  T_j = T_case + P*Rjc
+        const Tc_ss = Ta + P*Rca;
+        const Tj_ss = Tc_ss + P*Rjc;
+        // Time constants (simplified decoupled)
+        const tau1 = Cj*Rjc;
+        const tau2 = Cc*(Rjc+Rca);
+        return resultHTML([
+          { l: 'T_junction (steady-state)', v: `${fmt(Tj_ss,5)} °C` },
+          { l: 'T_case (steady-state)',     v: `${fmt(Tc_ss,5)} °C` },
+          { l: 'ΔT junction rise (P·Rjc)', v: `${fmt(P*Rjc,4)} °C` },
+          { l: 'ΔT case rise (P·Rca)',     v: `${fmt(P*Rca,4)} °C` },
+          { hr:1 },
+          { l: 'Junction τ₁ (Cj·Rjc)',    v: eng(tau1,'s') },
+          { l: 'Package τ₂ (Cc·Rtot)',    v: eng(tau2,'s') },
+          { l: 'Total R_ja',              v: `${fmt(Rjc+Rca,4)} °C/W` },
+          { hr:1 },
+          { note: `Max junction temp check: Tj_ss = ${fmt(Tj_ss,4)}°C. Typical MOSFET limit 150°C, BJT 200°C.` },
+          { note: Tj_ss > 125 ? '⚠ Junction temp exceeds 125°C — reduce power or improve heatsinking.' : '✓ Junction temp within typical limits.' },
+        ], 'Tj = Ta + P·(Rjc+Rca)  |  τ₁=Cj·Rjc  |  τ₂=Cc·(Rjc+Rca)');
+      }
+    },
+
+    hydraulic: {
+      title: 'Hydraulic R/C Analogy',
+      desc: 'Fluid systems map directly to electrical RC circuits. Flow Q ↔ Current I, Pressure P ↔ Voltage V, Fluid Resistance Rf ↔ R, Fluid Capacitance Cf ↔ C.',
+      fields: () => `
+        ${fieldPlainHTML('hy_rho', 'Fluid Density ρ (kg/m³)', '1000', 'Water: 1000, Oil: 870–900')}
+        ${fieldPlainHTML('hy_mu',  'Dynamic Viscosity μ (Pa·s)', '0.001', 'Water at 20°C: 0.001, Oil: 0.01–0.5')}
+        ${fieldHTML('hy_L', 'Pipe Length L', ['m','','k'], '', 'm')}
+        ${fieldHTML('hy_D', 'Pipe Diameter D', ['m','','k'], 'm', 'm')}
+        ${fieldHTML('hy_A', 'Tank Cross-Section Area A_tank (for Cf)', ['m','','k','M'], '', 'm²', 'Optional — for fluid capacitance and system τ')}`,
+      calc: () => {
+        const rho=parseFloat(document.getElementById('inp-hy_rho')?.value||'1000');
+        const mu=parseFloat(document.getElementById('inp-hy_mu')?.value||'0.001');
+        const L=getF('hy_L'),D=getF('hy_D'),A=getF('hy_A');
+        if (!L||L<=0||!D||D<=0) return null;
+        // Hagen-Poiseuille: Rf = 128*mu*L/(pi*D^4)
+        const Rf = 128*mu*L/(Math.PI*Math.pow(D,4));
+        const g=9.81;
+        // Fluid capacitance of tank: Cf = A/(rho*g)
+        const Cf = A ? A/(rho*g) : null;
+        const tau = Cf ? Rf*Cf : null;
+        // Reynolds number check (Q=1 m³/s reference is not meaningful, just Re regime info)
+        return resultHTML([
+          { l: 'Fluid Resistance Rf',      v: `${eng(Rf,'Pa·s/m³')} ↔ R (Ω)` },
+          ...(Cf ? [
+            { l: 'Fluid Capacitance Cf',   v: `${eng(Cf,'m³/Pa')} ↔ C (F)` },
+            { l: 'System τ = Rf·Cf',       v: eng(tau,'s') },
+          ] : []),
+          { hr:1 },
+          { note: 'Analogy: Q [m³/s] ↔ I [A],  ΔP [Pa] ↔ V [V],  Rf ↔ R,  Cf ↔ C' },
+          { note: `Hagen-Poiseuille valid for laminar flow (Re < 2300).` },
+          { note: `Rf = 128μL/(πD⁴) — very sensitive to D (4th power)!` },
+          { note: D < 0.001 ? '⚠ Very small diameter — check for laminar flow validity.' : '' },
+        ], 'Rf = 128μL/(πD⁴)  |  Cf = A_tank/(ρg)  |  τ = Rf·Cf');
+      }
+    },
+
+    fluid_tau: {
+      title: 'Fluid System Time Constant',
+      desc: 'Tank-valve system: liquid drains through a valve. The linearized time constant τ governs level dynamics. Analogous to an RC circuit discharge.',
+      fields: () => `
+        ${fieldHTML('ft_A',  'Tank Cross-Section A (m²)',  ['m','','k'], '', 'm²')}
+        ${fieldPlainHTML('ft_Rv', 'Valve Resistance Rv (Pa·s/m³)', '1e6', 'Pressure drop per unit flow: ΔP/Q')}
+        ${fieldPlainHTML('ft_h0', 'Initial Head h₀ (m)',            '2',   'Initial liquid level above outlet')}
+        ${fieldHTML('ft_t',  'Evaluate at time t (optional)', ['m','','k'], '', 's')}`,
+      calc: () => {
+        const A=getF('ft_A');
+        const Rv=parseFloat(document.getElementById('inp-ft_Rv')?.value);
+        const h0=parseFloat(document.getElementById('inp-ft_h0')?.value||'2');
+        const t=getF('ft_t');
+        if (!A||A<=0||isNaN(Rv)||Rv<=0) return null;
+        const rho=1000,g=9.81;
+        const Cf = A/(rho*g);
+        const tau = Cf*Rv;
+        const Q0  = rho*g*h0/Rv;  // initial flow rate
+        const rows = [
+          { l: 'Fluid Capacitance Cf',   v: eng(Cf,'m³/Pa') },
+          { l: 'Time Constant τ',        v: eng(tau,'s') },
+          { l: 'Initial Flow Rate Q₀',   v: eng(Q0,'m³/s') },
+          { l: 'Initial Head h₀',        v: `${fmt(h0,4)} m` },
+          { hr:1 },
+          { note: `h(t) = h₀·e^(−t/τ)  |  τ = ${eng(tau,'s')}` },
+          { note: `At t=τ: h = ${fmt(h0*0.368,4)} m  (36.8% of initial)` },
+        ];
+        if (t!==null&&t>=0) {
+          const ht = h0*Math.exp(-t/tau);
+          const Qt = rho*g*ht/Rv;
+          rows.push({hr:1},{l:`h(${eng(t,'s')})`,v:`${fmt(ht,4)} m`},{l:`Q(${eng(t,'s')})`,v:eng(Qt,'m³/s')});
+        }
+        return resultHTML(rows,'h(t)=h₀·e^(−t/τ)  |  τ=A·Rv/(ρg)  |  Cf=A/(ρg)');
+      }
+    },
+
+    // ── STEP 5: SENSORS & ACTUATORS ─────────────────────────────────────────
+
+    encoder: {
+      title: 'Encoder Resolution',
+      desc: 'Compute angular and linear resolution, minimum detectable velocity, and position quantization for incremental and absolute encoders.',
+      fields: () => `
+        ${fieldPlainHTML('enc_ppr', 'Pulses Per Revolution (PPR)', '1000', 'Lines on encoder disk. Quadrature gives 4× PPR counts.')}
+        <div class="field-group"><div class="field-label">Decoding Mode</div>
+          <select class="full-select" id="enc-mode" onchange="recalc()">
+            <option value="1">1× (single edge)</option>
+            <option value="2">2× (dual edge)</option>
+            <option value="4" selected>4× quadrature (both edges, both channels)</option>
+          </select>
+        </div>
+        ${fieldHTML('enc_fs', 'Controller Sample Rate (fs)', ['','k','M'], 'k', 'Hz', 'For minimum velocity calculation')}
+        ${fieldHTML('enc_r',  'Wheel/Drum Radius (optional)', ['m','','k'], 'm', 'm', 'For linear resolution')}`,
+      calc: () => {
+        const ppr = parseFloat(document.getElementById('inp-enc_ppr')?.value||'1000');
+        const mode = parseInt(document.getElementById('enc-mode')?.value||'4');
+        const fs = getF('enc_fs');
+        const r  = getF('enc_r');
+        if (isNaN(ppr)||ppr<=0) return null;
+        const counts_rev = ppr * mode;
+        const ang_res_deg = 360/counts_rev;
+        const ang_res_rad = 2*Math.PI/counts_rev;
+        const lin_res = r ? r*ang_res_rad : null;
+        // Min velocity: 1 count per sample period
+        const v_min_rads = fs ? (2*Math.PI/counts_rev)*fs : null;
+        const v_min_rpm  = v_min_rads ? v_min_rads*60/(2*Math.PI) : null;
+        return resultHTML([
+          { l: 'Counts per Revolution',    v: `${counts_rev}  (${ppr} PPR × ${mode}×)` },
+          { l: 'Angular Resolution',       v: `${fmt(ang_res_deg,5)}°  =  ${eng(ang_res_rad,'rad')}` },
+          ...(lin_res ? [{ l: 'Linear Resolution', v: eng(lin_res,'m') + `/count  (r=${eng(r,'m')})` }] : []),
+          { hr:1 },
+          ...(v_min_rads ? [
+            { l: 'Min Detectable Velocity', v: eng(v_min_rads,'rad/s') + `  (${fmt(v_min_rpm,4)} RPM)` },
+            { note: `At fs=${eng(fs,'Hz')}: need ≥1 count/sample for velocity detection.` },
+          ] : []),
+          { hr:1 },
+          { note: `Position quantization error: ±${fmt(ang_res_deg/2,4)}° (±½ LSB)` },
+          { note: 'Quadrature 4× decoding maximizes resolution and direction detection.' },
+        ], 'Counts/rev = PPR × mode  |  Δθ = 2π/counts  |  v_min = Δθ · fs');
+      }
+    },
+
+    dc_motor: {
+      title: 'DC Motor Time Constants',
+      desc: 'Electrical time constant τe = L/R governs current rise. Mechanical time constant τm = Jm/b governs speed rise. Their ratio determines if the motor is current-limited or inertia-limited.',
+      fields: () => `
+        ${fieldHTML('dcm_L',  'Armature Inductance L',   ['μ','m',''], 'm', 'H')}
+        ${fieldHTML('dcm_R',  'Armature Resistance R',   ['m','','k'], '', 'Ω')}
+        ${fieldHTML('dcm_J',  'Rotor Inertia Jm',        ['μ','m',''], 'm', 'kg·m²')}
+        ${fieldHTML('dcm_b',  'Viscous Friction b',      ['μ','m',''], 'm', 'N·m·s')}
+        ${fieldHTML('dcm_Ke', 'Back-EMF Constant Ke',    ['m','','k'], '', 'V/(rad/s)', 'Optional — for electromechanical coupling')}`,
+      calc: () => {
+        const L=getF('dcm_L'),R=getF('dcm_R'),J=getF('dcm_J'),b=getF('dcm_b'),Ke=getF('dcm_Ke');
+        if (!R||R<=0) return null;
+        const tau_e = L ? L/R : null;
+        const tau_m = (J&&b&&b>0) ? J/b : null;
+        const ratio = (tau_e&&tau_m) ? tau_m/tau_e : null;
+        // No-load speed and stall torque approximation
+        const rows = [];
+        if (tau_e) rows.push({ l: 'Electrical τe = L/R',    v: eng(tau_e,'s') });
+        if (tau_m) rows.push({ l: 'Mechanical τm = Jm/b',   v: eng(tau_m,'s') });
+        if (ratio) {
+          rows.push({ l: 'τm / τe ratio',              v: fmt(ratio,4) });
+          rows.push({ hr:1 });
+          rows.push({ note: ratio > 10 ? 'τm >> τe: current settles fast — mechanical dynamics dominate (typical).' :
+                            ratio < 2  ? '⚠ τe ≈ τm: electromechanical coupling significant — use full coupled model.' :
+                                         'Moderate separation — both dynamics relevant at high bandwidth.' });
+        }
+        if (Ke) {
+          rows.push({ hr:1 });
+          rows.push({ l: 'Ke (back-EMF)',          v: eng(Ke,'V/(rad/s)') });
+          rows.push({ l: 'Kt = Ke (SI units)',      v: eng(Ke,'N·m/A') });
+          rows.push({ note: 'In SI: Ke [V/(rad/s)] = Kt [N·m/A] numerically.' });
+        }
+        rows.push({ hr:1 });
+        rows.push({ note: 'Bandwidth rule: ωBW_control < 0.1/τe to avoid exciting electrical dynamics.' });
+        return resultHTML(rows, 'τe = L/R  |  τm = Jm/b  |  Kt = Ke [SI units]');
+      }
+    },
+
+    back_emf: {
+      title: 'Back-EMF Constant & Kt Relationship',
+      desc: 'In SI units, the back-EMF constant Ke [V/(rad/s)] and torque constant Kt [N·m/A] are numerically equal. This calculator relates motor electrical and mechanical power.',
+      fields: () => `
+        ${fieldHTML('be_Ke', 'Back-EMF Constant Ke (V/(rad/s))', ['m','','k'], '', 'V/(rad/s)', 'Also called Kv or Ke')}
+        ${fieldHTML('be_I',  'Motor Current (A)',                 ['m','','k'], '', 'A')}
+        ${fieldHTML('be_w',  'Motor Speed ω',                    ['m','','k'], '', 'rad/s')}
+        ${fieldHTML('be_R',  'Armature Resistance R',            ['m','','k'], '', 'Ω', 'For copper loss and efficiency')}`,
+      calc: () => {
+        const Ke=getF('be_Ke'),I=getF('be_I'),w=getF('be_w'),R=getF('be_R');
+        if (!Ke||Ke<=0) return null;
+        const Kt = Ke;  // SI equality
+        const T  = I ? Kt*I : null;
+        const E_back = w ? Ke*w : null;
+        const P_mech = (T&&w) ? T*w : null;
+        const P_elec = (E_back&&I) ? E_back*I : null;
+        const P_copper = (I&&R) ? I*I*R : null;
+        const eta = (P_mech&&P_elec&&P_copper) ? P_mech/(P_elec+P_copper) : null;
+        return resultHTML([
+          { l: 'Ke (back-EMF constant)',   v: eng(Ke,'V/(rad/s)') },
+          { l: 'Kt (torque constant)',     v: eng(Kt,'N·m/A')  + '  (= Ke in SI)' },
+          ...(T ?        [{ l: 'Motor Torque T = Kt·I', v: eng(T,'N·m') }] : []),
+          ...(E_back ?   [{ l: 'Back-EMF = Ke·ω',       v: eng(E_back,'V') }] : []),
+          ...(P_mech ?   [{ l: 'Mechanical Power',       v: eng(P_mech,'W') }] : []),
+          ...(P_copper ? [{ l: 'Copper Loss I²R',        v: eng(P_copper,'W') }] : []),
+          ...(eta ?      [{ l: 'Motor Efficiency',       v: `${(eta*100).toFixed(2)}%` }] : []),
+          { hr:1 },
+          { note: 'Ke = Kt only in SI (V·s/rad = N·m/A). In rpm/V or oz·in/A, a conversion factor is needed.' },
+          { note: 'Power balance: P_elec = T·ω + I²R + friction losses.' },
+        ], 'Kt = Ke [SI]  |  T = Kt·I  |  E_back = Ke·ω  |  η = T·ω / (V·I)');
+      }
+    },
+
+    servo_bw: {
+      title: 'Servo Bandwidth from Inertia Ratio',
+      desc: 'Achievable closed-loop servo bandwidth depends on motor torque, total inertia (motor + reflected load), and current loop bandwidth. High inertia ratio limits performance.',
+      fields: () => `
+        ${fieldHTML('sb_Jm',  'Motor Inertia Jm',         ['μ','m',''], 'm', 'kg·m²')}
+        ${fieldHTML('sb_Jl',  'Load Inertia Jl',          ['μ','m','','k'], '', 'kg·m²')}
+        ${fieldPlainHTML('sb_N', 'Gear Ratio N',           '1',   'Load inertia reflected = Jl/N²')}
+        ${fieldHTML('sb_Kt',  'Torque Constant Kt',       ['m','','k'], '', 'N·m/A')}
+        ${fieldHTML('sb_Ipk', 'Peak Current (A)',          ['m','','k'], '', 'A', 'Peak torque = Kt × Ipk')}
+        ${fieldHTML('sb_wci', 'Current Loop BW ωci',      ['','k','M'], 'k', 'rad/s', 'Sets upper limit on velocity loop')}`,
+      calc: () => {
+        const Jm=getF('sb_Jm'),Jl=getF('sb_Jl'),Kt=getF('sb_Kt'),Ipk=getF('sb_Ipk'),wci=getF('sb_wci');
+        const N=parseFloat(document.getElementById('inp-sb_N')?.value||'1');
+        if (!Jm||Jm<=0) return null;
+        const Jl_ref = Jl ? Jl/(N*N) : 0;
+        const J_tot  = Jm + Jl_ref;
+        const ratio  = Jl_ref/Jm;
+        const T_pk   = (Kt&&Ipk) ? Kt*Ipk : null;
+        // Max angular acceleration
+        const alpha_max = T_pk ? T_pk/J_tot : null;
+        // Rule of thumb BW: ωv ≤ ωci/10, ωp ≤ ωv/10
+        const wv_max = wci ? wci/10 : null;
+        const wp_max = wv_max ? wv_max/10 : null;
+        // Practical BW also limited by inertia ratio
+        const bw_factor = ratio > 10 ? 0.3 : ratio > 5 ? 0.5 : ratio > 2 ? 0.7 : 1.0;
+        return resultHTML([
+          { l: 'Total Inertia J_tot',       v: eng(J_tot,'kg·m²') },
+          { l: 'Reflected Load J_ref',      v: eng(Jl_ref,'kg·m²') + (N>1?` (Jl/N²=${fmt(N,2)}²)`:'') },
+          { l: 'Inertia Ratio Jl_ref/Jm',  v: Jl ? fmt(ratio,4) + (ratio>10?' ⚠ high':ratio>5?' moderate':' ✓ good') : 'N/A' },
+          { hr:1 },
+          ...(alpha_max ? [{ l: 'Peak Angular Accel α',    v: eng(alpha_max,'rad/s²') }] : []),
+          ...(wv_max    ? [{ l: 'Max Velocity Loop BW ωv', v: eng(wv_max,'rad/s') + '  (ωci/10)' }] : []),
+          ...(wp_max    ? [{ l: 'Max Position Loop BW ωp', v: eng(wp_max,'rad/s') + '  (ωv/10)' }] : []),
+          { hr:1 },
+          { note: ratio>10 ? `⚠ High inertia ratio ${fmt(ratio,2)}: bandwidth reduced ~${Math.round((1-bw_factor)*100)}%. Use gearbox or larger motor.` :
+                  ratio>5  ? `Inertia ratio ${fmt(ratio,2)}: moderate. Keep position loop BW conservative.` :
+                             `Inertia ratio ${fmt(ratio,2)}: good matching — full bandwidth achievable.` },
+          { note: 'Rule of thumb: ωp ≤ ωv/10 ≤ ωci/100 for stability margins.' },
+        ], 'J_tot = Jm + Jl/N²  |  ωv ≤ ωci/10  |  ωp ≤ ωv/10');
+      }
+    },
+
+    adc_res: {
+      title: 'ADC Dynamic Range & Resolution',
+      desc: 'Compute the voltage resolution, dynamic range in dB, SNR limit from quantization, and minimum detectable signal for an ADC with given bit depth and reference voltage.',
+      fields: () => `
+        ${fieldPlainHTML('adc_bits', 'ADC Resolution (bits)', '12', '8-bit to 24-bit typical')}
+        ${fieldHTML('adc_Vref', 'Reference Voltage (Vref)', ['m','','k'], '', 'V', 'Full-scale input range')}
+        ${fieldPlainHTML('adc_gain', 'Input Gain (optional)', '1', 'Pre-amplifier gain before ADC')}`,
+      calc: () => {
+        const bits = parseInt(document.getElementById('inp-adc_bits')?.value||'12');
+        const Vref = getF('adc_Vref');
+        const gain = parseFloat(document.getElementById('inp-adc_gain')?.value||'1')||1;
+        if (isNaN(bits)||bits<1||bits>32) return null;
+        const N = Math.pow(2,bits);
+        const lsb = Vref ? Vref/N : null;
+        const lsb_input = lsb ? lsb/gain : null;
+        const dr_dB = 20*Math.log10(N);
+        const snr_dB = 6.02*bits + 1.76;  // ideal SNR
+        const enob_formula = `ENOB = (SNR_actual − 1.76) / 6.02`;
+        return resultHTML([
+          { l: 'ADC Resolution',          v: `${bits} bits  (${N.toLocaleString()} codes)` },
+          { l: 'Dynamic Range',           v: `${dr_dB.toFixed(2)} dB  (20·log₁₀(2ⁿ))` },
+          { l: 'Ideal SNR',               v: `${snr_dB.toFixed(2)} dB  (6.02n + 1.76)` },
+          { hr:1 },
+          ...(lsb ? [
+            { l: '1 LSB Voltage',         v: eng(lsb,'V') },
+            { l: 'Min Detectable (input)',v: lsb_input ? eng(lsb_input,'V') : '—' },
+            { l: 'RMS Quantization Noise',v: eng(lsb/(2*Math.sqrt(3)),'V_rms') },
+          ] : []),
+          { hr:1 },
+          { note: `${bits}-bit: ${snr_dB.toFixed(0)} dB SNR — ${bits<=8?'low resolution, fast':bits<=12?'good general purpose':'high resolution, precision measurement'}` },
+          { note: enob_formula },
+        ], 'DR = 20·log₁₀(2ⁿ)  |  SNR = 6.02n + 1.76 dB  |  LSB = Vref/2ⁿ');
+      }
+    },
+
+    // ── STEP 5: DESIGN AIDS ─────────────────────────────────────────────────
+
+    ts_to_bw: {
+      title: 'Settling Time → Required Bandwidth',
+      desc: 'Back-calculate the required closed-loop bandwidth from a settling time specification and target damping ratio.',
+      fields: () => `
+        ${fieldHTML('tb_ts', 'Required Settling Time (ts)', ['μ','m','','k'], 'm', 's', '2% criterion: ts = 4/(ζωₙ)')}
+        ${fieldPlainHTML('tb_z', 'Damping Ratio ζ', '0.7', '0.5–0.8 typical for servo applications')}
+        ${fieldPlainHTML('tb_crit', 'Settling criterion (%)', '2', '2% or 5% are standard')}`,
+      calc: () => {
+        const ts = getF('tb_ts');
+        const z  = parseFloat(document.getElementById('inp-tb_z')?.value||'0.7');
+        const crit = parseFloat(document.getElementById('inp-tb_crit')?.value||'2');
+        if (!ts||ts<=0||isNaN(z)||z<=0) return null;
+        const k_factor = crit <= 2 ? 4.0 : crit <= 5 ? 3.0 : 4.6/Math.log(100/crit);
+        const wn_req  = k_factor/(z*ts);
+        const wBW     = wn_req*Math.sqrt(1-2*z*z+Math.sqrt(4*z**4-4*z**2+2));
+        const ts_check = k_factor/(z*wn_req);
+        const fs_min  = 20*wBW/(2*Math.PI);
+        return resultHTML([
+          { l: 'Required ts',                v: eng(ts,'s') + `  (${crit}% criterion)` },
+          { l: 'Damping Ratio ζ',            v: fmt(z,4) },
+          { hr:1 },
+          { l: 'Required ωₙ',               v: eng(wn_req,'rad/s') },
+          { l: 'Required Bandwidth ωBW',     v: eng(wBW,'rad/s') + `  (${eng(wBW/(2*Math.PI),'Hz')})` },
+          { hr:1 },
+          { l: 'Min Sample Rate (20×BW)',    v: eng(fs_min,'Hz') },
+          { note: `ts = ${k_factor}/（ζωₙ) = ${fmt(ts_check,4)} s  ✓ (matches input)` },
+          { note: `Set ωgc ≈ ωBW = ${eng(wBW,'rad/s')} at phase margin = ${fmt(z*100,0)}°` },
+        ], `ts ≈ ${k_factor}/(ζωₙ)  |  ωBW = ωₙ√(1−2ζ²+√(4ζ⁴−4ζ²+2))`);
+      }
+    },
+
+    pm_to_gc: {
+      title: 'Phase Margin → Gain Crossover Design',
+      desc: 'Given a phase margin requirement and open-loop transfer function parameters, find the gain crossover frequency ωgc that achieves the target PM.',
+      fields: () => `
+        ${fieldPlainHTML('pg_pm', 'Target Phase Margin (degrees)', '45', '30° minimum, 45° recommended, 60° conservative')}
+        ${fieldHTML('pg_tau1', 'Dominant Lag τ₁', ['m','','k'], '', 's', 'Largest time constant in the open loop')}
+        ${fieldHTML('pg_tau2', 'Second Lag τ₂ (optional)', ['m','','k'], 'm', 's')}
+        <div class="field-group"><div class="field-label">Include integrator (1/s)?</div>
+          <select class="full-select" id="pg-int" onchange="recalc()">
+            <option value="1" selected>Yes — Type 1</option><option value="0">No — Type 0</option>
+          </select>
+        </div>`,
+      calc: () => {
+        const pm_target = parseFloat(document.getElementById('inp-pg_pm')?.value||'45');
+        const tau1 = getF('pg_tau1'), tau2 = getF('pg_tau2');
+        const hasInt = parseInt(document.getElementById('pg-int')?.value||'1')===1;
+        if (!tau1||tau1<=0||isNaN(pm_target)) return null;
+        // Phase of G(jω) = -90°(int) - atan(ω*tau1) - atan(ω*tau2)
+        // Find ωgc where ∠G = -(180-PM)
+        const target_phase = -(180-pm_target);
+        let wgc = null;
+        for (let w=1e-5;w<1e6;w*=1.005) {
+          let ph = hasInt ? -90 : 0;
+          ph -= Math.atan(w*tau1)*180/Math.PI;
+          if (tau2) ph -= Math.atan(w*tau2)*180/Math.PI;
+          if (ph <= target_phase) { wgc=w; break; }
+        }
+        if (!wgc) return errorHTML('Cannot achieve target PM with this configuration. Add lead compensation or reduce PM requirement.');
+        let mag_at_wgc = 1;
+        if (hasInt) mag_at_wgc /= wgc;
+        mag_at_wgc /= Math.sqrt(1+(tau1*wgc)**2);
+        if (tau2) mag_at_wgc /= Math.sqrt(1+(tau2*wgc)**2);
+        const K_req = 1/mag_at_wgc;
+        const ts_est = 4/(pm_target/100*wgc);
+        return resultHTML([
+          { l: 'Target PM',                v: `${pm_target.toFixed(1)}°` },
+          { l: 'Gain Crossover ωgc',       v: eng(wgc,'rad/s') },
+          { l: 'Required Loop Gain K',     v: fmt(K_req,5) },
+          { hr:1 },
+          { l: 'Predicted ts (2%)',        v: eng(ts_est,'s') },
+          { l: 'Predicted ζ ≈ PM/100',    v: fmt(pm_target/100,3) },
+          { hr:1 },
+          { note: pm_target>=60?'Conservative — good robustness, slower response.':pm_target>=45?'Recommended range (45–60°).':pm_target>=30?'Acceptable but marginal.':'⚠ Low PM — fragile stability.' },
+          { note: `Set K=${fmt(K_req,4)} so |KG(jωgc)| = 1 at ω = ${eng(wgc,'rad/s')}` },
+        ], 'PM = 180° + ∠G(jωgc)  |  ωgc: |KG(jωgc)|=1');
+      }
+    },
+
+    snr_req: {
+      title: 'SNR Requirement from SS Error Spec',
+      desc: 'Determine the required signal-to-noise ratio at the controller input such that sensor noise does not cause steady-state position error exceeding a target specification.',
+      fields: () => `
+        ${fieldPlainHTML('snr_ess', 'Max Allowable SS Error (ess)',    '0.01', 'In same units as signal (e.g. mm, deg, %)')}
+        ${fieldPlainHTML('snr_K',   'Loop Gain at DC (Kp or Kv)',      '10',   'Open-loop gain at the frequency of concern')}
+        ${fieldPlainHTML('snr_sig', 'Signal Amplitude (full scale)',    '1',    'Peak command signal amplitude')}
+        ${fieldHTML('snr_fbw', 'Control Bandwidth ωBW', ['m','','k'], '', 'rad/s', 'Noise above BW is attenuated by roll-off')}`,
+      calc: () => {
+        const ess = parseFloat(document.getElementById('inp-snr_ess')?.value);
+        const K   = parseFloat(document.getElementById('inp-snr_K')?.value||'10');
+        const sig = parseFloat(document.getElementById('inp-snr_sig')?.value||'1');
+        const wBW = getF('snr_fbw');
+        if (isNaN(ess)||ess<=0||isNaN(K)||K<=0) return null;
+        // Noise-induced error ≈ n/(1+K) ≤ ess → n_max = ess*(1+K)
+        const n_max = ess*(1+K);
+        const snr_min = sig/n_max;
+        const snr_dB  = 20*Math.log10(snr_min);
+        const bits_eq = (snr_dB-1.76)/6.02;
+        return resultHTML([
+          { l: 'Max allowable noise n_max',  v: fmt(n_max,5) + '  (same units as ess)' },
+          { l: 'Required SNR (linear)',      v: fmt(snr_min,4) + '×' },
+          { l: 'Required SNR (dB)',          v: `${snr_dB.toFixed(2)} dB` },
+          { l: 'Equivalent ADC bits',        v: `${bits_eq.toFixed(1)} bits  (via SNR = 6.02n+1.76)` },
+          { hr:1 },
+          { note: `n ≤ ess·(1+Kp) = ${fmt(n_max,4)} — noise above this causes unacceptable SS error.` },
+          ...(wBW ? [{ note: `At ωBW=${eng(wBW,'rad/s')}: closed-loop attenuates noise above bandwidth by slope of T(jω).` }] : []),
+          { note: snr_dB > 80 ? '⚠ Very high SNR required — check if spec is achievable with available ADC.' :
+                  snr_dB > 60 ? 'High SNR — 12+ bit ADC and good shielding needed.' :
+                                'Moderate SNR — achievable with standard 12-bit ADC and careful layout.' },
+        ], 'n_max = ess·(1+Kp)  |  SNR = A_sig/n_max  |  SNR_dB = 20·log₁₀(SNR)');
+      }
+    },
+
+    loop_budget: {
+      title: 'Control Loop Error Budget',
+      desc: 'Allocate the total steady-state error budget across sources: reference quantization, sensor noise, actuator deadband, computation delay, and disturbances. Identifies dominant error sources.',
+      fields: () => `
+        ${fieldPlainHTML('lb_spec',  'Total Error Spec (ess_total)',        '1',    'Max allowable total error (units match signal)')}
+        ${fieldPlainHTML('lb_quant', 'Reference Quantization Error',        '0.01', 'DAC or command resolution / 2')}
+        ${fieldPlainHTML('lb_noise', 'Sensor Noise Contribution',           '0.1',  'RMS noise × (1+Kp) / loop gain')}
+        ${fieldPlainHTML('lb_dead',  'Actuator Deadband Error',             '0.05', 'Gear backlash, valve hysteresis, etc.')}
+        ${fieldHTML('lb_delay', 'Computation + Transport Delay', ['μ','m','','k'], 'm', 's', 'Delay θ at ωgc → PM loss = θ·ωgc·(180/π)')}
+        ${fieldHTML('lb_wgc',   'Gain Crossover ωgc',           ['m','','k'], '', 'rad/s', 'For delay → PM loss calculation')}
+        ${fieldPlainHTML('lb_dist',  'Disturbance SS Error',               '0.2',  'From load torque, gravity, friction')}`,
+      calc: () => {
+        const spec  = parseFloat(document.getElementById('inp-lb_spec')?.value||'1');
+        const quant = parseFloat(document.getElementById('inp-lb_quant')?.value||'0');
+        const noise = parseFloat(document.getElementById('inp-lb_noise')?.value||'0');
+        const dead  = parseFloat(document.getElementById('inp-lb_dead')?.value||'0');
+        const dist  = parseFloat(document.getElementById('inp-lb_dist')?.value||'0');
+        const delay = getF('lb_delay'), wgc = getF('lb_wgc');
+        if (isNaN(spec)||spec<=0) return null;
+        // Root-sum-square budget (systematic errors add linearly, random RSS)
+        const sources = [
+          { name:'Reference quantization', val:quant },
+          { name:'Sensor noise',           val:noise },
+          { name:'Actuator deadband',      val:dead  },
+          { name:'Disturbance',            val:dist  },
+        ].filter(s=>s.val>0);
+        const rss = Math.sqrt(sources.reduce((s,x)=>s+x.val**2,0));
+        const linear_sum = sources.reduce((s,x)=>s+x.val,0);
+        if (rss === 0) return resultHTML([{ l:'Total Error Spec', v:fmt(spec,4) },{ note:'All error sources are zero — no budget allocation needed.' }]);
+        const pm_loss = (delay&&wgc) ? delay*wgc*180/Math.PI : null;
+        const margin  = spec - rss;
+        const rows = [
+          { l: 'Total Error Spec',        v: fmt(spec,4) },
+          { l: 'RSS Combined Error',      v: fmt(rss,5) },
+          { l: 'Linear Sum (worst case)', v: fmt(linear_sum,5) },
+          { l: 'RSS Margin',              v: `${fmt(margin,5)}  (${margin>0?'✓ passes':'⚠ fails'})` },
+          { hr:1 },
+        ];
+        sources.forEach(s => rows.push({ l:s.name, v:`${fmt(s.val,4)}  (${(s.val/rss*100).toFixed(0)}% of RSS)` }));
+        if (pm_loss !== null) {
+          rows.push({ hr:1 });
+          rows.push({ l:'Delay PM loss',  v:`${pm_loss.toFixed(1)}°  (θ·ωgc·180/π)` });
+          rows.push({ note: pm_loss>15?'⚠ Delay consumes >15° PM — reduce delay or lower ωgc.':'Delay PM impact acceptable.' });
+        }
+        rows.push({ hr:1 });
+        const dom = sources.sort((a,b)=>b.val-a.val)[0];
+        if (dom) rows.push({ note:`Dominant error: ${dom.name} (${(dom.val/rss*100).toFixed(0)}% of RSS). Address this first.` });
+        rows.push({ note: margin<0?'⚠ Budget exceeded — tighten individual sources or relax spec.':margin<0.1*spec?'Budget tight — little margin for manufacturing variation.':'Budget OK with good margin.' });
+        return resultHTML(rows,'ess_total = √(e₁²+e₂²+...)  |  PM_loss = θ·ωgc·(180/π)');
+      }
+    },
+
+  }; // end CALCS
+
+  // ── ROUTH FIELD BUILDER ──────────────────────────────────────────────────
+  function routhRebuild() {
+    const orderSel = document.getElementById('routh-order');
+    const container = document.getElementById('routh-coeff-fields');
+    if (!orderSel || !container) return;
+    const n = parseInt(orderSel.value);
+    let html = '';
+    for (let i = n; i >= 0; i--) {
+      html += `<div class="field-group">
+        <div class="field-label">a${i}  (coefficient of s^${i})</div>
+        <div class="field-row">
+          <input type="number" step="any" placeholder="—" id="routh-a${i}" oninput="recalc()" style="width:100%">
+        </div>
+      </div>`;
+    }
+    container.innerHTML = html;
+    container.querySelectorAll('input').forEach(inp => inp.addEventListener('input', recalc));
+    recalc();
+  }
+
+  // ── ENGINE ───────────────────────────────────────────────────────────────
+  function recalc() {
+    const c = CALCS[S.activeCalc];
+    if (!c || !c.calc) return;
+    const result = c.calc();
+    const el = document.getElementById('calc-result-area');
+    if (el && result !== null) el.innerHTML = result;
+    else if (el && result === null && el.innerHTML === '') el.innerHTML = `<div class="empty-state">Enter values above to see results.</div>`;
+  }
+
+  function switchCalc(id) {
+    S.activeCalc = id;
+    document.querySelectorAll('.nav-item[data-calc]').forEach(el =>
+      el.classList.toggle('active', el.dataset.calc === id)
+    );
+    const c = CALCS[id];
+    if (!c) return;
+    const content = document.getElementById('hub-content');
+
+    // Reference pages (no calc fields)
+    if (c.render && !c.fields) {
+      content.innerHTML = `<h2>${c.title}</h2><p class="calc-desc">${c.desc}</p>${c.render()}`;
+      return;
+    }
+    // Stubs (render() but no fields defined as function)
+    if (c.render && c.fields === undefined) {
+      content.innerHTML = `<h2>${c.title}</h2>${c.render()}`;
+      return;
+    }
+    // Full calculators
+    content.innerHTML = `
+      <h2>${c.title}</h2>
+      <p class="calc-desc">${c.desc}</p>
+      ${c.schema || ''}
+      ${c.fields ? c.fields() : ''}
+      <div id="calc-result-area"><div class="empty-state">Enter values above to see results.</div></div>`;
+    content.querySelectorAll('input[type="number"]').forEach(inp => inp.addEventListener('input', recalc));
+    content.querySelectorAll('select').forEach(sel => sel.addEventListener('change', recalc));
+    // Special init for calculators with dynamic field builders
+    if (id === 'routh') setTimeout(routhRebuild, 0);
+    // Scroll active nav item into view
+    const activeEl = document.querySelector(`.nav-item[data-calc="${id}"]`);
+    if (activeEl) activeEl.scrollIntoView({ block:'nearest', behavior:'smooth' });
+  }
+
+  function filterNav(q) {
+    const term = q.toLowerCase().trim();
+    document.querySelectorAll('.nav-item[data-calc]').forEach(el => {
+      el.classList.toggle('hidden', term !== '' && !el.textContent.toLowerCase().includes(term));
+    });
+    document.querySelectorAll('.nav-cat[data-cat]').forEach(cat => {
+      if (!term) { cat.style.display = ''; return; }
+      let sib = cat.nextElementSibling, any = false;
+      while (sib && !sib.hasAttribute('data-cat')) {
+        if (!sib.classList.contains('hidden')) any = true;
+        sib = sib.nextElementSibling;
+      }
+      cat.style.display = any ? '' : 'none';
+    });
+  }
+
+  // Wire nav clicks
+  document.querySelectorAll('.nav-item[data-calc]').forEach(el =>
+    el.addEventListener('click', () => switchCalc(el.dataset.calc))
+  );
+
+  // Boot
+  switchCalc('formulas');
+  </script>
+</body>
+</html>

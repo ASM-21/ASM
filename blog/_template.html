@@ -1,0 +1,187 @@
+<!DOCTYPE HTML>
+<!--
+  =====================================================================
+  BLOG POST TEMPLATE
+  =====================================================================
+  HOW TO WRITE A NEW POST:
+
+  Step 1 — Copy this file:
+    Rename it:  post-YYYY-MM-DD-short-title.html
+    Example:    post-2026-04-01-heat-exchanger-design.html
+
+  Step 2 — Update the <title> tag (line ~10)
+
+  Step 3 — Fill in the post content below where you see:
+    POST TITLE, POST DATE, POST TAGS, and the article body
+
+  Step 4 — Add it to the listing pages:
+    a) blog/index.html    → paste a new post card at the top of .blog-list
+    b) index.html #blog   → paste a new post card at the top of .blog-posts
+       (remove oldest card from index.html if you have more than 3)
+
+  That's it!
+  =====================================================================
+-->
+<html>
+	<head>
+		<!-- STEP 2: Update title -->
+		<title>POST TITLE - Andrew Morrissey</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="../assets/css/main.css" />
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+		<style>
+			.post-container {
+				padding: 20px;
+				background: #f9f9f9;
+				border-radius: 10px;
+				box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+				margin-top: 20px;
+				max-width: 720px;
+			}
+			.post-meta { color: #aaa; font-size: 0.85em; margin-bottom: 1.5em; }
+			.post-meta .tag {
+				display: inline-block;
+				background: #e8f5e9;
+				color: #2e7d32;
+				border-radius: 12px;
+				padding: 2px 10px;
+				font-size: 0.8em;
+				margin-left: 6px;
+			}
+			.post-body h3 { color: #4CAF50; margin-top: 1.5em; }
+			.post-body p  { line-height: 1.7; color: #444; }
+			.post-body ul, .post-body ol { color: #444; line-height: 1.8; }
+			.post-body blockquote {
+				border-left: 4px solid #4CAF50;
+				padding: 0.5em 1em;
+				background: #eaf7ea;
+				border-radius: 0 6px 6px 0;
+				margin: 1em 0;
+				font-style: italic;
+				color: #555;
+			}
+			.post-body code {
+				background: #f0f0f0;
+				padding: 2px 6px;
+				border-radius: 3px;
+				font-family: monospace;
+				font-size: 0.9em;
+			}
+			.post-body img { max-width: 100%; border-radius: 8px; margin: 1em 0; }
+			.post-divider { border: none; border-top: 1px solid #ddd; margin: 2em 0; }
+			.back-button {
+				display: inline-block;
+				margin-top: 1.5em;
+				padding: 10px 20px;
+				background: #4CAF50;
+				color: #fff;
+				text-decoration: none;
+				border-radius: 5px;
+				transition: background 0.3s ease;
+			}
+			.back-button:hover { background: #45a049; }
+		</style>
+		<script async src="https://www.googletagmanager.com/gtag/js?id=GTM-N34CKH5Q"></script>
+		<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','GTM-N34CKH5Q');</script>
+	</head>
+	<body class="is-preload">
+
+		<div id="header">
+			<div class="top">
+				<div id="logo">
+					<span class="image avatar48"><img src="../images/Avatar_1.jpg" alt="" /></span>
+					<h1 id="title">Andrew Morrissey</h1>
+					<p>Mechanical Engineer</p>
+				</div>
+				<nav id="nav">
+					<ul>
+						<li><a href="../index.html#top"><span class="icon solid fa-home">Intro</span></a></li>
+						<li><a href="../index.html#portfolio"><span class="icon solid fa-th">Portfolio</span></a></li>
+						<li><a href="../index.html#tools"><span class="icon solid fa-wrench">Tools</span></a></li>
+						<li><a href="../index.html#blog"><span class="icon solid fa-pen-nib">Blog</span></a></li>
+						<li><a href="../index.html#about"><span class="icon solid fa-user">About Me</span></a></li>
+						<li><a href="../index.html#contact"><span class="icon solid fa-envelope">Contact</span></a></li>
+					</ul>
+				</nav>
+			</div>
+			<div class="bottom">
+				<ul class="icons">
+					<li><a href="https://www.linkedin.com/in/asmorrissey" class="icon brands fa-linkedin" target="_blank"><span class="label">LinkedIn</span></a></li>
+					<li><a href="mailto:asmspartan21@gmail.com" class="icon solid fa-envelope"><span class="label">Email</span></a></li>
+					<li><a href="https://github.com/ASM-21" class="icon brands fa-github" target="_blank"><span class="label">Github</span></a></li>
+				</ul>
+			</div>
+		</div>
+
+		<div id="main">
+			<section id="post" class="two">
+				<div class="container">
+					<header>
+						<!-- STEP 3a: Change this to your post title -->
+						<h2>POST TITLE</h2>
+					</header>
+
+					<div class="post-container">
+						<!-- STEP 3b: Update date and tags -->
+						<p class="post-meta">
+							<i class="fas fa-calendar-alt"></i> Month DD, YYYY
+							<span class="tag">tag1</span>
+							<span class="tag">tag2</span>
+						</p>
+
+						<!-- STEP 3c: Write your post content here -->
+						<div class="post-body">
+							<p>
+								Start your post here. This is the intro paragraph — give the reader a sense of what
+								this post is about and why it matters.
+							</p>
+
+							<h3>Section Heading</h3>
+							<p>
+								Body text goes here. You can use HTML freely — paragraphs, lists, images, blockquotes, etc.
+							</p>
+
+							<ul>
+								<li>Bullet point one</li>
+								<li>Bullet point two</li>
+								<li>Bullet point three</li>
+							</ul>
+
+							<blockquote>
+								A quote or key takeaway can go in a blockquote like this.
+							</blockquote>
+
+							<h3>Another Section</h3>
+							<p>
+								Keep going. Add as many sections as you need.
+							</p>
+
+							<!-- To include an image: -->
+							<!-- <img src="../images/your-image.jpg" alt="Description" /> -->
+
+							<hr class="post-divider" />
+							<p><em>Thanks for reading! Feel free to reach out via the <a href="../index.html#contact">contact form</a> if you have questions or thoughts.</em></p>
+						</div>
+
+						<a href="index.html" class="back-button">← Back to Blog</a>
+					</div>
+				</div>
+			</section>
+		</div>
+
+		<div id="footer">
+			<ul class="copyright">
+				<li>&copy; Andrew Morrissey. All rights reserved.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+			</ul>
+		</div>
+
+		<script src="../assets/js/jquery.min.js"></script>
+		<script src="../assets/js/jquery.scrolly.min.js"></script>
+		<script src="../assets/js/jquery.scrollex.min.js"></script>
+		<script src="../assets/js/browser.min.js"></script>
+		<script src="../assets/js/breakpoints.min.js"></script>
+		<script src="../assets/js/util.js"></script>
+		<script src="../assets/js/main.js"></script>
+	</body>
+</html>

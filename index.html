@@ -71,6 +71,26 @@
 				font-size: 0.9rem;
 				color: #333;
 			}
+		/* Engineering Tools Section */
+		.tools-category { margin-bottom: 2em; }
+		.tools-category > h3 { color: #4CAF50; border-bottom: 1px solid #ddd; padding-bottom: 0.4em; margin-bottom: 0.8em; font-size: 1.1em; }
+		.tools-list { list-style: none; padding: 0; margin: 0; }
+		.tools-list li { padding: 0.6em 0; border-bottom: 1px solid #eee; }
+		.tools-list li a { font-weight: 600; color: #444; text-decoration: none; }
+		.tools-list li a:hover { color: #4CAF50; }
+		.tool-desc { color: #888; font-size: 0.9em; }
+
+		/* Blog Section */
+		.blog-posts { margin-top: 1.5em; }
+		.blog-post-card { background: #f9f9f9; border-radius: 8px; padding: 1.2em 1.5em; margin-bottom: 1.2em; box-shadow: 0 2px 4px rgba(0,0,0,0.07); transition: box-shadow 0.2s ease; }
+		.blog-post-card:hover { box-shadow: 0 4px 10px rgba(0,0,0,0.12); }
+		.blog-post-card h3 { margin: 0 0 0.3em 0; font-size: 1.05em; }
+		.blog-post-card h3 a { color: #444; text-decoration: none; }
+		.blog-post-card h3 a:hover { color: #4CAF50; }
+		.post-meta { color: #aaa; font-size: 0.85em; margin-bottom: 0.6em; }
+		.blog-post-card p.excerpt { margin: 0 0 0.8em 0; font-size: 0.95em; color: #555; line-height: 1.6; }
+		.read-more { color: #4CAF50; font-weight: 600; text-decoration: none; font-size: 0.9em; }
+		.read-more:hover { color: #45a049; }
 		</style>
 
 		<!-- Structured Data (Schema.org) -->
@@ -102,17 +122,19 @@
 		}
 		</script>
 
-		<!-- Google Analytics -->
-		<!-- Google Tag Manager tracking ID: GTM-N34CKH5Q -->
-		<script async src="https://www.googletagmanager.com/gtag/js?id=GTM-N34CKH5Q"></script>
-		<script>
-			window.dataLayer = window.dataLayer || [];
-			function gtag(){dataLayer.push(arguments);}
-			gtag('js', new Date());
-			gtag('config', 'GTM-N34CKH5Q');
-		</script>
+		<!-- Google Tag Manager -->
+		<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({"gtm.start":
+		new Date().getTime(),event:"gtm.js"});var f=d.getElementsByTagName(s)[0],
+		j=d.createElement(s),dl=l!="dataLayer"?"&l="+l:"";j.async=true;j.src=
+		"https://www.googletagmanager.com/gtm.js?id="+i+dl;f.parentNode.insertBefore(j,f);
+		})(window,document,"script","dataLayer","GTM-N34CKH5Q");</script>
+		<!-- End Google Tag Manager -->
 	</head>
 	<body class="is-preload">
+		<!-- Google Tag Manager (noscript) -->
+		<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-N34CKH5Q"
+		height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+		<!-- End Google Tag Manager (noscript) -->
 
 		<!-- Header -->
 		<div id="header">
@@ -129,6 +151,8 @@
 					<ul>
 						<li><a href="#top" id="top-link"><span class="icon solid fa-home">Intro</span></a></li>
 						<li><a href="#portfolio" id="portfolio-link"><span class="icon solid fa-th">Portfolio</span></a></li>
+						<li><a href="#tools" id="tools-link"><span class="icon solid fa-wrench">Tools</span></a></li>
+						<li><a href="#blog" id="blog-link"><span class="icon solid fa-pen-nib">Blog</span></a></li>
 						<li><a href="#about" id="about-link"><span class="icon solid fa-user">About Me</span></a></li>
 						<li><a href="#contact" id="contact-link"><span class="icon solid fa-envelope">Contact</span></a></li>
 					</ul>
@@ -138,9 +162,9 @@
 			<div class="bottom">
 				<!-- Social Icons -->
 				<ul class="icons">
-					<li><a href="https://www.linkedin.com/in/asmorrissey" class="icon brands fa-linkedin" target="_blank"><span class="label">LinkedIn</span></a></li>
+					<li><a href="https://www.linkedin.com/in/asmorrissey" class="icon brands fa-linkedin" target="_blank" rel="noopener noreferrer"><span class="label">LinkedIn</span></a></li>
 					<li><a href="mailto:asmspartan21@gmail.com" class="icon solid fa-envelope"><span class="label">Email</span></a></li>
-					<li><a href="https://github.com/ASM-21" class="icon brands fa-github" target="_blank"><span class="label">Github</span></a></li>
+					<li><a href="https://github.com/ASM-21" class="icon brands fa-github" target="_blank" rel="noopener noreferrer"><span class="label">Github</span></a></li>
 				</ul>
 			</div>
 		</div>
@@ -172,59 +196,59 @@
 					<div class="row">
 						<div class="col-4 col-12-mobile">
 							<article class="item">
-								<a href="foot-pedal-rake.html" class="image fit"><img src="images/Foot_Petal_1.jpg" alt="" /></a>
-								<header>
-									<h3>Sophomore Design - Foot Pedal Rake</h3>
-								</header>
-							</article>
-							<article class="item">
-								<a href="automatic-leveling-table.html" class="image fit"><img src="images/SR_1.PNG" alt="" /></a>
+								<a href="automatic-leveling-table.html" class="image fit"><img src="images/SR_1.PNG" alt="Automatic leveling table for NDE — Senior Design" /></a>
 								<header>
 									<h3>Senior Design - Automatic Leveling Table for Nondestructive Evaluation</h3>
 								</header>
 							</article>
 							<article class="item">
-								<a href="audio-equalizer.html" class="image fit"><img src="images/2k7_circuit_image.PNG" alt="" /></a>
+								<a href="economics-decarbonization.html" class="image fit"><img src="images/TIVA_1.png" alt="Economics of decarbonization — global trade visualization" /></a>
 								<header>
-									<h3>Electrical Engineering Fundamentals Lab - Audio Equalizer</h3>
+									<h3>ME Research - Economics of Decarbonization</h3>
+								</header>
+							</article>
+							<article class="item">
+								<a href="carbon-accounting.html" class="image fit"><img src="images/Soy_1.PNG" alt="Soy-Mal-Tan adhesive carbon footprint analysis" /></a>
+								<header>
+									<h3>Carbon Accounting - Soy-Mal-Tan Adhesive Footprint</h3>
 								</header>
 							</article>
 						</div>
 						<div class="col-4 col-12-mobile">
 							<article class="item">
-								<a href="fluid-dynamics-lab.html" class="image fit"><img src="images/fluids_setup1.PNG" alt="" /></a>
+								<a href="data-center-sustainability.html" class="image fit"><img src="images/smart_data_center.png" alt="Data center sustainability analysis" /></a>
 								<header>
-									<h3>Fluid Dynamics Lab: Artery Blockage Through Flow Visualization</h3>
+									<h3>Data Center Sustainability Analysis</h3>
 								</header>
 							</article>
 							<article class="item">
-								<a href="krishi-due-diligence.html" class="image fit"><img src="images/Krishi_1.PNG" alt="" /></a>
+								<a href="krishi-due-diligence.html" class="image fit"><img src="images/Krishi_1.PNG" alt="Krishi agricultural startup — due diligence analysis" /></a>
 								<header>
 									<h3>Student Managed Venture Fund - Krishi Due Diligence</h3>
 								</header>
 							</article>
 							<article class="item">
-								<a href="motor-selection.html" class="image fit"><img src="images/541_Image_1.PNG" alt="" /></a>
+								<a href="ritecarb-market-research.html" class="image fit"><img src="images/Rite_1.PNG" alt="RiteCarb startup market research" /></a>
 								<header>
-									<h3>Engineering Design: A Decision Based Approach - Motor Selection</h3>
+									<h3>Student Managed Venture Fund - RiteCarb Market Research</h3>
 								</header>
 							</article>
 						</div>
 						<div class="col-4 col-12-mobile">
 							<article class="item">
-								<a href="heat-mass-transfer-lab.html" class="image fit"><img src="images/315_diagram.PNG" alt="" /></a>
+								<a href="safety-motorcycle-attachment.html" class="image fit"><img src="images/Seat_1.jpg" alt="Safety motorcycle seat attachment" /></a>
 								<header>
-									<h3>Heat and Mass Transfer Lab: Optimal Pool Color</h3>
+									<h3>Product and Process Design - Safety Motorcycle Attachment</h3>
 								</header>
 							</article>
 							<article class="item">
-								<a href="ritecarb-market-research.html" class="image fit"><img src="images/Rite_1.PNG" alt="" /></a>
+								<a href="skitter-robot.html" class="image fit"><img src="images/375_Pic1.PNG" alt="Skitter robot — Controls II Lab" /></a>
 								<header>
-									<h3>Student Managed Venture Fund - RiteCarb Market Research</h3>
+									<h3>Controls II Lab - Skitter Robot</h3>
 								</header>
 							</article>
 							<article class="item">
-								<a href="transmission-unit.html" class="image fit"><img src="images/Machine_1.PNG" alt="" /></a>
+								<a href="transmission-unit.html" class="image fit"><img src="images/Machine_1.PNG" alt="Transmission unit — Machine Design" /></a>
 								<header>
 									<h3>Machine Design - Transmission Unit</h3>
 								</header>
@@ -236,53 +260,152 @@
 					<div class="row">
 						<div class="col-4 col-12-mobile">
 							<article class="item">
-								<a href="skitter-robot.html" class="image fit"><img src="images/375_Pic1.PNG" alt="" /></a>
+								<a href="fluid-dynamics-lab.html" class="image fit"><img src="images/fluids_setup1.PNG" alt="Artery blockage flow visualization experiment" /></a>
 								<header>
-									<h3>Controls II Lab - Skitter Robot</h3>
+									<h3>Fluid Dynamics Lab: Artery Blockage Through Flow Visualization</h3>
 								</header>
 							</article>
 							<article class="item">
-								<a href="boggins-challenge.html" class="image fit"><img src="images/Bog_1.png" alt="" /></a>
+								<a href="motor-selection.html" class="image fit"><img src="images/541_Image_1.PNG" alt="Motor selection decision matrix" /></a>
+								<header>
+									<h3>Engineering Design: A Decision Based Approach - Motor Selection</h3>
+								</header>
+							</article>
+						</div>
+						<div class="col-4 col-12-mobile">
+							<article class="item">
+								<a href="heat-mass-transfer-lab.html" class="image fit"><img src="images/315_diagram.PNG" alt="Pool heat absorption experiment diagram" /></a>
+								<header>
+									<h3>Heat and Mass Transfer Lab: Optimal Pool Color</h3>
+								</header>
+							</article>
+							<article class="item">
+								<a href="foot-pedal-rake.html" class="image fit"><img src="images/Foot_Petal_1.jpg" alt="Foot pedal rake device — Sophomore Design" /></a>
+								<header>
+									<h3>Sophomore Design - Foot Pedal Rake</h3>
+								</header>
+							</article>
+							<article class="item">
+								<a href="audio-equalizer.html" class="image fit"><img src="images/2k7_circuit_image.PNG" alt="Audio equalizer circuit board" /></a>
+								<header>
+									<h3>Electrical Engineering Fundamentals Lab - Audio Equalizer</h3>
+								</header>
+							</article>
+						</div>
+						<div class="col-4 col-12-mobile">
+							<article class="item">
+								<a href="boggins-challenge.html" class="image fit"><img src="images/Bog_1.png" alt="The Boggins Challenge" /></a>
 								<header>
 									<h3>The Boggins Challenge</h3>
 								</header>
 							</article>
 							<article class="item">
-								<a href="data-center-sustainability.html" class="image fit"><img src="images/smart_data_center.png" alt="" /></a>
+								<a href="speedruns.html" class="image fit"><img src="images/cube.jpg" alt="Rubik's cube speedrun personal records" /></a>
 								<header>
-									<h3>Data Center Sustainability Analysis</h3>
-								</header>
-							</article>
-						</div>
-						<div class="col-4 col-12-mobile">
-							<article class="item">
-								<a href="economics-decarbonization.html" class="image fit"><img src="images/TIVA_1.png" alt="" /></a>
-								<header>
-									<h3>ME Research - Economics of Decarbonization</h3>
-								</header>
-							</article>
-							<article class="item">
-								<a href="safety-motorcycle-attachment.html" class="image fit"><img src="images/Seat_1.jpg" alt="" /></a>
-								<header>
-									<h3>Product and Process Design - Safety Motorcycle Attachment</h3>
-								</header>
-							</article>
-						</div>
-						<div class="col-4 col-12-mobile">
-							<article class="item">
-								<a href="carbon-accounting.html" class="image fit"><img src="images/Soy_1.PNG" alt="" /></a>
-								<header>
-									<h3>Carbon Accounting - Soy-Mal-Tan Adhesive Footprint</h3>
-								</header>
-							</article>
-							<article class="item">
-								<a href="speedruns.html" class="image fit"><img src="images/cube.jpg" alt="" /></a>
-								<header>
-									<h3>Speedruns & Personal Records</h3>
+									<h3>Speedruns &amp; Personal Records</h3>
 								</header>
 							</article>
 						</div>
 					</div>
+
+				</div>
+			</section>
+
+			<!-- Engineering Tools -->
+			<section id="tools" class="three">
+				<div class="container">
+					<header>
+						<h2>Engineering Tools</h2>
+					</header>
+					<p>Interactive calculators for common engineering problems. Click any tool to open the calculator.</p>
+
+					<div class="tools-category">
+						<h3><i class="fas fa-cog"></i> Mechanical</h3>
+						<ul class="tools-list">
+							<li>
+								<a href="tools/beam-deflection.html"><i class="fas fa-ruler-combined"></i> Beam Deflection</a>
+								<span class="tool-desc"> — Cantilever &amp; simply-supported beams; point &amp; distributed loads; 8 material presets; 6 cross-section types; SFD, BMD, deflection &amp; slope diagrams</span>
+							</li>
+							<li>
+								<a href="tools/stress-strain.html"><i class="fas fa-compress"></i> Stress &amp; Strain</a>
+								<span class="tool-desc"> — 6 solve modes (force, area, elongation, modulus, stress); 11 material presets; factor of safety; stress-strain curve &amp; member schematic</span>
+							</li>
+						</ul>
+					</div>
+
+					<div class="tools-category">
+						<h3><i class="fas fa-water"></i> Fluid &amp; Thermal</h3>
+						<ul class="tools-list">
+							<li>
+								<a href="tools/reynolds-number.html"><i class="fas fa-droplet"></i> Reynolds Number &amp; Fluid Mechanics</a>
+								<span class="tool-desc"> — 20+ modules: Re, Darcy-Weisbach, Moody chart, minor losses, Bernoulli, pump affinity laws, water hammer, compressible flow, boundary layer, open channel</span>
+							</li>
+							<li>
+								<a href="tools/heat-transfer.html"><i class="fas fa-temperature-half"></i> Heat Transfer</a>
+								<span class="tool-desc"> — 8 modules: flat wall &amp; cylindrical conduction, convection, radiation, composite multilayer wall, fin efficiency, LMTD/NTU heat exchangers, transient lumped-capacitance</span>
+							</li>
+						</ul>
+					</div>
+
+					<div class="tools-category">
+						<h3><i class="fas fa-bolt"></i> Electrical and Controls</h3>
+						<ul class="tools-list">
+							<li>
+								<a href="tools/voltage-divider.html"><i class="fas fa-plug"></i> Electrical Circuits</a>
+								<span class="tool-desc"> — Voltage divider, Ohm's law, series/parallel resistors, power dissipation, E12/E24 standard values, AWG wire gauge, RC filters, impedance</span>
+							</li>
+							<li>
+								<a href="tools/controls-systems.html"><i class="fas fa-sliders"></i> Control Systems</a>
+								<span class="tool-desc"> — Transfer functions, Bode plots, root locus, Routh-Hurwitz stability, step response metrics, state-space, PID tuning, Nyquist &amp; Nichols chart</span>
+							</li>
+						</ul>
+					</div>
+
+					<div class="tools-category">
+						<h3><i class="fas fa-right-left"></i> General</h3>
+						<ul class="tools-list">
+							<li>
+								<a href="tools/unit-converter.html"><i class="fas fa-scale-balanced"></i> Unit Converter</a>
+								<span class="tool-desc"> — 140+ units across 14 categories: length, area, volume, mass, temperature, pressure, energy, power, force, torque, speed, density, flow rate, frequency</span>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</section>
+
+			<!-- Blog -->
+			<section id="blog" class="two">
+				<div class="container">
+					<header>
+						<h2>Blog</h2>
+					</header>
+					<p>Notes on things I've learned and would like to share.</p>
+
+					<div class="blog-posts">
+						<!-- BLOG POST CARD — copy this block to add a new post to the homepage preview -->
+						<div class="blog-post-card">
+							<h3><a href="blog/post-2026-03-16-getting-started.html">Getting Started: Literature Review Guide</a></h3>
+							<p class="post-meta"><i class="fas fa-calendar-alt"></i> April 5, 2026</p>
+							<p class="excerpt">A quick introduction to my literature review workflow that I've used for my MS research.</p>
+							<a href="blog/post-2026-03-16-getting-started.html" class="read-more">Read more →</a>
+						</div>
+						<!-- END BLOG POST CARD -->
+					</div>
+
+					<p style="margin-top: 1.5em;"><a href="blog/index.html" class="button">View All Posts</a></p>
+				</div>
+			</section>
+
+		<!-- About Me -->
+			<section id="about" class="three">
+				<div class="container">
+					<header>
+						<h2>About Me</h2>
+					</header>
+
+					<a href="#" class="image featured"><img src="images/Colorado_Pic.jpg" alt="" /></a>
+
+					<p>I am a Mechanical Engineering student at Purdue University, currently pursuing a MS degree. My academic and professional interests lie in sustainability, AI, and venture capital. I have gained practical experience through internships at Air Products and AFB International.</p>
 
 					<!-- Interests Section -->
 					<header>
@@ -310,19 +433,7 @@
 							<p>Startups and Venture Capital</p>
 						</div>
 					</div>
-				</div>
-			</section>
 
-			<!-- About Me -->
-			<section id="about" class="three">
-				<div class="container">
-					<header>
-						<h2>About Me</h2>
-					</header>
-
-					<a href="#" class="image featured"><img src="images/Colorado_Pic.jpg" alt="" /></a>
-
-					<p>I am a Mechanical Engineering student at Purdue University, currently pursuing a MS degree. My academic and professional interests lie in sustainability, AI, and venture capital. I have gained practical experience through internships at Air Products and AFB International.</p>
 				</div>
 			</section>
 

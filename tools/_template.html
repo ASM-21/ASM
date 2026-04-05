@@ -1,0 +1,203 @@
+<!DOCTYPE HTML>
+<!--
+  =====================================================================
+  ENGINEERING TOOL TEMPLATE
+  =====================================================================
+  HOW TO ADD A NEW CALCULATOR:
+  1. Copy this file and rename it: tools/your-calculator-name.html
+  2. Update the <title> tag (line ~10)
+  3. Update the page heading <h2> (search for CALCULATOR NAME)
+  4. Update the description paragraph
+  5. Replace the example form fields with your calculator's inputs
+  6. Write your calculation logic in the <script> block at the bottom
+  7. Add a link to your new calculator in:
+       - ASM/index.html  → find the #tools section, add a new <li>
+  =====================================================================
+-->
+<html>
+	<head>
+		<title>CALCULATOR NAME - Andrew Morrissey</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="../assets/css/main.css" />
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+		<style>
+			.calculator-box {
+				padding: 20px;
+				background: #f9f9f9;
+				border-radius: 10px;
+				box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+				margin-top: 20px;
+				max-width: 520px;
+			}
+			.calculator-box p.description { color: #555; margin-bottom: 1.5em; line-height: 1.6; }
+			.calc-group { margin-bottom: 1.1em; }
+			.calc-group label { display: block; font-weight: 600; color: #444; margin-bottom: 0.3em; font-size: 0.95em; }
+			.calc-group input[type="number"],
+			.calc-group select {
+				width: 100%;
+				padding: 0.5em 0.8em;
+				border: 1px solid #ddd;
+				border-radius: 5px;
+				font-size: 1em;
+				background: #fff;
+				box-sizing: border-box;
+			}
+			.calc-btn {
+				display: inline-block;
+				padding: 10px 28px;
+				background: #4CAF50;
+				color: #fff;
+				border: none;
+				border-radius: 5px;
+				font-size: 1em;
+				cursor: pointer;
+				transition: background 0.3s ease;
+				margin-top: 0.5em;
+			}
+			.calc-btn:hover { background: #45a049; }
+			.calc-result {
+				margin-top: 1.5em;
+				padding: 1em 1.2em;
+				background: #eaf7ea;
+				border-left: 4px solid #4CAF50;
+				border-radius: 5px;
+				display: none;
+			}
+			.calc-result h3 { color: #4CAF50; margin: 0 0 0.5em 0; font-size: 1em; text-transform: uppercase; letter-spacing: 0.05em; }
+			.calc-result p { margin: 0.25em 0; color: #333; font-size: 0.95em; }
+			.calc-result .big-val { font-size: 1.4em; font-weight: 600; color: #2e7d32; }
+			.calc-error { color: #c0392b; font-size: 0.9em; margin-top: 0.6em; display: none; }
+			.back-button {
+				display: inline-block;
+				margin-top: 1.5em;
+				padding: 10px 20px;
+				background: #4CAF50;
+				color: #fff;
+				text-decoration: none;
+				border-radius: 5px;
+				transition: background 0.3s ease;
+			}
+			.back-button:hover { background: #45a049; }
+			.formula-note { font-size: 0.85em; color: #999; margin-top: 0.4em; font-style: italic; }
+		</style>
+		<!-- Google Analytics -->
+		<script async src="https://www.googletagmanager.com/gtag/js?id=GTM-N34CKH5Q"></script>
+		<script>
+			window.dataLayer = window.dataLayer || [];
+			function gtag(){dataLayer.push(arguments);}
+			gtag('js', new Date());
+			gtag('config', 'GTM-N34CKH5Q');
+		</script>
+	</head>
+	<body class="is-preload">
+
+		<!-- Header -->
+		<div id="header">
+			<div class="top">
+				<div id="logo">
+					<span class="image avatar48"><img src="../images/Avatar_1.jpg" alt="" /></span>
+					<h1 id="title">Andrew Morrissey</h1>
+					<p>Mechanical Engineer</p>
+				</div>
+				<nav id="nav">
+					<ul>
+						<li><a href="../index.html#top"><span class="icon solid fa-home">Intro</span></a></li>
+						<li><a href="../index.html#portfolio"><span class="icon solid fa-th">Portfolio</span></a></li>
+						<li><a href="../index.html#tools"><span class="icon solid fa-wrench">Tools</span></a></li>
+						<li><a href="../index.html#blog"><span class="icon solid fa-pen-nib">Blog</span></a></li>
+						<li><a href="../index.html#about"><span class="icon solid fa-user">About Me</span></a></li>
+						<li><a href="../index.html#contact"><span class="icon solid fa-envelope">Contact</span></a></li>
+					</ul>
+				</nav>
+			</div>
+			<div class="bottom">
+				<ul class="icons">
+					<li><a href="https://www.linkedin.com/in/asmorrissey" class="icon brands fa-linkedin" target="_blank"><span class="label">LinkedIn</span></a></li>
+					<li><a href="mailto:asmspartan21@gmail.com" class="icon solid fa-envelope"><span class="label">Email</span></a></li>
+					<li><a href="https://github.com/ASM-21" class="icon brands fa-github" target="_blank"><span class="label">Github</span></a></li>
+				</ul>
+			</div>
+		</div>
+
+		<!-- Main -->
+		<div id="main">
+			<section id="calculator" class="two">
+				<div class="container">
+					<header>
+						<!-- STEP 3: Change this heading to your calculator's name -->
+						<h2>CALCULATOR NAME</h2>
+					</header>
+
+					<div class="calculator-box">
+						<!-- STEP 4: Update this description -->
+						<p class="description">Brief description of what this calculator does and what formula it uses.</p>
+
+						<!-- STEP 5: Replace these example fields with your calculator's inputs -->
+						<div class="calc-group">
+							<label for="input1">Input 1 (units)</label>
+							<input type="number" id="input1" placeholder="e.g. 100" step="any" />
+						</div>
+						<div class="calc-group">
+							<label for="input2">Input 2 (units)</label>
+							<input type="number" id="input2" placeholder="e.g. 0.5" step="any" />
+						</div>
+
+						<button class="calc-btn" onclick="calculate()">Calculate</button>
+						<p class="calc-error" id="calcError">Please fill in all fields with valid numbers.</p>
+						<p class="formula-note">Formula: Result = Input1 × Input2</p>
+
+						<!-- Result box — shown after calculation -->
+						<div class="calc-result" id="calcResult">
+							<h3>Result</h3>
+							<p><span class="big-val" id="resultVal">—</span></p>
+							<p id="resultNote"></p>
+						</div>
+
+						<a href="../index.html#tools" class="back-button">← Back to Tools</a>
+					</div>
+				</div>
+			</section>
+		</div>
+
+		<!-- Footer -->
+		<div id="footer">
+			<ul class="copyright">
+				<li>&copy; Andrew Morrissey. All rights reserved.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+			</ul>
+		</div>
+
+		<!-- Scripts -->
+		<script src="../assets/js/jquery.min.js"></script>
+		<script src="../assets/js/jquery.scrolly.min.js"></script>
+		<script src="../assets/js/jquery.scrollex.min.js"></script>
+		<script src="../assets/js/browser.min.js"></script>
+		<script src="../assets/js/breakpoints.min.js"></script>
+		<script src="../assets/js/util.js"></script>
+		<script src="../assets/js/main.js"></script>
+
+		<script>
+			// STEP 6: Replace this with your calculation logic
+			function calculate() {
+				var err = document.getElementById('calcError');
+				var res = document.getElementById('calcResult');
+				err.style.display = 'none';
+				res.style.display = 'none';
+
+				var a = parseFloat(document.getElementById('input1').value);
+				var b = parseFloat(document.getElementById('input2').value);
+
+				if (isNaN(a) || isNaN(b)) {
+					err.style.display = 'block';
+					return;
+				}
+
+				var result = a * b; // ← replace with your formula
+
+				document.getElementById('resultVal').textContent = result.toPrecision(4);
+				document.getElementById('resultNote').textContent = ''; // optional extra info
+				res.style.display = 'block';
+			}
+		</script>
+	</body>
+</html>
