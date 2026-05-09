@@ -5,194 +5,212 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
     <link rel="stylesheet" href="../assets/css/main.css" />
+    <link rel="stylesheet" href="../assets/css/calc-base.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
     <script async src="https://www.googletagmanager.com/gtag/js?id=GTM-N34CKH5Q"></script>
     <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','GTM-N34CKH5Q');</script>
     <style>
         /* ================================================================
-           FLUIDS HUB — namespaced with .fh- to avoid theme conflicts
+           FLUIDS HUB — dark theme, namespaced .fh-
         ================================================================ */
 
         .fh-wrap { max-width: 960px; }
 
+        /* ── Wrapper ── */
+        .fh-tool-inner {
+            background: #0d1117; border-radius: 12px; border: 1px solid #30363d;
+            overflow: hidden; margin-top: 1em;
+            font-family: 'IBM Plex Sans', sans-serif;
+        }
+
         /* ── Unit toggle ── */
         .fh-unit-bar {
             display: flex; align-items: center; flex-wrap: wrap; gap: 8px;
-            background: #f2f2f2; border-radius: 8px; padding: 10px 16px;
-            margin-bottom: 1.6em;
+            background: #161b22; border-bottom: 1px solid #30363d;
+            padding: 10px 1.6em;
         }
-        .fh-unit-bar span { font-size: 0.88em; font-weight: 600; color: #555; }
+        .fh-unit-bar span { font-size: 0.82em; font-weight: 600; color: #8b949e; }
         .fh-unit-btn {
-            padding: 5px 18px; border: 2px solid #ccc; border-radius: 20px;
-            background: #fff; cursor: pointer; font-size: 0.88em; font-weight: 700;
-            color: #666; transition: all 0.2s;
+            padding: 4px 16px; border: 1px solid #30363d; border-radius: 20px;
+            background: #21262d; cursor: pointer; font-size: 0.82em; font-weight: 600;
+            color: #8b949e; transition: all 0.2s;
         }
-        .fh-unit-btn.active { background: #4CAF50; color: #fff; border-color: #4CAF50; }
-        .fh-unit-note { font-size: 0.78em; color: #bbb; margin-left: 4px; }
+        .fh-unit-btn.active { background: rgba(76,175,80,0.12); color: #4CAF50; border-color: #4CAF50; }
+        .fh-unit-note { font-size: 0.72em; color: #484f58; margin-left: 4px; font-family: 'IBM Plex Mono', monospace; }
 
         /* ── Tab navigation ── */
         .fh-tab-nav {
-            display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 0;
-            border-bottom: 2px solid #e0e0e0;
+            display: flex; flex-wrap: wrap; gap: 0;
+            background: #161b22; border-bottom: 1px solid #30363d;
+            padding: 0 1.6em; overflow-x: auto;
         }
         .fh-tab-btn {
-            padding: 8px 14px; background: #f7f7f7; border: 1px solid #e0e0e0;
-            border-bottom: none; border-radius: 6px 6px 0 0; cursor: pointer;
-            font-size: 0.82em; font-weight: 700; color: #888; transition: all 0.2s;
-            position: relative; top: 2px;
+            padding: 0.85em 1.1em; background: transparent; border: none;
+            border-bottom: 2px solid transparent; cursor: pointer;
+            font-size: 0.8em; font-weight: 500; color: #8b949e; transition: all 0.15s;
+            font-family: 'IBM Plex Sans', sans-serif; white-space: nowrap; outline: none;
         }
-        .fh-tab-btn.active { background: #fff; color: #2e7d32; border-color: #e0e0e0; border-bottom-color: #fff; }
-        .fh-tab-btn:hover:not(.active) { background: #e8f5e9; color: #388e3c; }
-        .fh-tab-btn.coming-soon { opacity: 0.55; }
-        .fh-tab-btn.coming-soon:hover { opacity: 0.75; }
+        .fh-tab-btn.active { color: #4CAF50; border-bottom-color: #4CAF50; }
+        .fh-tab-btn:hover:not(.active) { color: #e6edf3; }
+        .fh-tab-btn.coming-soon { opacity: 0.45; }
 
         /* ── Tab panels ── */
         .fh-tab-panel {
-            display: none; padding-top: 1.6em;
+            display: none; padding: 1.6em;
             animation: fhFadeIn 0.18s ease;
         }
         .fh-tab-panel.active { display: block; }
         @keyframes fhFadeIn {
-            from { opacity: 0; transform: translateY(5px); }
+            from { opacity: 0; transform: translateY(4px); }
             to   { opacity: 1; transform: translateY(0); }
         }
 
         /* ── Section headers inside a tab ── */
         .fh-section {
-            font-size: 0.72em; text-transform: uppercase; letter-spacing: 0.1em;
-            font-weight: 800; color: #bbb; border-bottom: 1px solid #eee;
-            padding-bottom: 0.3em; margin-bottom: 0.9em; margin-top: 0.4em;
+            font-size: 0.7em; text-transform: uppercase; letter-spacing: 0.14em;
+            font-weight: 600; color: #4CAF50;
+            border-bottom: 1px solid #21262d;
+            padding-bottom: 0.5em; margin-bottom: 1em; margin-top: 0.4em;
+            display: flex; align-items: center; gap: 0.5em;
         }
 
         /* ── Calculator cards ── */
         .fh-card {
-            background: #f9f9f9; border-radius: 10px; padding: 1.3em 1.5em;
-            margin-bottom: 1.4em; box-shadow: 0 2px 6px rgba(0,0,0,0.07);
+            background: #161b22; border: 1px solid #30363d; border-radius: 8px;
+            padding: 1.3em 1.5em; margin-bottom: 1.2em;
         }
         .fh-card h3 {
-            margin: 0 0 0.4em; color: #2e7d32; font-size: 1.02em;
-            padding-bottom: 0.4em; border-bottom: 2px solid #e8f5e9;
+            margin: 0 0 0.4em; color: #e6edf3; font-size: 1em;
+            padding-bottom: 0.4em; border-bottom: 1px solid #21262d;
         }
         .fh-card h3 i { color: #4CAF50; margin-right: 7px; }
 
         /* ── Formula display ── */
         .fh-formula {
-            background: #0f1923; color: #4CAF50;
-            font-family: 'Courier New', Courier, monospace; font-size: 0.88em;
+            background: #0a0e14; color: #4CAF50;
+            font-family: 'IBM Plex Mono', monospace; font-size: 0.85em;
             padding: 0.55em 1em; border-radius: 6px; margin-bottom: 0.9em;
             letter-spacing: 0.02em; line-height: 1.5;
+            border: 1px solid #21262d;
         }
 
         /* ── Preset row ── */
         .fh-presets { margin-bottom: 0.9em; }
-        .fh-presets-label { font-size: 0.78em; color: #bbb; margin-bottom: 0.3em; display: block; }
+        .fh-presets-label { font-size: 0.75em; color: #484f58; margin-bottom: 0.3em; display: block; font-family: 'IBM Plex Mono', monospace; }
         .fh-preset {
-            font-size: 0.78em; background: #e8f5e9; border: 1px solid #c8e6c9;
-            border-radius: 4px; padding: 3px 9px; cursor: pointer;
-            margin-right: 5px; margin-bottom: 4px;
+            font-size: 0.78em; background: #21262d; border: 1px solid #30363d;
+            border-radius: 4px; padding: 3px 9px; cursor: pointer; color: #8b949e;
+            margin-right: 5px; margin-bottom: 4px; transition: all 0.15s;
         }
-        .fh-preset:hover { background: #c8e6c9; }
+        .fh-preset:hover { border-color: #4CAF50; color: #4CAF50; }
 
         /* ── Input grid ── */
         .fh-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75em; margin-bottom: 0.8em; }
         @media (max-width: 580px) { .fh-grid { grid-template-columns: 1fr; } }
-        .fh-field label { display: block; font-size: 0.83em; font-weight: 700; color: #555; margin-bottom: 0.25em; }
+        .fh-field label { display: block; font-size: 0.8em; font-weight: 500; color: #8b949e; margin-bottom: 0.25em; }
         .fh-field input, .fh-field select {
-            width: 100%; padding: 0.44em 0.7em; border: 1px solid #ddd;
-            border-radius: 5px; font-size: 0.95em; box-sizing: border-box; background: #fff;
+            width: 100%; padding: 0.44em 0.7em; border: 1px solid #30363d;
+            border-radius: 5px; font-size: 0.9em; box-sizing: border-box;
+            background: #0d1117; color: #e6edf3;
+            font-family: 'IBM Plex Mono', monospace;
+            transition: border-color 0.15s;
         }
-        .fh-field input:focus { outline: none; border-color: #4CAF50; box-shadow: 0 0 0 2px #c8e6c9; }
+        .fh-field input:focus, .fh-field select:focus {
+            outline: none; border-color: #4CAF50; box-shadow: 0 0 0 2px rgba(76,175,80,0.12);
+        }
 
         /* ── Button ── */
         .fh-btn {
-            padding: 9px 24px; background: #4CAF50; color: #fff; border: none;
-            border-radius: 5px; font-size: 0.93em; font-weight: 700; cursor: pointer;
-            transition: background 0.2s; margin-top: 0.2em;
+            padding: 0.62em 1.6em; background: #238636; color: #fff; border: 1px solid #2ea043;
+            border-radius: 6px; font-size: 0.88em; font-weight: 600; cursor: pointer;
+            transition: background 0.18s; margin-top: 0.2em;
+            font-family: 'IBM Plex Sans', sans-serif;
         }
-        .fh-btn:hover { background: #388e3c; }
+        .fh-btn:hover { background: #2ea043; }
 
         /* ── Result block ── */
         .fh-result {
-            margin-top: 1em; padding: 0.85em 1.1em; background: #eaf7ea;
-            border-left: 4px solid #4CAF50; border-radius: 5px; display: none;
+            margin-top: 1em; padding: 0.85em 1.1em; background: #0a0e14;
+            border-left: 3px solid #4CAF50; border-radius: 5px;
+            border: 1px solid #30363d; border-left-width: 3px;
+            display: none;
         }
         .fh-result.show { display: block; }
         .fh-result-head {
-            font-size: 0.72em; text-transform: uppercase; letter-spacing: 0.08em;
-            color: #4CAF50; font-weight: 800; margin-bottom: 0.5em;
+            font-size: 0.7em; text-transform: uppercase; letter-spacing: 0.1em;
+            color: #4CAF50; font-weight: 600; margin-bottom: 0.5em;
+            font-family: 'IBM Plex Mono', monospace;
         }
         .fh-result-row {
             display: flex; justify-content: space-between; align-items: baseline;
             margin-bottom: 0.18em;
         }
-        .fh-rl { color: #555; font-size: 0.88em; }
+        .fh-rl { color: #8b949e; font-size: 0.88em; }
         .fh-rv {
-            font-size: 1.08em; font-weight: 700; color: #1b5e20;
-            font-family: 'Courier New', monospace;
+            font-size: 1.05em; font-weight: 600; color: #4CAF50;
+            font-family: 'IBM Plex Mono', monospace;
         }
-        .fh-note { font-size: 0.78em; color: #888; margin-top: 0.5em; font-style: italic; }
+        .fh-note { font-size: 0.78em; color: #484f58; margin-top: 0.5em; font-style: italic; }
 
         /* ── Error ── */
-        .fh-err { color: #c0392b; font-size: 0.83em; margin-top: 0.4em; display: none; }
+        .fh-err { color: #f78166; font-size: 0.82em; margin-top: 0.4em; display: none; font-family: 'IBM Plex Mono', monospace; }
         .fh-err.show { display: block; }
 
         /* ── Regime badges ── */
-        .badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-weight: 700; font-size: 0.83em; }
-        .badge-lam { background: #c8e6c9; color: #1b5e20; }
-        .badge-trans { background: #fff9c4; color: #f57f17; }
-        .badge-turb { background: #ffcdd2; color: #b71c1c; }
+        .badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-weight: 700; font-size: 0.82em; font-family: 'IBM Plex Mono', monospace; }
+        .badge-lam  { background: rgba(63,185,80,0.15);  color: #3fb950; border: 1px solid rgba(63,185,80,0.3); }
+        .badge-trans{ background: rgba(227,179,65,0.15); color: #e3b341; border: 1px solid rgba(227,179,65,0.3); }
+        .badge-turb { background: rgba(247,129,102,0.15);color: #f78166; border: 1px solid rgba(247,129,102,0.3); }
 
         /* ── Moody Chart ── */
         .fh-moody-wrap {
-            background: #0d1117; border-radius: 10px; padding: 14px 16px;
-            margin-bottom: 1.4em; border: 1px solid #1e2a38;
+            background: #0d1117; border-radius: 8px; padding: 14px 16px;
+            margin-bottom: 1.2em; border: 1px solid #30363d;
         }
         .fh-moody-head {
-            font-family: 'Courier New', monospace; font-size: 0.8em;
+            font-family: 'IBM Plex Mono', monospace; font-size: 0.8em;
             color: #4CAF50; margin-bottom: 10px; letter-spacing: 0.06em;
         }
-        .fh-moody-hint { font-size: 0.73em; color: #4a5568; font-family: 'Courier New', monospace; margin-top: 8px; }
+        .fh-moody-hint { font-size: 0.73em; color: #484f58; font-family: 'IBM Plex Mono', monospace; margin-top: 8px; }
 
         /* ── K-factor table ── */
         .fh-ktable { width: 100%; border-collapse: collapse; font-size: 0.84em; margin-top: 0.8em; }
-        .fh-ktable th { background: #e8f5e9; color: #2e7d32; padding: 6px 10px; text-align: left; font-size: 0.78em; text-transform: uppercase; }
-        .fh-ktable td { padding: 5px 10px; border-bottom: 1px solid #f0f0f0; }
-        .fh-ktable td:nth-child(2) { font-family: 'Courier New', monospace; font-weight: 600; }
-        .fh-ktable tr:hover td { background: #f5fdf5; }
+        .fh-ktable th { background: #161b22; color: #4CAF50; padding: 6px 10px; text-align: left; font-size: 0.78em; text-transform: uppercase; border-bottom: 1px solid #30363d; }
+        .fh-ktable td { padding: 5px 10px; border-bottom: 1px solid #21262d; color: #e6edf3; }
+        .fh-ktable td:nth-child(2) { font-family: 'IBM Plex Mono', monospace; font-weight: 600; color: #4CAF50; }
+        .fh-ktable tr:hover td { background: rgba(76,175,80,0.04); }
 
         /* ── Coming soon placeholder ── */
-        .fh-soon {
-            text-align: center; padding: 3.5em 1em; color: #ccc;
-        }
-        .fh-soon i { font-size: 2em; display: block; margin-bottom: 0.5em; color: #ddd; }
-        .fh-soon strong { color: #aaa; font-size: 1.05em; display: block; margin-bottom: 0.4em; }
+        .fh-soon { text-align: center; padding: 3.5em 1em; color: #484f58; }
+        .fh-soon i { font-size: 2em; display: block; margin-bottom: 0.5em; color: #30363d; }
+        .fh-soon strong { color: #8b949e; font-size: 1.05em; display: block; margin-bottom: 0.4em; }
         .fh-soon span { font-size: 0.85em; }
 
         /* ── Properties table ── */
         .fh-prop-table { width: 100%; border-collapse: collapse; font-size: 0.82em; margin-top: 0.6em; overflow-x: auto; display: block; }
-        .fh-prop-table th { background: #1b5e20; color: #fff; padding: 6px 10px; text-align: center; font-size: 0.78em; white-space: nowrap; }
+        .fh-prop-table th { background: #238636; color: #fff; padding: 6px 10px; text-align: center; font-size: 0.78em; white-space: nowrap; }
         .fh-prop-table th:first-child { text-align: left; }
-        .fh-prop-table td { padding: 5px 10px; border-bottom: 1px solid #e8f5e9; text-align: center; font-family: 'Courier New', monospace; font-size: 0.9em; white-space: nowrap; }
-        .fh-prop-table td:first-child { text-align: left; font-family: inherit; font-weight: 600; color: #2e7d32; }
-        .fh-prop-table tr:hover td { background: #f1f8e9; }
-        .fh-prop-table tr.highlight td { background: #e8f5e9; font-weight: 700; }
+        .fh-prop-table td { padding: 5px 10px; border-bottom: 1px solid #21262d; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 0.9em; white-space: nowrap; color: #e6edf3; }
+        .fh-prop-table td:first-child { text-align: left; font-family: 'IBM Plex Sans', sans-serif; font-weight: 600; color: #4CAF50; }
+        .fh-prop-table tr:hover td { background: rgba(76,175,80,0.05); }
+        .fh-prop-table tr.highlight td { background: rgba(76,175,80,0.08); font-weight: 700; }
 
         /* ── Fluid selector pills ── */
         .fh-fluid-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 1em; }
         .fh-fluid-pill {
-            padding: 5px 14px; border: 2px solid #e0e0e0; border-radius: 20px;
-            background: #fff; cursor: pointer; font-size: 0.82em; font-weight: 700;
-            color: #888; transition: all 0.18s;
+            padding: 4px 13px; border: 1px solid #30363d; border-radius: 20px;
+            background: #21262d; cursor: pointer; font-size: 0.82em; font-weight: 600;
+            color: #8b949e; transition: all 0.18s;
         }
-        .fh-fluid-pill.active { background: #2e7d32; color: #fff; border-color: #2e7d32; }
-        .fh-fluid-pill:hover:not(.active) { border-color: #4CAF50; color: #2e7d32; }
+        .fh-fluid-pill.active { background: rgba(76,175,80,0.12); color: #4CAF50; border-color: #4CAF50; }
+        .fh-fluid-pill:hover:not(.active) { border-color: #4CAF50; color: #4CAF50; }
 
         /* ── Pressure unit converter ── */
         .fh-pconv-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6em; margin-top: 0.8em; }
         @media (max-width: 600px) { .fh-pconv-grid { grid-template-columns: 1fr 1fr; } }
-        .fh-pconv-field label { display: block; font-size: 0.75em; font-weight: 700; color: #666; margin-bottom: 0.2em; }
-        .fh-pconv-field input { width: 100%; padding: 0.4em 0.6em; border: 1px solid #ddd; border-radius: 5px; font-size: 0.9em; box-sizing: border-box; }
+        .fh-pconv-field label { display: block; font-size: 0.75em; font-weight: 500; color: #8b949e; margin-bottom: 0.2em; }
+        .fh-pconv-field input { width: 100%; padding: 0.4em 0.6em; border: 1px solid #30363d; border-radius: 5px; font-size: 0.9em; box-sizing: border-box; background: #0d1117; color: #e6edf3; font-family: 'IBM Plex Mono', monospace; }
         .fh-pconv-field input:focus { outline: none; border-color: #4CAF50; }
 
         /* ── Viscosity converter inline ── */
@@ -202,53 +220,34 @@
 
         /* ── Interpolation result chip ── */
         .fh-interp-chip {
-            display: inline-block; background: #e8f5e9; border: 1px solid #c8e6c9;
+            display: inline-block; background: #0a0e14; border: 1px solid #30363d;
+            border-left: 3px solid #4CAF50;
             border-radius: 6px; padding: 0.5em 1em; font-size: 0.82em;
-            color: #1b5e20; margin-top: 0.6em; font-family: 'Courier New', monospace;
+            color: #4CAF50; margin-top: 0.6em; font-family: 'IBM Plex Mono', monospace;
             line-height: 1.8;
         }
 
         /* ── Surface tension mini-table ── */
         .fh-surtens { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5em; margin-top: 0.7em; }
         @media (max-width: 500px) { .fh-surtens { grid-template-columns: 1fr; } }
-        .fh-surtens-item { background: #f9f9f9; border-radius: 6px; padding: 0.5em 0.8em; font-size: 0.83em; border-left: 3px solid #4CAF50; }
-        .fh-surtens-item strong { color: #2e7d32; display: block; margin-bottom: 0.15em; }
-
-        /* ── Back button ── */
-        .fh-back {
-            display: inline-block; margin-top: 2em; padding: 10px 20px;
-            background: #4CAF50; color: #fff; text-decoration: none;
-            border-radius: 5px; transition: background 0.3s; font-size: 0.92em;
-        }
-        .fh-back:hover { background: #388e3c; }
+        .fh-surtens-item { background: #161b22; border-radius: 6px; padding: 0.5em 0.8em; font-size: 0.83em; border-left: 3px solid #4CAF50; border: 1px solid #30363d; border-left-width: 3px; }
+        .fh-surtens-item strong { color: #4CAF50; display: block; margin-bottom: 0.15em; }
 
         /* ── Copy results button ── */
         .fh-copy-btn {
-            float: right; padding: 2px 10px; font-size: 0.72em; font-weight: 700;
-            background: transparent; border: 1px solid #a5d6a7; border-radius: 4px;
-            color: #4CAF50; cursor: pointer; letter-spacing: 0.04em;
-            transition: all 0.15s; margin-top: -2px;
+            float: right; padding: 2px 10px; font-size: 0.72em; font-weight: 600;
+            background: transparent; border: 1px solid #30363d; border-radius: 4px;
+            color: #8b949e; cursor: pointer; letter-spacing: 0.04em;
+            transition: all 0.15s; margin-top: -2px; font-family: 'IBM Plex Mono', monospace;
         }
-        .fh-copy-btn:hover { background: #4CAF50; color: #fff; border-color: #4CAF50; }
-        .fh-copy-btn.copied { background: #2e7d32; color: #fff; border-color: #2e7d32; }
+        .fh-copy-btn:hover { border-color: #4CAF50; color: #4CAF50; }
+        .fh-copy-btn.copied { background: rgba(76,175,80,0.12); color: #4CAF50; border-color: #4CAF50; }
 
-        /* ── Print stylesheet ── */
+        /* ── Print ── */
         @media print {
             #header, .fh-unit-bar, .fh-btn, .fh-preset, .fh-presets,
-            .fh-copy-btn, .fh-back, .fh-moody-wrap, .fh-err,
+            .fh-copy-btn, .fh-moody-wrap, .fh-err,
             .fh-tab-nav, .fh-fluid-pills { display: none !important; }
-
-            body, #main { background: #fff !important; }
-            .fh-tab-panel { display: block !important; }
-            .fh-card { box-shadow: none !important; border: 1px solid #ddd; page-break-inside: avoid; margin-bottom: 0.8em; }
-            .fh-formula { background: #f5f5f5 !important; color: #000 !important; border: 1px solid #ccc; }
-            .fh-result { display: block !important; background: #f9f9f9 !important; }
-            .fh-result-head { color: #000 !important; }
-            .fh-rv { color: #000 !important; }
-            .fh-section { color: #444 !important; }
-            .fh-prop-table th { background: #444 !important; -webkit-print-color-adjust: exact; }
-            h2, h3 { color: #000 !important; }
-            a.fh-back { display: none !important; }
         }
     </style>
 </head>
@@ -295,6 +294,19 @@
                     <h2>Fluids Engineering Hub</h2>
                     <p>Complete fluid mechanics reference — interactive calculators, Moody diagram, and property tables.</p>
                 </header>
+
+                <div class="fh-tool-inner">
+
+                <!-- ── TOP BAR ── -->
+                <div class="tool-topbar">
+                    <div class="status-dot"></div>
+                    <span class="topbar-title">Fluids Engineering Hub</span>
+                    <div class="topbar-badges">
+                        <span class="badge" style="color:#8b949e;background:#21262d;border-color:#30363d">Reynolds</span>
+                        <span class="badge" style="color:#8b949e;background:#21262d;border-color:#30363d">Moody</span>
+                        <span class="badge" style="color:#8b949e;background:#21262d;border-color:#30363d">9 modules</span>
+                    </div>
+                </div>
 
                 <!-- ── UNIT TOGGLE ── -->
                 <div class="fh-unit-bar">
@@ -2119,7 +2131,9 @@
                 </div><!-- /tab-dimensionless -->
 
 
-                <a href="../index.html#tools" class="fh-back">← Back to Tools</a>
+                </div><!-- /fh-tool-inner -->
+
+                <a href="../index.html#tools" class="back-btn" style="margin-top:1.6em;"><i class="fas fa-arrow-left"></i> Back to Tools</a>
 
             </div>
         </section>
