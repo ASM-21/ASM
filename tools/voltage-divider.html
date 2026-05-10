@@ -14,9 +14,10 @@
     #hub-wrap {
       display: flex; max-width: 1020px; margin: 0 auto;
       background: #0d1117; border-radius: 12px;
-      border: 1px solid #30363d; overflow: hidden; min-height: 660px;
+      border: 1px solid #30363d; overflow: hidden;
       font-family: 'IBM Plex Sans', sans-serif;
     }
+    @media (min-width: 701px) { #hub-wrap { min-height: 620px; } }
     #hub-nav {
       width: 212px; flex-shrink: 0; background: #161b22;
       display: flex; flex-direction: column;
@@ -139,7 +140,16 @@
 
     @media (max-width: 700px) {
       #hub-wrap { flex-direction: column; }
-      #hub-nav { width: 100%; border-right: none; border-bottom: 1px solid #30363d; flex-direction: row; flex-wrap: wrap; }
+      #hub-nav  { width: 100%; border-right: none; border-bottom: 1px solid #30363d; }
+      #hub-nav-list { display: flex; flex-wrap: wrap; padding: 4px; gap: 2px; }
+      #hub-nav-list .nav-item {
+        flex: 1 1 auto; min-width: 130px; min-height: 44px;
+        border-left: none; border-bottom: 2px solid transparent;
+        border-radius: 6px; justify-content: center; text-align: center;
+      }
+      #hub-nav-list .nav-item.active { border-bottom-color: #4CAF50; border-left-color: transparent; }
+      #hub-nav-footer { display: none; }
+      #hub-content { padding: 18px 16px; }
       .formula-grid { grid-template-columns: 1fr; }
     }
   </style>

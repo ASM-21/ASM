@@ -15,12 +15,15 @@
       display: flex; max-width: 1060px; margin: 0 auto;
       background: #0d1117; border-radius: 12px;
       border: 1px solid #30363d; overflow: hidden;
-      height: 740px;
       font-family: 'IBM Plex Sans', sans-serif;
+    }
+    @media (min-width: 701px) {
+      #hub-wrap { height: 740px; }
+      #hub-nav  { height: 100%; }
     }
     #hub-nav {
       width: 224px; flex-shrink: 0; background: #161b22;
-      display: flex; flex-direction: column; height: 100%;
+      display: flex; flex-direction: column;
       border-right: 1px solid #30363d;
     }
     #hub-nav-header { padding: 18px 14px 12px; border-bottom: 1px solid #30363d; flex-shrink: 0; }
@@ -172,10 +175,29 @@
     .resp-crit  { background: rgba(227,179,65,0.12); color: #e3b341; border: 1px solid rgba(227,179,65,0.3); }
     .resp-over  { background: rgba(247,129,102,0.12);color: #f78166; border: 1px solid rgba(247,129,102,0.3); }
 
+    /* ── Nav toggle (mobile only) ───────────────────────────────────── */
+    #nav-toggle {
+      display: none; width: 100%; margin-top: 10px;
+      background: #21262d; border: 1px solid #30363d;
+      color: #8b949e; border-radius: 6px; padding: 9px 12px;
+      font-size: 12px; font-family: 'IBM Plex Sans', sans-serif;
+      cursor: pointer; align-items: center; justify-content: space-between; gap: 6px;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    #nav-toggle:hover { border-color: #4CAF50; color: #e6edf3; }
+
     /* ── Responsive ─────────────────────────────────────────────────── */
     @media (max-width: 700px) {
-      #hub-wrap { flex-direction: column; height: auto; }
-      #hub-nav { width: 100%; height: auto; border-right: none; border-bottom: 1px solid #30363d; }
+      #hub-wrap { flex-direction: column; }
+      #hub-nav  { width: 100%; border-right: none; border-bottom: 1px solid #30363d; }
+      #hub-nav-list   { display: none; }
+      #hub-nav-footer { display: none; }
+      #hub-nav.nav-open #hub-nav-list   { display: block; max-height: 55vh; overflow-y: auto; }
+      #hub-nav.nav-open #hub-nav-footer { display: block; }
+      #nav-toggle { display: flex !important; }
+      #hub-search-wrap { display: none; }
+      #hub-nav.nav-open #hub-search-wrap { display: block; }
+      #hub-content { padding: 18px 16px; }
       .formula-grid { grid-template-columns: 1fr; }
     }
   </style>
@@ -224,6 +246,10 @@
               <div class="t1"><div class="status-dot"></div>Controls &amp;</div>
               <div class="t2">Systems Hub</div>
               <div class="sub">~50 tools · live results · unit prefixes</div>
+              <button id="nav-toggle" onclick="toggleNav()">
+                <span id="nav-toggle-label"><i class="fas fa-bars"></i> Show Calculators</span>
+                <i class="fas fa-chevron-down" id="nav-toggle-icon"></i>
+              </button>
             </div>
             <div id="hub-search-wrap">
               <input id="hub-search" type="text" placeholder="Search calculators..." oninput="filterNav(this.value)">
@@ -331,6 +357,18 @@
   <script src="../assets/js/main.js"></script>
 
   <script>
+  // ── MOBILE NAV TOGGLE ────────────────────────────────────────────────────
+  function toggleNav() {
+    const nav  = document.getElementById('hub-nav');
+    const icon = document.getElementById('nav-toggle-icon');
+    const label = document.getElementById('nav-toggle-label');
+    const open = nav.classList.toggle('nav-open');
+    icon.style.transform  = open ? 'rotate(180deg)' : '';
+    label.innerHTML = open
+      ? '<i class="fas fa-bars"></i> Hide Calculators'
+      : '<i class="fas fa-bars"></i> Show Calculators';
+  }
+
   // ── CONSTANTS ────────────────────────────────────────────────────────────
   const MUL = { p:1e-12, n:1e-9, 'μ':1e-6, m:1e-3, '':1, k:1e3, M:1e6, G:1e9 };
 

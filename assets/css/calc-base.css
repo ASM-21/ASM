@@ -563,3 +563,35 @@ input[type="range"]::-webkit-slider-thumb:hover {
 
 /* ===== UTILITY ===== */
 .hidden { display: none !important; }
+
+/* ===== RESPONSIVE — ≤700px ===== */
+@media (max-width: 700px) {
+    .tool-wrapper {
+        border-radius: 0;
+        margin-top: 0;
+        border-left: none;
+        border-right: none;
+    }
+    .tool-topbar { padding: 0.75em 1.1em; }
+    .topbar-badges { display: none; }
+    .input-panel { padding: 1.2em 1.1em; }
+    .load-row { padding: 1em 1.1em; }
+    .analyze-row { padding: 0.85em 1.1em; }
+    #results { padding: 0 1.1em 1.4em; }
+    .btn-analyze { min-height: 44px; padding: 0.75em 1.6em; }
+    .btn-reset   { min-height: 44px; padding: 0.75em 1.2em; }
+    .back-btn    { margin: 1.2em 1.1em; }
+    .dims-grid3  { grid-template-columns: 1fr 1fr; }
+    .tool-wrapper .nav-item { min-height: 44px; }
+    .tool-wrapper .tool-tab { padding: 0.9em 1em; min-height: 44px; }
+}
+
+/* ===== RESPONSIVE — ≤480px ===== */
+@media (max-width: 480px) {
+    .dims-grid, .dims-grid3 { grid-template-columns: 1fr; }
+    .result-cards { grid-template-columns: 1fr 1fr; }
+    .formula-row { gap: 0.4em; }
+    .topbar-title { font-size: 0.7em; }
+    .btn-analyze, .btn-reset { width: 100%; justify-content: center; }
+    .analyze-row { flex-direction: column; align-items: stretch; gap: 0.6em; }
+}
