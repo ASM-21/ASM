@@ -5,148 +5,160 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
   <link rel="stylesheet" href="../assets/css/main.css" />
+  <link rel="stylesheet" href="../assets/css/calc-base.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
   <script async src="https://www.googletagmanager.com/gtag/js?id=GTM-N34CKH5Q"></script>
   <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','GTM-N34CKH5Q');</script>
   <style>
-    /* ── Layout ─────────────────────────────────────────────────────── */
+    /* ── Controls Hub — dark theme ─────────────────────────────────── */
     #hub-wrap {
       display: flex; max-width: 1060px; margin: 0 auto;
-      background: #fff; border-radius: 12px;
-      box-shadow: 0 4px 24px rgba(0,0,0,.10); overflow: hidden;
-      height: 740px; /* fixed height — both panels scroll independently */
+      background: #0d1117; border-radius: 12px;
+      border: 1px solid #30363d; overflow: hidden;
+      height: 740px;
+      font-family: 'IBM Plex Sans', sans-serif;
     }
-    #hub-nav { width: 224px; flex-shrink: 0; background: #1a1a2e; display: flex; flex-direction: column; height: 100%; }
-    #hub-nav-header { padding: 18px 14px 12px; border-bottom: 1px solid #252540; flex-shrink: 0; }
-    #hub-nav-header .t1 { font-size: 14px; font-weight: 800; color: #fff; line-height: 1.2; }
-    #hub-nav-header .t2 { font-size: 14px; font-weight: 800; color: #00b4d8; line-height: 1.2; }
-    #hub-nav-header .sub { font-size: 10px; color: #44446a; margin-top: 4px; }
-    #hub-search-wrap { padding: 9px 12px; border-bottom: 1px solid #252540; flex-shrink: 0; }
+    #hub-nav {
+      width: 224px; flex-shrink: 0; background: #161b22;
+      display: flex; flex-direction: column; height: 100%;
+      border-right: 1px solid #30363d;
+    }
+    #hub-nav-header { padding: 18px 14px 12px; border-bottom: 1px solid #30363d; flex-shrink: 0; }
+    #hub-nav-header .t1 { font-size: 14px; font-weight: 700; color: #e6edf3; line-height: 1.2; display: flex; align-items: center; gap: 8px; }
+    #hub-nav-header .t1 .status-dot { flex-shrink: 0; }
+    #hub-nav-header .t2 { font-size: 14px; font-weight: 700; color: #4CAF50; line-height: 1.2; }
+    #hub-nav-header .sub { font-size: 10px; color: #484f58; margin-top: 4px; font-family: 'IBM Plex Mono', monospace; }
+    #hub-search-wrap { padding: 9px 12px; border-bottom: 1px solid #30363d; flex-shrink: 0; }
     #hub-search {
-      width: 100%; padding: 6px 10px; background: #22223a; border: 1px solid #333360;
-      border-radius: 6px; color: #ccc; font-size: 12px; outline: none; box-sizing: border-box;
+      width: 100%; padding: 6px 10px; background: #21262d; border: 1px solid #30363d;
+      border-radius: 6px; color: #e6edf3; font-size: 12px; outline: none;
+      box-sizing: border-box; font-family: 'IBM Plex Sans', sans-serif;
     }
-    #hub-search::placeholder { color: #44446a; }
-    #hub-search:focus { border-color: #00b4d8; }
+    #hub-search::placeholder { color: #484f58; }
+    #hub-search:focus { border-color: #4CAF50; }
     #hub-nav-list { flex: 1; overflow-y: auto; padding: 6px 0; min-height: 0; scroll-behavior: smooth; }
     #hub-nav-list::-webkit-scrollbar { width: 4px; }
     #hub-nav-list::-webkit-scrollbar-track { background: transparent; }
-    #hub-nav-list::-webkit-scrollbar-thumb { background: #333360; border-radius: 2px; }
-    .nav-cat { font-size: 9px; font-weight: 700; color: #44446a; letter-spacing: .12em; text-transform: uppercase; padding: 10px 14px 3px; }
+    #hub-nav-list::-webkit-scrollbar-thumb { background: #30363d; border-radius: 2px; }
+    .nav-cat { font-size: 9px; font-weight: 700; color: #484f58; letter-spacing: .12em; text-transform: uppercase; padding: 10px 14px 3px; }
     .nav-item {
       display: flex; align-items: center; gap: 8px;
-      padding: 7px 14px; cursor: pointer; font-size: 11.5px; color: #8888aa;
+      padding: 7px 14px; cursor: pointer; font-size: 12px; color: #8b949e;
       transition: background .1s, color .1s; border-left: 3px solid transparent;
     }
-    .nav-item:hover { background: #22223a; color: #ccc; }
-    .nav-item.active { background: #0d1b2a; color: #00b4d8; border-left-color: #00b4d8; font-weight: 600; }
+    .nav-item:hover { background: #21262d; color: #e6edf3; }
+    .nav-item.active { background: rgba(76,175,80,0.08); color: #4CAF50; border-left-color: #4CAF50; font-weight: 600; }
     .nav-item.hidden { display: none; }
     .nav-item .ni { width: 13px; text-align: center; font-size: 10px; flex-shrink: 0; }
     .nav-item .badge {
-      margin-left: auto; font-size: 8px; background: #252540; color: #44446a;
-      border-radius: 3px; padding: 1px 4px; letter-spacing: .04em;
+      margin-left: auto; font-size: 8px; background: #21262d; color: #484f58;
+      border-radius: 3px; padding: 1px 4px; letter-spacing: .04em; border: 1px solid #30363d;
     }
-    .nav-item.active .badge { background: #0d2233; color: #00b4d8; }
-    #hub-nav-footer { padding: 10px 14px; border-top: 1px solid #252540; font-size: 10px; color: #556; line-height: 1.6; flex-shrink: 0; }
-    #hub-content { flex: 1; padding: 28px 30px; overflow-y: auto; background: #f8fafc; height: 100%; }
-    #hub-content h2 { margin: 0 0 4px; font-size: 20px; color: #1a1a2e; }
+    .nav-item.active .badge { background: rgba(76,175,80,0.1); color: #4CAF50; border-color: rgba(76,175,80,0.3); }
+    #hub-nav-footer { padding: 10px 14px; border-top: 1px solid #30363d; font-size: 10px; color: #484f58; line-height: 1.6; flex-shrink: 0; font-family: 'IBM Plex Mono', monospace; }
+    #hub-content { flex: 1; padding: 28px 30px; overflow-y: auto; background: #0d1117; height: 100%; color: #e6edf3; }
+    #hub-content h2 { margin: 0 0 4px; font-size: 18px; color: #e6edf3; }
 
     /* ── Field components ───────────────────────────────────────────── */
-    .calc-desc { font-size: 13px; color: #666; margin: 0 0 20px; line-height: 1.6; }
+    .calc-desc { font-size: 13px; color: #8b949e; margin: 0 0 20px; line-height: 1.6; }
     .field-group { margin-bottom: 13px; }
-    .field-label { font-size: 11px; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
+    .field-label { font-size: 11px; font-weight: 700; color: #8b949e; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; font-family: 'IBM Plex Mono', monospace; }
     .field-row { display: flex; gap: 6px; }
     .field-row input[type="number"] {
-      flex: 1; padding: 7px 10px; border: 1px solid #dde; border-radius: 6px;
-      font-size: 13px; color: #222; background: #fff; outline: none; transition: border-color .15s;
+      flex: 1; padding: 7px 10px; border: 1px solid #30363d; border-radius: 6px;
+      font-size: 13px; color: #e6edf3; background: #161b22; outline: none;
+      transition: border-color .15s; font-family: 'IBM Plex Mono', monospace;
     }
-    .field-row input[type="number"]:focus { border-color: #00b4d8; }
+    .field-row input[type="number"]:focus { border-color: #4CAF50; box-shadow: 0 0 0 2px rgba(76,175,80,0.12); }
     .field-row select {
-      width: 72px; flex-shrink: 0; padding: 7px 5px; border: 1px solid #dde;
-      border-radius: 6px; font-size: 12px; background: #fff; color: #333; outline: none; cursor: pointer;
+      width: 72px; flex-shrink: 0; padding: 7px 5px; border: 1px solid #30363d;
+      border-radius: 6px; font-size: 12px; background: #161b22; color: #e6edf3;
+      outline: none; cursor: pointer; font-family: 'IBM Plex Mono', monospace;
     }
-    .field-hint { font-size: 11px; color: #aaa; margin-top: 3px; }
+    .field-hint { font-size: 11px; color: #484f58; margin-top: 3px; }
     select.full-select {
-      width: 100%; padding: 7px 10px; border: 1px solid #dde; border-radius: 6px;
-      font-size: 13px; background: #fff; color: #333; outline: none; cursor: pointer;
+      width: 100%; padding: 7px 10px; border: 1px solid #30363d; border-radius: 6px;
+      font-size: 13px; background: #161b22; color: #e6edf3; outline: none; cursor: pointer;
+      font-family: 'IBM Plex Mono', monospace;
     }
-    select.full-select:focus { border-color: #00b4d8; }
+    select.full-select:focus { border-color: #4CAF50; }
     .slider-row { display: flex; align-items: center; gap: 10px; }
-    .slider-row input[type="range"] { flex: 1; accent-color: #00b4d8; }
+    .slider-row input[type="range"] { flex: 1; accent-color: #4CAF50; }
     .mode-toggle { display: flex; gap: 7px; margin-bottom: 14px; flex-wrap: wrap; }
     .mode-btn {
       flex: 1; padding: 7px 8px; border-radius: 6px; font-size: 12px; font-weight: 600;
-      cursor: pointer; border: 1.5px solid #222; background: #1a1a1a; color: #ddd; transition: all .13s;
+      cursor: pointer; border: 1px solid #30363d; background: #161b22; color: #8b949e; transition: all .13s;
     }
-    .mode-btn.active { border-color: #00b4d8; background: #00b4d8; color: #fff; }
+    .mode-btn:hover { background: #21262d; color: #e6edf3; }
+    .mode-btn.active { border-color: #4CAF50; background: rgba(76,175,80,0.12); color: #4CAF50; }
 
     /* ── Result box ─────────────────────────────────────────────────── */
     .result-box {
-      margin-top: 16px; background: #f0f9ff; border: 1.5px solid #00b4d8;
-      border-radius: 8px; padding: 14px 16px;
+      margin-top: 16px; background: #0a0e14; border: 1px solid #30363d;
+      border-left: 3px solid #4CAF50; border-radius: 8px; padding: 14px 16px;
     }
     .result-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-    .result-title { font-size: 9px; font-weight: 800; color: #00b4d8; letter-spacing: .12em; text-transform: uppercase; }
+    .result-title { font-size: 9px; font-weight: 700; color: #4CAF50; letter-spacing: .12em; text-transform: uppercase; font-family: 'IBM Plex Mono', monospace; }
     .copy-btn {
-      font-size: 10px; color: #00b4d8; background: none; border: 1px solid #bae6fd;
+      font-size: 10px; color: #4CAF50; background: transparent; border: 1px solid #30363d;
       border-radius: 4px; padding: 3px 8px; cursor: pointer; transition: all .12s;
     }
-    .copy-btn:hover { background: #00b4d8; color: #fff; }
-    .copy-btn.copied { background: #00b4d8; color: #fff; }
+    .copy-btn:hover { border-color: #4CAF50; background: rgba(76,175,80,0.1); }
+    .copy-btn.copied { border-color: #4CAF50; background: rgba(76,175,80,0.1); }
     .result-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 5px; }
-    .result-label { font-size: 13px; color: #334; }
-    .result-value { font-size: 15px; font-weight: 700; color: #0369a1; font-family: monospace; }
-    .result-divider { border: none; border-top: 1px solid #bae6fd; margin: 8px 0; }
-    .result-note { font-size: 12px; color: #445; margin-bottom: 5px; line-height: 1.5; }
+    .result-label { font-size: 13px; color: #8b949e; }
+    .result-value { font-size: 15px; font-weight: 700; color: #4CAF50; font-family: 'IBM Plex Mono', monospace; }
+    .result-divider { border: none; border-top: 1px solid #21262d; margin: 8px 0; }
+    .result-note { font-size: 12px; color: #8b949e; margin-bottom: 5px; line-height: 1.5; }
     .formula-line {
-      margin-top: 10px; padding-top: 9px; border-top: 1px solid #bae6fd;
-      font-size: 11px; color: #0369a1; font-family: monospace; line-height: 1.7;
+      margin-top: 10px; padding-top: 9px; border-top: 1px solid #21262d;
+      font-size: 11px; color: #4CAF50; font-family: 'IBM Plex Mono', monospace; line-height: 1.7;
     }
     .error-box {
-      margin-top: 14px; background: #fff5f5; border: 1px solid #fca5a5;
-      border-radius: 8px; padding: 10px 14px; color: #b91c1c; font-size: 13px;
+      margin-top: 14px; background: rgba(247,129,102,0.08); border: 1px solid rgba(247,129,102,0.3);
+      border-radius: 8px; padding: 10px 14px; color: #f78166; font-size: 13px;
     }
-    .empty-state { margin-top: 16px; font-size: 13px; color: #888; text-align: center; padding: 24px; }
+    .empty-state { margin-top: 16px; font-size: 13px; color: #484f58; text-align: center; padding: 24px; }
     .coming-soon {
-      margin-top: 24px; background: #f1f5f9; border: 1.5px dashed #cbd5e1;
+      margin-top: 24px; background: #161b22; border: 1px dashed #30363d;
       border-radius: 8px; padding: 28px 20px; text-align: center;
     }
-    .coming-soon .cs-icon { font-size: 28px; color: #94a3b8; margin-bottom: 8px; }
-    .coming-soon h3 { color: #475569; font-size: 15px; margin: 0 0 6px; }
-    .coming-soon p { color: #64748b; font-size: 12px; margin: 0; }
+    .coming-soon .cs-icon { font-size: 28px; color: #484f58; margin-bottom: 8px; }
+    .coming-soon h3 { color: #8b949e; font-size: 15px; margin: 0 0 6px; }
+    .coming-soon p { color: #484f58; font-size: 12px; margin: 0; }
 
     /* ── Formula sheet ──────────────────────────────────────────────── */
-    .formula-cat { font-size: 11px; font-weight: 700; color: #00b4d8; text-transform: uppercase; letter-spacing: .08em; margin: 20px 0 8px; }
+    .formula-cat { font-size: 11px; font-weight: 700; color: #4CAF50; text-transform: uppercase; letter-spacing: .08em; margin: 20px 0 8px; font-family: 'IBM Plex Mono', monospace; }
     .formula-cat:first-child { margin-top: 0; }
     .formula-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .formula-card { background: #fff; border: 1px solid #e5e8ee; border-radius: 7px; padding: 10px 12px; }
-    .formula-card .fc-name { font-size: 11px; font-weight: 700; color: #333; margin-bottom: 5px; }
-    .formula-card .fc-eq { font-family: monospace; font-size: 12px; color: #0369a1; line-height: 1.9; }
-    .formula-card .fc-note { font-size: 10px; color: #aaa; margin-top: 4px; }
+    .formula-card { background: #161b22; border: 1px solid #30363d; border-radius: 7px; padding: 10px 12px; }
+    .formula-card .fc-name { font-size: 11px; font-weight: 700; color: #e6edf3; margin-bottom: 5px; }
+    .formula-card .fc-eq { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #4CAF50; line-height: 1.9; }
+    .formula-card .fc-note { font-size: 10px; color: #484f58; margin-top: 4px; }
 
     /* ── Laplace table ──────────────────────────────────────────────── */
     .laplace-table { width: 100%; border-collapse: collapse; font-size: 12.5px; margin-top: 4px; }
-    .laplace-table th { background: #1a1a2e; color: #fff; padding: 8px 12px; text-align: left; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; }
-    .laplace-table td { padding: 7px 12px; border-bottom: 1px solid #eef; font-family: monospace; color: #334; }
-    .laplace-table tr:nth-child(even) td { background: #f8fafc; }
-    .laplace-table td:first-child { color: #0369a1; font-weight: 600; }
-    .laplace-table td:last-child { color: #666; font-family: sans-serif; font-size: 11px; }
+    .laplace-table th { background: #238636; color: #fff; padding: 8px 12px; text-align: left; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; }
+    .laplace-table td { padding: 7px 12px; border-bottom: 1px solid #21262d; font-family: 'IBM Plex Mono', monospace; color: #e6edf3; }
+    .laplace-table tr:nth-child(even) td { background: #161b22; }
+    .laplace-table td:first-child { color: #4CAF50; font-weight: 600; }
+    .laplace-table td:last-child { color: #8b949e; font-family: 'IBM Plex Sans', sans-serif; font-size: 11px; }
 
-    /* ── Hub data tables (Routh, Laplace etc.) ─────────────────────── */
+    /* ── Hub data tables ────────────────────────────────────────────── */
     .hub-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 4px; }
-    .hub-table th { background: #1a1a2e; color: #e2e8f0; padding: 7px 10px; text-align: left; font-size: 10px; letter-spacing: .06em; text-transform: uppercase; font-family: sans-serif; }
+    .hub-table th { background: #238636; color: #fff; padding: 7px 10px; text-align: left; font-size: 10px; letter-spacing: .06em; text-transform: uppercase; font-family: 'IBM Plex Sans', sans-serif; }
     .hub-table th.num { text-align: center; }
-    .hub-table td { padding: 6px 10px; border-bottom: 1px solid #e8edf4; color: #1e293b; font-family: monospace; }
-    .hub-table tr:nth-child(even) td { background: #f1f5f9; }
-    .hub-table td.key { color: #0369a1; font-weight: 700; font-family: sans-serif; font-size: 11px; }
+    .hub-table td { padding: 6px 10px; border-bottom: 1px solid #21262d; color: #e6edf3; font-family: 'IBM Plex Mono', monospace; }
+    .hub-table tr:nth-child(even) td { background: #161b22; }
+    .hub-table td.key { color: #4CAF50; font-weight: 700; font-family: 'IBM Plex Sans', sans-serif; font-size: 11px; }
     .hub-table td.num { text-align: center; }
-    .hub-table td.sign-pos { text-align: center; font-weight: 700; color: #166534; font-family: sans-serif; }
-    .hub-table td.sign-neg { text-align: center; font-weight: 700; color: #991b1b; font-family: sans-serif; }
-    .hub-table td.sign-zero { text-align: center; font-weight: 700; color: #92400e; font-family: sans-serif; }
-    .hub-table tr.row-unstable td { background: #fef2f2 !important; }
-    .verdict-stable   { margin-top: 12px; padding: 10px 14px; background: #dcfce7; border: 1px solid #86efac; border-radius: 6px; color: #166534; font-weight: 700; font-size: 13px; }
-    .verdict-unstable { margin-top: 12px; padding: 10px 14px; background: #fee2e2; border: 1px solid #fca5a5; border-radius: 6px; color: #991b1b; font-weight: 700; font-size: 13px; }
-    .verdict-warn     { margin-top: 8px;  padding: 8px 12px;  background: #fef3c7; border: 1px solid #fcd34d; border-radius: 6px; color: #78350f; font-size: 12px; }
+    .hub-table td.sign-pos { text-align: center; font-weight: 700; color: #3fb950; font-family: 'IBM Plex Sans', sans-serif; }
+    .hub-table td.sign-neg { text-align: center; font-weight: 700; color: #f78166; font-family: 'IBM Plex Sans', sans-serif; }
+    .hub-table td.sign-zero { text-align: center; font-weight: 700; color: #e3b341; font-family: 'IBM Plex Sans', sans-serif; }
+    .hub-table tr.row-unstable td { background: rgba(247,129,102,0.05) !important; }
+    .verdict-stable   { margin-top: 12px; padding: 10px 14px; background: rgba(63,185,80,0.1); border: 1px solid rgba(63,185,80,0.3); border-radius: 6px; color: #3fb950; font-weight: 700; font-size: 13px; }
+    .verdict-unstable { margin-top: 12px; padding: 10px 14px; background: rgba(247,129,102,0.1); border: 1px solid rgba(247,129,102,0.3); border-radius: 6px; color: #f78166; font-weight: 700; font-size: 13px; }
+    .verdict-warn     { margin-top: 8px;  padding: 8px 12px;  background: rgba(227,179,65,0.1); border: 1px solid rgba(227,179,65,0.3); border-radius: 6px; color: #e3b341; font-size: 12px; }
 
     /* ── Schematic area ─────────────────────────────────────────────── */
     .schematic { display: block; margin: 0 auto 18px; }
@@ -156,14 +168,14 @@
       display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 11px;
       font-weight: 700; margin-left: 8px; vertical-align: middle;
     }
-    .resp-under { background: #dcfce7; color: #166534; }
-    .resp-crit  { background: #fef3c7; color: #92400e; }
-    .resp-over  { background: #fee2e2; color: #991b1b; }
+    .resp-under { background: rgba(63,185,80,0.12);  color: #3fb950; border: 1px solid rgba(63,185,80,0.3); }
+    .resp-crit  { background: rgba(227,179,65,0.12); color: #e3b341; border: 1px solid rgba(227,179,65,0.3); }
+    .resp-over  { background: rgba(247,129,102,0.12);color: #f78166; border: 1px solid rgba(247,129,102,0.3); }
 
     /* ── Responsive ─────────────────────────────────────────────────── */
     @media (max-width: 700px) {
-      #hub-wrap { flex-direction: column; }
-      #hub-nav { width: 100%; }
+      #hub-wrap { flex-direction: column; height: auto; }
+      #hub-nav { width: 100%; height: auto; border-right: none; border-bottom: 1px solid #30363d; }
       .formula-grid { grid-template-columns: 1fr; }
     }
   </style>
@@ -209,7 +221,7 @@
           <!-- ── Sidebar nav ─────────────────────────────────────── -->
           <div id="hub-nav">
             <div id="hub-nav-header">
-              <div class="t1">Controls &amp;</div>
+              <div class="t1"><div class="status-dot"></div>Controls &amp;</div>
               <div class="t2">Systems Hub</div>
               <div class="sub">~50 tools · live results · unit prefixes</div>
             </div>
@@ -295,11 +307,10 @@
           <div id="hub-content"></div>
         </div>
 
-        <p style="margin-top:14px;font-size:13px;color:#aaa;">
-          <a href="../index.html#tools" style="color:#00b4d8;">← Back to Tools</a>
-          &nbsp;·&nbsp;
-          <a href="voltage-divider.html" style="color:#00b4d8;">Electronics Calculator Hub →</a>
-        </p>
+        <div style="margin-top:1.6em;display:flex;align-items:center;gap:1em;flex-wrap:wrap;">
+          <a href="../index.html#tools" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Tools</a>
+          <a href="voltage-divider.html" style="color:#4CAF50;font-size:13px;">Electronics Calculator Hub →</a>
+        </div>
       </div>
     </section>
   </div>

@@ -5,6 +5,7 @@
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 	<link rel="stylesheet" href="../assets/css/main.css" />
+	<link rel="stylesheet" href="../assets/css/calc-base.css" />
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 	<script async src="https://www.googletagmanager.com/gtag/js?id=GTM-N34CKH5Q"></script>
 	<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','GTM-N34CKH5Q');</script>
@@ -27,7 +28,7 @@
 		--c-text:     #e2e8f0;
 		--c-label:    #94a3b8;
 		--c-muted:    #4a5568;
-		--c-mono:     'Courier New', Courier, monospace;
+		--c-mono:     'IBM Plex Mono', monospace;
 	}
 
 	/* wrapper */
@@ -39,7 +40,7 @@
 		max-width: 860px;
 		margin-top: 22px;
 		box-shadow: 0 24px 60px rgba(0,0,0,.55);
-		font-family: 'Source Sans Pro', sans-serif;
+		font-family: 'IBM Plex Sans', sans-serif;
 	}
 
 	/* top bar */
@@ -62,14 +63,7 @@
 		align-items: center;
 		gap: 9px;
 	}
-	.htc-bar-title::before {
-		content:'';
-		width:8px; height:8px;
-		background: var(--c-acc);
-		border-radius:50%;
-		box-shadow: 0 0 10px var(--c-acc);
-		flex-shrink:0;
-	}
+	/* status-dot handled by calc-base.css */
 
 	/* unit toggle */
 	.unit-toggle { display:flex; border:1px solid var(--c-border); border-radius:6px; overflow:hidden; }
@@ -271,12 +265,7 @@
 	.ig input.invalid { border-color: var(--c-red) !important; }
 	.ig-err { font-size:.65em; color:var(--c-red); margin-top:3px; display:none; }
 	.ig input.invalid ~ .ig-err { display:block; }
-	.back-btn {
-		display:inline-block; margin-top:22px; padding:10px 20px;
-		background:#4CAF50; color:#fff; text-decoration:none;
-		border-radius:5px; transition:background .3s; font-size:.9em;
-	}
-	.back-btn:hover { background:#45a049; }
+	/* .back-btn handled by calc-base.css */
 
 	/* worked example cards */
 	.ex-card {
@@ -286,7 +275,7 @@
 	.ex-card:hover { border-color:#4CAF50; box-shadow:0 0 16px rgba(76,175,80,.12); }
 	.ex-title { font-size:.82em; font-weight:700; color:#e2e8f0; margin-bottom:5px; }
 	.ex-desc  { font-size:.73em; color:#94a3b8; line-height:1.5; margin-bottom:7px; }
-	.ex-params { font-family:'Courier New',monospace; font-size:.65em; color:#4a5568; }
+	.ex-params { font-family:'IBM Plex Mono',monospace; font-size:.65em; color:#4a5568; }
 	</style>
 </head>
 <body class="is-preload">
@@ -329,11 +318,12 @@
 		Five calculation modes covering the core mechanisms of heat transfer. Toggle SI ↔ Imperial throughout.
 	</p>
 
-	<div class="htc">
+	<div class="htc tool-wrapper">
 
 		<!-- top bar -->
 		<div class="htc-bar">
 			<div class="htc-bar-title">
+				<div class="status-dot"></div>
 				<i class="fas fa-temperature-high" style="color:var(--c-acc)"></i>
 				Heat Transfer
 			</div>
